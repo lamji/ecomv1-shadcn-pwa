@@ -187,9 +187,23 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
     );
   }
 
-  // In production, allow secure WebSocket connections (required for some streaming/RSC cases)
+  // In production, allow connections to the site's own origin (https and wss)
   if (process.env.NODE_ENV === 'production') {
-    connectSrc.push('wss://*');
+    const siteOrigin =
+      process.env.NEXT_PUBLIC_SITE_ORIGIN ||
+      (process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : 'https://ecomv1-shadcn-pwa.vercel.app');
+    if (siteOrigin) {
+      try {
+        const u = new URL(siteOrigin);
+        connectSrc.push(`${u.protocol}//${u.host}`);
+        // Always allow secure websocket to the same host
+        connectSrc.push(`wss://${u.host}`);
+      } catch {
+        // ignore malformed site origin
+      }
+    }
   }
 
   // Use strict script policy in production, permissive in development
@@ -277,6 +291,12 @@ function checkRateLimit(request: NextRequest): boolean {
  */
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const accept = request.headers.get('accept') || '';
+  const isRSCFlight =
+    accept.includes('text/x-component') ||
+    accept.includes('application/x-component') ||
+    accept.includes('multipart/mixed');
+  const isNextPrefetch = request.headers.get('next-router-prefetch') === '1';
 
   // Skip middleware for static files and Next.js internals
   if (
@@ -288,7 +308,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Skip middleware for RSC streaming endpoints
-  if (pathname.startsWith('/_rsc')) {
+  if (pathname.startsWith('/_rsc') || isRSCFlight || isNextPrefetch) {
     return NextResponse.next();
   }
 
