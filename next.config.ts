@@ -1,16 +1,21 @@
 import type { NextConfig } from 'next';
 import withPWA from 'next-pwa';
 
+const isProd = process.env.NODE_ENV === 'production';
+
 const nextConfig: NextConfig = {
   devIndicators: {
     buildActivity: false,
   },
+
   typescript: {
     ignoreBuildErrors: true,
   },
+
   eslint: {
     ignoreDuringBuilds: true,
   },
+
   images: {
     domains: [
       'images.unsplash.com',
@@ -19,14 +24,54 @@ const nextConfig: NextConfig = {
       'www.pricekeeda.com',
     ],
   },
+
+  /**
+   * ✅ SECURITY HEADERS (SAFE FOR RSC)
+   */
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+
+          // ⚠️ CSP tuned for Next.js + RSC
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: https: blob:",
+              "font-src 'self' data:",
+              "connect-src 'self' https: wss:",
+              "frame-ancestors 'none'",
+            ].join('; '),
+          },
+
+          // Permissions Policy
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(), payment=()',
+          },
+        ],
+      },
+    ];
+  },
 };
 
+/**
+ * ✅ PWA CONFIG (SAFE)
+ */
 const pwaConfig = withPWA({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  // Enable in development mode for testing
-  disable: false,
+
+  // 🔥 CRITICAL FIX
+  disable: !isProd,
 });
 
 export default pwaConfig(nextConfig);
