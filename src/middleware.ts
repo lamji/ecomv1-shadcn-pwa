@@ -13,7 +13,7 @@ function isValidJWT(token: string): boolean {
 
     // Decode the payload (second part)
     const payload = JSON.parse(atob(parts[1]));
-    
+
     // Check if token has expiration and if it's not expired
     if (payload.exp) {
       const currentTime = Math.floor(Date.now() / 1000);
@@ -75,6 +75,7 @@ function isPublicRoute(pathname: string): boolean {
     '/api/auth/register',
     '/api/auth/forgot-password',
     '/api/auth/reset-password',
+    '/',
   ];
 
   // Check for exact matches
@@ -153,7 +154,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   if (process.env.NODE_ENV === 'production') {
     response.headers.set(
       'Strict-Transport-Security',
-      'max-age=31536000; includeSubDomains; preload'
+      'max-age=31536000; includeSubDomains; preload',
     );
   }
 
@@ -167,7 +168,8 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
       const apiUrl = new URL(process.env.NEXT_PUBLIC_API_BASE_URL);
       connectSrc.push(`${apiUrl.protocol}//${apiUrl.host}`);
       // If using websockets on same host
-      const wsScheme = apiUrl.protocol === 'https:' ? 'wss' : apiUrl.protocol === 'http:' ? 'ws' : '';
+      const wsScheme =
+        apiUrl.protocol === 'https:' ? 'wss' : apiUrl.protocol === 'http:' ? 'ws' : '';
       if (wsScheme) connectSrc.push(`${wsScheme}://${apiUrl.host}`);
     } catch {
       // ignore malformed env URL
@@ -176,13 +178,19 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
 
   // In development, allow localhost and 127.0.0.1 with any port (http and ws)
   if (process.env.NODE_ENV !== 'production') {
-    connectSrc.push('http://localhost:*', 'http://127.0.0.1:*', 'ws://localhost:*', 'ws://127.0.0.1:*');
+    connectSrc.push(
+      'http://localhost:*',
+      'http://127.0.0.1:*',
+      'ws://localhost:*',
+      'ws://127.0.0.1:*',
+    );
   }
 
   // Use strict script policy in production, permissive in development
-  const scriptSrc = process.env.NODE_ENV === 'production'
-    ? "script-src 'self'"
-    : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
+  const scriptSrc =
+    process.env.NODE_ENV === 'production'
+      ? "script-src 'self'"
+      : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
 
   const csp = [
     "default-src 'self'",
@@ -201,7 +209,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   // Permissions Policy (formerly Feature Policy)
   response.headers.set(
     'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=(), payment=()'
+    'camera=(), microphone=(), geolocation=(), payment=()',
   );
 
   return response;
@@ -214,7 +222,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
  */
 function redirectToLogin(request: NextRequest): NextResponse {
   const loginUrl = new URL('/login', request.url);
-  
+
   // Preserve the intended destination for redirect after login
   if (request.nextUrl.pathname !== '/login') {
     loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
@@ -275,11 +283,11 @@ export function middleware(request: NextRequest) {
 
   // Apply rate limiting to all requests
   if (!checkRateLimit(request)) {
-    return new NextResponse('Too Many Requests', { 
+    return new NextResponse('Too Many Requests', {
       status: 429,
       headers: {
         'Retry-After': '900', // 15 minutes
-      }
+      },
     });
   }
 
@@ -304,10 +312,10 @@ export function middleware(request: NextRequest) {
 
   // Token is valid - allow access to protected route
   const response = NextResponse.next();
-  
+
   // Add user context to headers for downstream consumption
   response.headers.set('x-user-authenticated', 'true');
-  
+
   return addSecurityHeaders(response);
 }
 

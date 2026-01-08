@@ -12,7 +12,12 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: ['images.unsplash.com', 'source.unsplash.com'],
+    domains: [
+      'images.unsplash.com',
+      'source.unsplash.com',
+      'cdn.mos.cms.futurecdn.net',
+      'www.pricekeeda.com',
+    ],
   },
 };
 

@@ -15,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Loan Management',
-  description: 'Manage loans, repayments, and customer accounts efficiently with our Loan Management app.',
+  description:
+    'Manage loans, repayments, and customer accounts efficiently with our Loan Management app.',
   manifest: '/icons/site.webmanifest',
   appleWebApp: {
     capable: true,

@@ -1,9 +1,9 @@
-import { LoanDashboard } from '@/components/loans/LoanDashboard';
+import Homepage from '@/presentation/home/index';
 
 export default function Home() {
   return (
     <main>
-      <LoanDashboard />
+      <Homepage />
     </main>
   );
 }

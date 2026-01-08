@@ -1,44 +1,37 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Bell, CircleUser, PiggyBank, User, LogOut } from 'lucide-react';
-import { useLogin } from '@/lib/hooks/useLogin';
+import { useRouter, usePathname } from 'next/navigation';
+import { Search, ShoppingCart, User, Menu, X, ShoppingBag } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface AppHeaderProps {
   title?: string;
-  subtitle?: string;
-  notifCount?: number;
 }
 
-export const AppHeader = ({
-  title = 'Loans',
-  subtitle = 'Manage and track your loans in one place.',
-  notifCount = 0,
-}: AppHeaderProps) => {
+const navLinks = [
+  { name: 'Home', path: '/' },
+  { name: 'About', path: '/about' },
+  { name: 'Contact', path: '/contact' },
+  { name: 'Login', path: '/login' },
+];
+
+export const AppHeader = ({ title = 'E-Commerce' }: AppHeaderProps) => {
   const router = useRouter();
-  const { handleLogout } = useLogin();
-
-  const [profileOpen, setProfileOpen] = useState(false);
-  const profileRef = useRef<HTMLDivElement | null>(null);
-  const headerRef = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    if (!profileOpen) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as Node | null;
-      if (profileRef.current && target && !profileRef.current.contains(target)) {
-        setProfileOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [profileOpen]);
+  const pathname = usePathname();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [cartCount, setCartCount] = useState(3); // Example cart count
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   // Keep a global CSS var with the current header height for sticky layouts
   useEffect(() => {
     const applyHeaderHeightVar = () => {
-      const h = headerRef.current?.offsetHeight ?? 64;
+      const h = headerRef.current?.offsetHeight ?? 80;
       document.documentElement.style.setProperty('--app-header-h', `${h}px`);
     };
     applyHeaderHeightVar();
@@ -46,82 +39,178 @@ export const AppHeader = ({
     return () => window.removeEventListener('resize', applyHeaderHeightVar);
   }, []);
 
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isMenuOpen &&
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        headerRef.current &&
+        !headerRef.current.contains(event.target as Node)
+      ) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMenuOpen]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
   return (
-    <header
+    <Card
       ref={headerRef}
-      className="sticky top-0 z-50 mb-0 bg-white/80 backdrop-blur [--app-header-h:64px] supports-[backdrop-filter]:bg-white/60"
+      className="sticky top-0 z-50 w-full rounded-none border-x-0 border-t-0 border-b-0 py-4 shadow-none"
+      data-testid="app-header"
     >
-      <div className="container mx-auto p-4 pt-4 pb-0 md:p-2">
+      <div className="w-full">
         <div className="flex items-center justify-between">
-          <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
-            <PiggyBank className="text-primary h-7 w-7" />
-            {title}
-          </h1>
-          <div className="flex items-center gap-2">
-            <button
-              aria-label="Notifications"
-              className="relative rounded-full p-2 hover:bg-gray-100"
-              onClick={() => router.push('/notifications')}
+          {/* Left Section - Menu Button (Mobile) & Title/Logo */}
+          <div className="flex items-center gap-2" data-testid="header-title">
+            {/* Mobile menu button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="cursor-pointer lg:hidden"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+              data-testid="mobile-menu-button"
             >
-              <Bell className="h-5 w-5 text-gray-700" />
-              {notifCount > 0 ? (
-                <span className="absolute -right-1 -top-1 inline-flex min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold leading-4 text-white ring-2 ring-white">
-                  {notifCount > 99 ? '99+' : notifCount}
-                </span>
-              ) : null}
-            </button>
-            <div className="relative" ref={profileRef}>
-              <button
-                aria-label="Profile"
-                aria-haspopup="menu"
-                aria-expanded={profileOpen}
-                onClick={() => setProfileOpen(v => !v)}
-                className="rounded-full p-2 hover:bg-gray-100"
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+
+            <ShoppingBag className="mr-2 h-6 w-6" />
+            <h1 className="text-foreground hidden text-2xl font-bold lg:block">{title}</h1>
+          </div>
+
+          {/* Middle Section - Navigation Links */}
+          <nav className="hidden items-center space-x-6 lg:flex" data-testid="desktop-nav">
+            {navLinks.map(link => (
+              <Button
+                key={link.path}
+                variant="ghost"
+                className={`text-muted-foreground hover:text-foreground cursor-pointer rounded-none px-0 py-0 ${
+                  pathname === link.path ? 'border-foreground text-foreground border-b-2' : ''
+                }`}
+                onClick={() => router.push(link.path)}
+                data-testid={`nav-${link.name.toLowerCase()}`}
               >
-                <CircleUser className="h-6 w-6 text-gray-700" />
-              </button>
-              {profileOpen && (
-                <div
-                  role="menu"
-                  aria-label="Profile menu"
-                  className="absolute right-0 z-20 mt-2 w-44 rounded-md border border-gray-200 bg-white p-1 shadow-md"
+                {link.name}
+              </Button>
+            ))}
+          </nav>
+
+          {/* Right Section - Search, Cart, Profile */}
+          <div className="flex items-center gap-2" data-testid="header-actions">
+            {/* Mobile Search */}
+            <form
+              onSubmit={handleSearch}
+              className="relative flex-1 lg:hidden"
+              data-testid="mobile-search-form-header"
+            >
+              <Input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full border-0 bg-gray-100 pr-9 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-gray-800"
+                data-testid="mobile-search-input-header"
+              />
+              <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+            </form>
+
+            {/* Desktop Search */}
+            <form
+              onSubmit={handleSearch}
+              className="relative hidden lg:block"
+              data-testid="search-form"
+            >
+              <Input
+                type="text"
+                placeholder="What are you looking for?"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-60 border-0 bg-gray-100 pr-9 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-gray-800"
+                data-testid="search-input"
+              />
+              <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+            </form>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.push('/cart')}
+              className="relative cursor-pointer"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {cartCount > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center p-0 text-xs"
                 >
-                  <button
-                    role="menuitem"
-                    className="w-full rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    onClick={() => {
-                      setProfileOpen(false);
-                      router.push('/profile');
-                    }}
-                  >
-                    <User className="h-4 w-4 text-gray-600" />
-                    <span>Profile</span>
-                  </button>
-                  <button
-                    role="menuitem"
-                    className="w-full rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    onClick={() => {
-                      setProfileOpen(false);
-                      // Clear token from sessionStorage and in-app state
-                      handleLogout();
-                      // Clear auth cookie set during login
-                      document.cookie =
-                        'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax' +
-                        (location.protocol === 'https:' ? '; Secure' : '');
-                      // Redirect to login
-                      router.push('/login');
-                    }}
-                  >
-                    <LogOut className="h-4 w-4 text-gray-600" />
-                    <span>Logout</span>
-                  </button>
-                </div>
+                  {cartCount}
+                </Badge>
               )}
-            </div>
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.push('/profile')}
+              className="hidden cursor-pointer lg:flex"
+            >
+              <User className="h-5 w-5" />
+            </Button>
           </div>
         </div>
-        {subtitle ? <p className="mt-1 pb-3 text-gray-600">{subtitle}</p> : null}
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <Card
+            ref={menuRef}
+            className="absolute top-full right-0 left-0 z-50 mt-0 p-4 lg:hidden"
+            data-testid="mobile-menu"
+          >
+            <div className="flex flex-col space-y-2" data-testid="mobile-nav">
+              {navLinks.map(link => (
+                <Button
+                  key={link.path}
+                  variant="ghost"
+                  className={`w-full justify-start rounded-none px-0 py-0 ${
+                    pathname === link.path ? 'border-foreground text-foreground border-b-2' : ''
+                  }`}
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    router.push(link.path);
+                  }}
+                  data-testid={`mobile-nav-${link.name.toLowerCase()}`}
+                >
+                  {link.name}
+                </Button>
+              ))}
+              <Button
+                variant="ghost"
+                className="w-full justify-start rounded-none px-0 py-0"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  router.push('/profile');
+                }}
+                data-testid="mobile-nav-profile"
+              >
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </Button>
+            </div>
+          </Card>
+        )}
       </div>
-    </header>
+    </Card>
   );
 };

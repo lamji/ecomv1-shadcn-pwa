@@ -35,8 +35,15 @@ export default function ReactProvider({
 
   return (
     <Providers bearer={false} queryClient={queryClient}>
-      {!isAuthRoute && <AppHeader notifCount={7} />}
-      {children}
+      <div className="flex min-h-screen flex-col">
+        <main className="flex-1">
+          <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+            {!isAuthRoute && <AppHeader />}
+            {!isAuthRoute && <div className="border-b border-gray-200" />}
+            {children}
+          </div>
+        </main>
+      </div>
     </Providers>
   );
 }
