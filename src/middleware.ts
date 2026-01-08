@@ -86,6 +86,7 @@ function isPublicRoute(pathname: string): boolean {
   // Check for pattern matches (e.g., /api/public/*)
   const publicPatterns = [
     '/api/public',
+    '/_rsc',
     '/_next', // Next.js static files
     '/favicon.ico',
     '/robots.txt',
@@ -186,6 +187,11 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
     );
   }
 
+  // In production, allow secure WebSocket connections (required for some streaming/RSC cases)
+  if (process.env.NODE_ENV === 'production') {
+    connectSrc.push('wss://*');
+  }
+
   // Use strict script policy in production, permissive in development
   const scriptSrc =
     process.env.NODE_ENV === 'production'
@@ -281,6 +287,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Skip middleware for RSC streaming endpoints
+  if (pathname.startsWith('/_rsc')) {
+    return NextResponse.next();
+  }
+
   // Apply rate limiting to all requests
   if (!checkRateLimit(request)) {
     return new NextResponse('Too Many Requests', {
@@ -334,6 +345,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public folder files
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|public/).*)',
+    '/((?!api|_next/static|_next/image|_rsc|favicon.ico|public/).*)',
   ],
 };
