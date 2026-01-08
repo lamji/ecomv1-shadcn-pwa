@@ -13,7 +13,7 @@ export type Product = {
 export const flashSaleProducts: Product[] = [
   {
     id: 'p1',
-    imageSrc: '/products/fashion-shoes-sneakers.jpg',
+    imageSrc: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&fit=crop',
     imageAlt: 'Sample Product 1',
     title: 'Stylish Fashion Sneakers',
     price: 59.99,
@@ -24,7 +24,7 @@ export const flashSaleProducts: Product[] = [
   },
   {
     id: 'p2',
-    imageSrc: '/products/men-shoes.jpg',
+    imageSrc: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=400&h=400&fit=crop',
     imageAlt: 'Sample Product 2',
     title: "Classic Men's Leather Shoes",
     price: 79.99,
@@ -35,7 +35,7 @@ export const flashSaleProducts: Product[] = [
   },
   {
     id: 'p3',
-    imageSrc: '/products/men-shoes-2.jpg',
+    imageSrc: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&h=400&fit=crop',
     imageAlt: 'Sample Product 3',
     title: "Casual Men's Sneakers",
     price: 24.99,
@@ -46,7 +46,7 @@ export const flashSaleProducts: Product[] = [
   },
   {
     id: 'p4',
-    imageSrc: '/products/emerald-green-evening-gown-with-lace-detailing-gold-clutch.jpg',
+    imageSrc: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=400&fit=crop',
     imageAlt: 'Sample Product 4',
     title: 'Elegant Emerald Green Evening Gown',
     price: 19.99,
@@ -57,8 +57,8 @@ export const flashSaleProducts: Product[] = [
   },
   {
     id: 'p5',
-    imageSrc: '/products/woman-with-hands-hips.jpg',
-    imageAlt: 'Sample Product 1',
+    imageSrc: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=400&fit=crop',
+    imageAlt: 'Sample Product 5',
     title: 'Woman with Hands on Hips',
     price: 59.99,
     originalPrice: 119.99,

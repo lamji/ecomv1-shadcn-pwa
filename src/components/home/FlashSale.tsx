@@ -10,7 +10,7 @@ type FlashSaleProps = {
   className?: string;
 };
 
-export default function FlashSale({ title = "Today's", className }: FlashSaleProps) {
+export default function FlashSale({ title = 'Flash Sale', className }: FlashSaleProps) {
   const {
     days,
     hours,
@@ -43,19 +43,22 @@ export default function FlashSale({ title = "Today's", className }: FlashSalePro
       aria-label={`Flash sale products count ${flashSaleProducts.length}`}
       data-testid="flashsale-section"
     >
-      <h2
+      {/* <h2
         className="border-primary text-primary mb-3 border-l-[10px] pl-3 text-lg font-semibold"
         data-testid="flashsale-title"
       >
         {title}
-      </h2>
-      <div className="flex items-center justify-between" data-testid="flashsale-header-wrapper">
+      </h2> */}
+      <div
+        className="border-l-primary mt-5 flex items-center justify-between border-l-[10px] bg-gradient-to-r from-blue-50 to-purple-50 p-2"
+        data-testid="flashsale-header-wrapper"
+      >
         <div className="mr-5 flex items-center gap-4" data-testid="flashsale-left-section">
           <h1
-            className="mr-4 mb-2 text-2xl font-bold tracking-wider text-gray-900 md:mr-10 md:text-3xl"
+            className="text-primary mb-3 pl-3 font-bold font-semibold text-gray-900 md:mr-10"
             data-testid="flashsale-main-title"
           >
-            Flash Sale
+            {title}
           </h1>
           <div
             className="flex items-center font-mono text-sm font-bold text-gray-800 md:text-base"
@@ -114,21 +117,54 @@ export default function FlashSale({ title = "Today's", className }: FlashSalePro
           </button>
         </div>
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
-        {visibleProducts.map((p, idx) => (
-          <ProductCard
-            key={p.id}
-            imageSrc={p.imageSrc}
-            imageAlt={p.imageAlt || p.title}
-            title={p.title}
-            price={p.price}
-            originalPrice={p.originalPrice}
-            discountPercent={p.discountPercent}
-            rating={p.rating}
-            reviewCount={p.reviewCount}
-            priority={idx < itemsPerView}
-          />
-        ))}
+      <div className="relative mt-4">
+        <button
+          className={`absolute top-1/2 left-0 z-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-200 p-2 shadow-md transition-colors md:hidden ${canPrev ? 'hover:bg-gray-300' : 'cursor-not-allowed bg-gray-100 text-gray-400'}`}
+          data-testid="flashsale-mobile-prev-btn"
+          onClick={handlePrev}
+          aria-label="Previous products"
+          disabled={!canPrev}
+          aria-disabled={!canPrev}
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
+
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {visibleProducts.map((p, idx) => (
+            <ProductCard
+              key={p.id}
+              imageSrc={p.imageSrc}
+              imageAlt={p.imageAlt || p.title}
+              title={p.title}
+              price={p.price}
+              originalPrice={p.originalPrice}
+              discountPercent={p.discountPercent}
+              rating={p.rating}
+              reviewCount={p.reviewCount}
+              priority={idx < itemsPerView}
+            />
+          ))}
+        </div>
+
+        <button
+          className={`absolute top-1/2 right-0 z-10 translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-200 p-2 shadow-md transition-colors md:hidden ${canNext ? 'hover:bg-gray-300' : 'cursor-not-allowed bg-gray-100 text-gray-400'}`}
+          data-testid="flashsale-mobile-next-btn"
+          onClick={handleNext}
+          aria-label="Next products"
+          disabled={!canNext}
+          aria-disabled={!canNext}
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
     </section>
   );

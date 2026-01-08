@@ -39,7 +39,7 @@ export default function AdSlider({
   if (ads.length === 0) {
     return (
       <div
-        className="h-full w-full border-gray-200 px-0 py-0 md:flex-1 md:border-l md:px-4 md:py-5"
+        className="h-full w-full border-gray-200 px-0 py-0 md:flex-1 md:border-l md:py-5 md:pl-4"
         data-testid="ad-section"
       >
         <div

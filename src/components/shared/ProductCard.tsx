@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { formatCurrency } from '@/lib/helper/currency';
 import { StarRating } from './StarRating';
 import { ShoppingCart } from 'lucide-react';
@@ -83,13 +84,14 @@ export default function ProductCard({
             className="flex h-40 w-full items-center justify-center overflow-hidden rounded-md bg-white transition-transform duration-200 group-hover:scale-105"
             data-testid="product-card-image"
           >
-            <img
+            <Image
               src={imageSrc}
               alt={imageAlt || title}
-              className="max-h-full max-w-full object-contain"
-              loading={priority ? 'eager' : 'lazy'}
-              fetchPriority={priority ? 'high' : 'auto'}
-              decoding="async"
+              width={160}
+              height={160}
+              className="object-contain"
+              priority={priority}
+              sizes="(max-width: 768px) 160px, (max-width: 1200px) 160px, 160px"
             />
           </div>
         </div>
