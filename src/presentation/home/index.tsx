@@ -8,7 +8,7 @@ export default function Homepage() {
   return (
     <div className="min-h-screen" data-testid="homepage-root">
       {/* Jumbotron Section */}
-      <div className="h-[35vh] bg-white text-gray-900 lg:h-[50vh]" data-testid="jumbotron-section">
+      <div className="h-[35vh] bg-white text-gray-900 lg:h-[60vh]" data-testid="jumbotron-section">
         <div className="container mx-auto h-full px-0 lg:px-4" data-testid="jumbotron-container">
           <div
             className="flex h-full flex-col gap-4 md:flex-row md:gap-8"
