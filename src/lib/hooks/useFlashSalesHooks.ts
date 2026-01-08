@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
+import { Product, categories } from '@/lib/data/products';
+import { FilterOptions } from '@/components/home/FilterModal';
 
 type TimeLeft = {
   days: number;
@@ -16,7 +18,11 @@ type CarouselState = {
   handleNext: () => void;
 };
 
-export function useFlashSalesHooks(totalItems: number = 0): TimeLeft & CarouselState {
+export function useFlashSalesHooks(
+  totalItems: number = 0,
+  products: Product[] = [],
+  filters: FilterOptions | null = null,
+): TimeLeft & CarouselState & { filteredProducts: Product[] } {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({
     days: 0,
     hours: 0,
@@ -98,6 +104,67 @@ export function useFlashSalesHooks(totalItems: number = 0): TimeLeft & CarouselS
     setStartIndex(prev => Math.min(maxStart, prev + 1));
   };
 
+  // Filter and sort products
+  const filteredProducts = useMemo(() => {
+    if (!filters) return products;
+
+    const filtered = products.filter(product => {
+      // Price filter
+      const productPrice = product.originalPrice || product.price || 0;
+      if (productPrice < filters.priceRange.min || productPrice > filters.priceRange.max) {
+        return false;
+      }
+
+      // Sold filter - hardcoded minimum of 200
+      const soldCount = product.soldCount || 0;
+      if (soldCount < 200) {
+        return false;
+      }
+
+      // Review filter - hardcoded minimum of 50
+      const reviewCount = product.reviewCount || 0;
+      if (reviewCount < 50) {
+        return false;
+      }
+
+      // Stock filter
+      if (filters.inStockOnly && product.stock === 0) {
+        return false;
+      }
+
+      // Category filter - match category names to categoryIds
+      if (filters.categories.length > 0) {
+        const selectedCategoryIds = categories
+          .filter(cat => filters.categories.includes(cat.name))
+          .map(cat => cat.id);
+
+        if (!product.categoryId || !selectedCategoryIds.includes(product.categoryId)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    // Sort products
+    switch (filters.sortBy) {
+      case 'price-low':
+        return filtered.sort(
+          (a, b) => (a.originalPrice || a.price || 0) - (b.originalPrice || b.price || 0),
+        );
+      case 'price-high':
+        return filtered.sort(
+          (a, b) => (b.originalPrice || b.price || 0) - (a.originalPrice || a.price || 0),
+        );
+      case 'reviews':
+        return filtered.sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0));
+      case 'sold':
+        return filtered.sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0));
+      default:
+        return filtered;
+    }
+  }, [products, filters]);
+
   return {
     ...timeLeft,
     itemsPerView,
@@ -106,5 +173,6 @@ export function useFlashSalesHooks(totalItems: number = 0): TimeLeft & CarouselS
     canNext,
     handlePrev,
     handleNext,
+    filteredProducts,
   };
 }

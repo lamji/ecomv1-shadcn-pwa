@@ -86,8 +86,15 @@ export const AppHeader = ({ title = 'E-Commerce' }: AppHeaderProps) => {
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
 
-            <ShoppingBag className="mr-2 h-6 w-6" />
-            <h1 className="text-foreground hidden text-2xl font-bold lg:block">{title}</h1>
+            <Button
+              variant="ghost"
+              onClick={() => router.push('/')}
+              className="flex items-center gap-2 p-2"
+              data-testid="header-logo-button"
+            >
+              <ShoppingBag className="h-6 w-6" />
+              <h1 className="text-foreground hidden text-2xl font-bold lg:block">{title}</h1>
+            </Button>
           </div>
 
           {/* Middle Section - Navigation Links */}

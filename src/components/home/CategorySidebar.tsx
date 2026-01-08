@@ -1,15 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-
-const categories = [
-  { id: 1, name: 'Electronics', count: 24 },
-  { id: 2, name: 'Clothing', count: 18 },
-  { id: 3, name: 'Home & Garden', count: 12 },
-  { id: 4, name: 'Sports', count: 8 },
-  { id: 5, name: 'Books', count: 15 },
-  { id: 6, name: 'Toys', count: 10 },
-];
+import { categories } from '@/lib/data/products';
 
 export default function CategorySidebar() {
   return (
@@ -38,6 +30,11 @@ export default function CategorySidebar() {
               data-testid={`category-item-${category.id}`}
             >
               <div className="flex items-center gap-3">
+                {category.icon && (
+                  <span className="text-lg" data-testid="category-icon">
+                    {category.icon}
+                  </span>
+                )}
                 <span
                   className="text-sm font-medium text-gray-900 transition-colors group-hover:text-blue-600 md:group-hover:underline"
                   data-testid="category-name"
@@ -51,7 +48,7 @@ export default function CategorySidebar() {
                   className="bg-gray-100 text-xs text-gray-700 hover:bg-gray-200 md:text-sm"
                   data-testid="category-count-badge"
                 >
-                  {category.count}
+                  {category.productCount || 0}
                 </Badge>
               </div>
             </li>

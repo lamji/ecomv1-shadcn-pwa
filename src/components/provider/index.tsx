@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Providers } from 'plugandplay-react-query-hooks';
 import { usePathname } from 'next/navigation';
 import { AppHeader } from '@/components/shared/AppHeader';
+import Footer from '../layout/Footer';
 
 const queryClient = {
   queries: {
@@ -31,7 +32,8 @@ export default function ReactProvider({
   }, [initialToken]);
 
   const pathname = usePathname();
-  const isAuthRoute = pathname === '/login' || pathname === '/signup';
+  const isAuthRoute =
+    pathname === '/login' || pathname === '/signup' || pathname.startsWith('/product/');
 
   return (
     <Providers bearer={false} queryClient={queryClient}>
@@ -43,6 +45,7 @@ export default function ReactProvider({
             {children}
           </div>
         </main>
+        <Footer />
       </div>
     </Providers>
   );

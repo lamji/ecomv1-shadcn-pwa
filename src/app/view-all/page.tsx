@@ -3,12 +3,9 @@
 import AdSlider, { defaultAds } from '@/components/home/AdSlider';
 import CategorySidebar from '@/components/home/CategorySidebar';
 import Products from '@/components/home/FlashSale';
-import MiddleBanner from '@/components/home/MiddleBanner';
-import NewArrivals from '@/components/home/NewArrivals';
 import { flashSaleProducts } from '@/lib/data/products';
-import { getFlashSaleProducts, getNewArrivalsProducts } from '@/lib/helpers/productFilters';
 
-export default function Homepage() {
+export default function ViewAllPages() {
   return (
     <div className="min-h-screen" data-testid="homepage-root">
       {/* Jumbotron Section */}
@@ -31,36 +28,17 @@ export default function Homepage() {
         </div>
       </div>
 
-      {/* Flash Sale Products */}
-      <div className="mt-8">
-        <Products
-          title="FLASH SALE"
-          showCountdown={true}
-          showArrows={true}
-          productsData={getFlashSaleProducts(flashSaleProducts)}
-        />
-      </div>
-
-      {/* Middle Banner */}
-      <div className="mt-8 px-4 md:px-6">
-        <MiddleBanner />
-      </div>
-
       {/* Explore our products */}
       <div className="mt-8">
         <Products
-          title="EXPLORE OUR PRODUCTS"
+          title="ALL PRODUCTS"
           showCountdown={false}
           showArrows={false}
           showType={true}
           productsData={flashSaleProducts}
-          limit={true}
+          limit={false}
+          showFilter={true}
         />
-      </div>
-
-      {/* New Arrivals */}
-      <div className="mt-8">
-        <NewArrivals productsData={getNewArrivalsProducts(flashSaleProducts)} />
       </div>
     </div>
   );

@@ -11,6 +11,8 @@ const PUBLIC_ROUTES = [
   '/forgot-password',
   '/reset-password',
   '/verify-email',
+  '/product/[id]',
+  '/view-all',
 ];
 
 /**
@@ -28,6 +30,9 @@ const PUBLIC_API_ROUTES = [
  */
 function isPublicRoute(pathname: string): boolean {
   if (PUBLIC_ROUTES.includes(pathname)) return true;
+
+  // Handle dynamic product routes
+  if (pathname.startsWith('/product/')) return true;
 
   if (PUBLIC_API_ROUTES.some(route => pathname.startsWith(route))) {
     return true;
