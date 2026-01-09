@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { StarRating } from '@/components/shared/StarRating';
 import { formatCurrency } from '@/lib/helper/currency';
 import { useProductDetailsHooks } from '@/lib/hooks/useProductDetailsHooks';
+import { useAddToCart } from '@/lib/hooks/useAddToCart';
 
 export default function ProductPage() {
   const {
@@ -26,7 +27,14 @@ export default function ProductPage() {
     handleQuantityChange,
   } = useProductDetailsHooks();
 
+  const { addToCart } = useAddToCart();
   const router = useRouter();
+
+  const handleAddToCart = () => {
+    if (!isOutOfStock && product) {
+      addToCart(product, quantity);
+    }
+  };
 
   if (!product) {
     return (
@@ -336,16 +344,7 @@ export default function ProductPage() {
             size="lg"
             className="max-w-xs flex-1"
             disabled={!!isOutOfStock}
-            onClick={() => {
-              // TODO: Add to cart functionality
-              console.log('Added to cart:', {
-                product: product.title,
-                quantity,
-                size: selectedSize,
-                price: displayPrice,
-                total: totalPrice,
-              });
-            }}
+            onClick={handleAddToCart}
             data-testid="floating-add-to-cart-button"
           >
             <ShoppingCart className="mr-2 h-5 w-5" />

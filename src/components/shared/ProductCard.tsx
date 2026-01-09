@@ -5,8 +5,10 @@ import { formatCurrency } from '@/lib/helper/currency';
 import { StarRating } from './StarRating';
 import { ShoppingCart, Star } from 'lucide-react';
 import { Button } from '../ui/button';
+import { useAddToCart } from '@/lib/hooks/useAddToCart';
 
 type ProductCardProps = {
+  id: string; // Product ID
   imageSrc: string;
   imageAlt?: string;
   title: string;
@@ -33,6 +35,7 @@ type ProductCardProps = {
 };
 
 export default function ProductCard({
+  id,
   imageSrc,
   imageAlt = '',
   title,
@@ -50,8 +53,8 @@ export default function ProductCard({
   priceColor = 'black',
   badgeColor = 'red',
   stock,
-  onClick,
 }: ProductCardProps) {
+  const { addToCart } = useAddToCart();
   const router = useRouter();
   const hasDiscount = typeof discountPercent === 'number' && discountPercent > 0;
   const isOutOfStock = stock === 0;
@@ -60,6 +63,36 @@ export default function ProductCard({
     if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}m`;
     if (count >= 1_000) return `${(count / 1_000).toFixed(1)}k`;
     return String(count);
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isOutOfStock) {
+      // Create product object for the cart
+      const product = {
+        id, // Use the actual product ID
+        title,
+        price: Number(originalPrice || price || 0),
+        originalPrice: originalPrice ? Number(originalPrice) : undefined,
+        discountPercent,
+        rating: rating || 0,
+        reviewCount: reviewCount || 0,
+        soldCount: soldCount || 0,
+        imageSrc,
+        imageAlt,
+        stock: stock || 0,
+        description: '',
+        categoryId: '',
+        category: '',
+        type: productType || 'regular',
+        images: [],
+        sizes: [],
+      };
+
+      console.log('handleAddToCart', { product, id });
+
+      addToCart(product, 1);
+    }
   };
 
   const handleProductClick = () => {
@@ -101,8 +134,8 @@ export default function ProductCard({
   return (
     <div
       className={`group relative rounded-lg shadow-none transition`}
-      role={onClick ? 'button' : undefined}
-      onClick={isOutOfStock ? undefined : handleProductClick}
+      // role={onClick ? 'button' : undefined}
+      // onClick={isOutOfStock ? undefined : handleProductClick}
       data-testid="product-card"
     >
       <div
@@ -113,12 +146,7 @@ export default function ProductCard({
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-black/50 p-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <Button
             className="flex w-full max-w-[180px] items-center justify-center gap-2 rounded-full bg-white px-6 py-2 text-sm font-medium text-gray-900 shadow-lg hover:bg-gray-100"
-            onClick={e => {
-              e.stopPropagation();
-              if (!isOutOfStock) {
-                handleProductClick();
-              }
-            }}
+            onClick={handleAddToCart}
             disabled={isOutOfStock}
           >
             <ShoppingCart className="h-4 w-4" />

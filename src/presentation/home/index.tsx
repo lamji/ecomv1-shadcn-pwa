@@ -32,7 +32,7 @@ export default function Homepage() {
       </div>
 
       {/* Flash Sale Products */}
-      <div className="mt-4 md:mt-8">
+      <div className="mt-1 md:mt-8">
         <Products
           title="FLASH SALE"
           showCountdown={true}

@@ -32,8 +32,6 @@ export function useFlashSalesHooks(
   const endTimeRef = useRef<number>(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  console.log('Filters:', filters);
-
   // Carousel state
   const [itemsPerView, setItemsPerView] = useState<number>(4);
   const [startIndex, setStartIndex] = useState<number>(0);
@@ -90,9 +88,9 @@ export function useFlashSalesHooks(
 
   // Clamp start index when deps change
   const maxStart = Math.max(0, totalItems - itemsPerView);
-  useEffect(() => {
-    setStartIndex(prev => Math.min(Math.max(0, prev), maxStart));
-  }, [itemsPerView, totalItems, maxStart]);
+  // useEffect(() => {
+  //   setStartIndex(prev => Math.min(Math.max(0, prev), maxStart));
+  // }, [itemsPerView, totalItems, maxStart]);
 
   const canPrev = startIndex > 0;
   const canNext = startIndex < maxStart;

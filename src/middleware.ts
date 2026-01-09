@@ -10,6 +10,7 @@ const PUBLIC_ROUTES = [
   '/forgot-password',
   '/new-arrivals',
   '/summer-collection',
+  '/view-all',
 ];
 
 /**

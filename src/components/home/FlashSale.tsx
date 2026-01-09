@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 
 import { cn } from '@/lib/utils';
 import { useFlashSalesHooks } from '@/lib/hooks/useFlashSalesHooks';
@@ -42,22 +42,26 @@ export default function Products({
     (typeof window !== 'undefined' &&
       GRID_VIEW_ROUTES.some(route => window.location.pathname.includes(route)));
 
-  // Helper function to get default filter options
-  const getDefaultFilterOptions = (): FilterOptions => ({
-    priceRange: { min: 0, max: 1000 },
-    inStockOnly: false,
-    sortBy: 'price-low',
-    categories: [],
-    types: [],
-  });
-
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [appliedFilters, setAppliedFilters] = useState<FilterOptions | null>(
-    defaultFilter ? { ...getDefaultFilterOptions(), ...defaultFilter } : null,
+
+  // Memoize default filter options to prevent infinite renders
+  const defaultFilterOptions = useMemo(
+    () => ({
+      priceRange: { min: 0, max: 1000 },
+      inStockOnly: false,
+      sortBy: 'price-low' as const,
+      categories: [],
+      types: [],
+    }),
+    [],
   );
 
-  // Use custom productsData if provided, otherwise use default flashSaleProducts
-  const products = productsData || flashSaleProducts;
+  const [appliedFilters, setAppliedFilters] = useState<FilterOptions | null>(
+    defaultFilter ? { ...defaultFilterOptions, ...defaultFilter } : null,
+  );
+
+  // Memoize products array to prevent infinite renders
+  const products = useMemo(() => productsData || flashSaleProducts, [productsData]);
 
   const {
     days,
@@ -245,6 +249,7 @@ export default function Products({
                 productType={p.type}
                 priority={idx < 4}
                 stock={p.stock}
+                id={p.id}
               />
             ))}
           </div>
@@ -272,6 +277,7 @@ export default function Products({
                       productType={p.type}
                       priority={idx < 4}
                       stock={p.stock}
+                      id={p.id}
                     />
                   </div>
                 ))}
@@ -299,6 +305,7 @@ export default function Products({
                   productType={p.type}
                   priority={idx < itemsPerView}
                   stock={p.stock}
+                  id={p.id}
                 />
               ))}
             </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, ShoppingCart, User } from 'lucide-react';
+import { Search, ShoppingCart, User, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -17,7 +17,8 @@ interface AppHeaderProps {
 export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [cartCount, setCartCount] = useState(3); // Example cart count
+  const [cartCount, setCartCount] = useState(0); // Example cart count
+  const [notificationCount, setNotificationCount] = useState(0); // Example notification count
   const headerRef = useRef<HTMLDivElement | null>(null);
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -76,7 +77,7 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
           </div>
 
           {/* Right Section - Search, Cart, Profile */}
-          <div className="flex items-center gap-2" data-testid="header-actions">
+          <div className="flex items-center gap-0.5 md:gap-2" data-testid="header-actions">
             {/* Mobile Search */}
             <form
               onSubmit={handleSearch}
@@ -88,7 +89,7 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full border-0 bg-gray-100 pr-9 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-gray-800"
+                className="w-full border border-gray-300 bg-gray-100 pr-9 focus-visible:ring-0 focus-visible:ring-offset-0 dark:border-gray-600 dark:bg-gray-800"
                 data-testid="mobile-search-input-header"
               />
               <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
@@ -105,7 +106,7 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
                 placeholder="What are you looking for?"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-60 border-0 bg-gray-100 pr-9 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-gray-800"
+                className="w-60 border border-gray-300 bg-gray-100 pr-9 focus-visible:ring-0 focus-visible:ring-offset-0 dark:border-gray-600 dark:bg-gray-800"
                 data-testid="search-input"
               />
               <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
@@ -122,9 +123,29 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
                 {cartCount > 0 && (
                   <Badge
                     variant="destructive"
-                    className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center p-0 text-xs"
+                    className="absolute -top-1.5 -right-1.5 flex h-3 w-3 items-center justify-center p-0 text-[8px] md:h-5 md:w-5 md:text-xs"
                   >
                     {cartCount}
+                  </Badge>
+                )}
+              </Button>
+            )}
+
+            {isAuthenticated && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => router.push('/notifications')}
+                className="relative cursor-pointer"
+                data-testid="notification-button"
+              >
+                <Bell className="h-5 w-5" />
+                {notificationCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-1.5 -right-1.5 flex h-3 w-3 items-center justify-center p-0 text-[8px] md:h-5 md:w-5 md:text-xs"
+                  >
+                    {notificationCount}
                   </Badge>
                 )}
               </Button>

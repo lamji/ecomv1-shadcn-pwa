@@ -4,6 +4,7 @@ import { Providers } from 'plugandplay-react-query-hooks';
 import { usePathname } from 'next/navigation';
 import { AppHeader } from '@/components/shared/AppHeader';
 import Footer from '../layout/Footer';
+import GlobalLoader from '@/components/shared/GlobalLoader';
 
 const queryClient = {
   queries: {
@@ -37,6 +38,7 @@ export default function ReactProvider({
 
   return (
     <Providers bearer={false} queryClient={queryClient}>
+      <GlobalLoader />
       <div className="flex min-h-screen flex-col">
         <main className="flex-1">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">

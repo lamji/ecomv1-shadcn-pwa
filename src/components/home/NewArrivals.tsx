@@ -171,6 +171,7 @@ export default function NewArrivals({
                     textColor="white"
                     priceColor="white"
                     badgeColor="yellow"
+                    id={p.id}
                   />
                 </div>
               ))}
@@ -201,6 +202,7 @@ export default function NewArrivals({
                   textColor="white"
                   priceColor="white"
                   badgeColor="yellow"
+                  id={p.id}
                 />
               </div>
             ))}
