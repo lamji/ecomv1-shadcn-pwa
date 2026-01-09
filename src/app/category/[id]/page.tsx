@@ -98,7 +98,7 @@ export default function CategoryPage() {
                   </span>
 
                   {/* Category Name */}
-                  <span className="relative z-10 mt-1 text-center text-xs leading-tight font-medium text-gray-700">
+                  <span className="relative z-10 mt-1 w-full truncate px-1 text-center text-xs leading-tight font-medium text-gray-700">
                     {cat.name}
                   </span>
 
@@ -136,7 +136,7 @@ export default function CategoryPage() {
                 </span>
 
                 {/* Category Name */}
-                <span className="relative z-10 mt-1 text-center text-xs leading-tight font-medium text-gray-700">
+                <span className="relative z-10 mt-1 w-full truncate px-1 text-center text-xs leading-tight font-medium text-gray-700">
                   {cat.name}
                 </span>
 

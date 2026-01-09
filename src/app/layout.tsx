@@ -14,16 +14,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Loan Management',
+  title: 'E-hotShop',
   description:
-    'Manage loans, repayments, and customer accounts efficiently with our Loan Management app.',
+    'Shop the latest products with our modern ecommerce store. Fast delivery, secure payments, and great prices.',
   manifest: '/icons/site.webmanifest',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black',
-    title: 'Loan Management',
+    title: 'E-hotShop',
   },
-  applicationName: 'Loan Management',
+  applicationName: 'E-hotShop',
   formatDetection: {
     telephone: false,
   },

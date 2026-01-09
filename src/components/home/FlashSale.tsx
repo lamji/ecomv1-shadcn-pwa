@@ -214,27 +214,36 @@ export default function Products({
         )}
       </div>
       <div className="relative mt-4">
-        {showArrows && !limit && (
-          <button
-            className={`absolute top-1/2 left-0 z-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-200 p-2 shadow-md transition-colors md:hidden ${canPrev ? 'hover:bg-gray-300' : 'cursor-not-allowed bg-gray-100 text-gray-400'}`}
-            data-testid="flashsale-mobile-prev-btn"
-            onClick={handlePrev}
-            aria-label="Previous products"
-            disabled={!canPrev}
-            aria-disabled={!canPrev}
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-        )}
+        {/* Mobile Swipeable Container */}
+        <div className="md:hidden">
+          <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2">
+            {displayProducts.map((p, idx) => (
+              <div key={p.id} className="w-[45%] flex-shrink-0 snap-center">
+                <ProductCard
+                  imageSrc={p.imageSrc}
+                  imageAlt={p.imageAlt || p.title}
+                  images={p.images}
+                  description={p.description}
+                  sizes={p.sizes}
+                  title={p.title}
+                  price={p?.price}
+                  originalPrice={p.originalPrice}
+                  discountPercent={p.discountPercent}
+                  rating={p.rating}
+                  reviewCount={p.reviewCount}
+                  soldCount={p.soldCount}
+                  showType={showType}
+                  productType={p.type}
+                  priority={idx < 4}
+                  stock={p.stock}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
 
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        {/* Desktop Grid */}
+        <div className="hidden md:grid md:grid-cols-4 md:gap-3">
           {visibleProducts.map((p, idx) => (
             <ProductCard
               key={p.id}
@@ -257,21 +266,6 @@ export default function Products({
             />
           ))}
         </div>
-
-        {showArrows && !limit && (
-          <button
-            className={`absolute top-1/2 right-0 z-10 translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-200 p-2 shadow-md transition-colors md:hidden ${canNext ? 'hover:bg-gray-300' : 'cursor-not-allowed bg-gray-100 text-gray-400'}`}
-            data-testid="flashsale-mobile-next-btn"
-            onClick={handleNext}
-            aria-label="Next products"
-            disabled={!canNext}
-            aria-disabled={!canNext}
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        )}
       </div>
 
       {/* Filter Modal */}

@@ -19,7 +19,7 @@ const navLinks = [
   { name: 'Login', path: '/login' },
 ];
 
-export const AppHeader = ({ title = 'E-Commerce' }: AppHeaderProps) => {
+export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
