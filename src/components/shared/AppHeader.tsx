@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { useSearchHooks } from '@/lib/hooks/useSearchHooks';
 
 interface AppHeaderProps {
   title?: string;
@@ -16,11 +17,14 @@ interface AppHeaderProps {
 
 export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
   const [cartCount, setCartCount] = useState(0); // Example cart count
   const [notificationCount, setNotificationCount] = useState(0); // Example notification count
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const headerRef = useRef<HTMLDivElement | null>(null);
   const { isAuthenticated, isLoading } = useAuth();
+
+  // Use search hooks for search functionality
+  const { searchQuery, setSearchQuery, handleSearch, getSearchSuggestions } = useSearchHooks();
 
   // Keep a global CSS var with the current header height for sticky layouts
   useEffect(() => {
@@ -33,11 +37,15 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
     return () => window.removeEventListener('resize', applyHeaderHeightVar);
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
+  // Wrapper functions for form submissions
+  const handleMobileSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-    }
+    handleSearch();
+  };
+
+  const handleDesktopSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSearch();
   };
 
   return (
@@ -79,38 +87,140 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
           {/* Right Section - Search, Cart, Profile */}
           <div className="flex items-center gap-0.5 md:gap-2" data-testid="header-actions">
             {/* Mobile Search */}
-            <form
-              onSubmit={handleSearch}
-              className="relative flex-1 lg:hidden"
-              data-testid="mobile-search-form-header"
-            >
-              <Input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="w-full border border-gray-300 bg-gray-100 pr-9 focus-visible:ring-0 focus-visible:ring-offset-0 dark:border-gray-600 dark:bg-gray-800"
-                data-testid="mobile-search-input-header"
-              />
-              <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
-            </form>
+            <div className="relative flex-1 lg:hidden">
+              <form
+                onSubmit={handleMobileSearch}
+                className="relative"
+                data-testid="mobile-search-form-header"
+              >
+                <Input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  onFocus={() => setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                  className="w-full border border-gray-300 bg-gray-100 pr-9 focus-visible:ring-0 focus-visible:ring-offset-0 dark:border-gray-600 dark:bg-gray-800"
+                  data-testid="mobile-search-input-header"
+                />
+                <Search
+                  className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2"
+                  data-testid="mobile-search-icon"
+                />
+              </form>
+
+              {/* Mobile Search Suggestions Dropdown */}
+              {showSuggestions && searchQuery.length >= 2 && (
+                <div
+                  className="absolute top-full right-0 left-0 z-50 mt-1 max-h-60 overflow-y-auto rounded-md border bg-white shadow-lg"
+                  data-testid="mobile-search-suggestions"
+                >
+                  {getSearchSuggestions(searchQuery).length > 0 ? (
+                    <div className="p-2">
+                      {getSearchSuggestions(searchQuery).map(product => (
+                        <button
+                          key={product.id}
+                          type="button"
+                          onClick={() => {
+                            setSearchQuery(product.title);
+                            setShowSuggestions(false);
+                            handleSearch(product.title);
+                          }}
+                          className="w-full rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100"
+                          data-testid={`mobile-suggestion-${product.id}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
+                              <Image
+                                src={product.imageSrc}
+                                alt={product.imageAlt || product.title}
+                                width={32}
+                                height={32}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                            <span className="truncate">{product.title}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div
+                      className="p-3 text-center text-sm text-gray-500"
+                      data-testid="mobile-no-suggestions"
+                    >
+                      No suggestions found
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Desktop Search */}
-            <form
-              onSubmit={handleSearch}
-              className="relative hidden lg:block"
-              data-testid="search-form"
-            >
-              <Input
-                type="text"
-                placeholder="What are you looking for?"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="w-60 border border-gray-300 bg-gray-100 pr-9 focus-visible:ring-0 focus-visible:ring-offset-0 dark:border-gray-600 dark:bg-gray-800"
-                data-testid="search-input"
-              />
-              <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
-            </form>
+            <div className="relative hidden lg:block">
+              <form onSubmit={handleDesktopSearch} className="relative" data-testid="search-form">
+                <Input
+                  type="text"
+                  placeholder="What are you looking for?"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  onFocus={() => setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                  className="w-60 border border-gray-300 bg-gray-100 pr-9 focus-visible:ring-0 focus-visible:ring-offset-0 dark:border-gray-600 dark:bg-gray-800"
+                  data-testid="search-input"
+                />
+                <Search
+                  className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2"
+                  data-testid="desktop-search-icon"
+                />
+              </form>
+
+              {/* Desktop Search Suggestions Dropdown */}
+              {showSuggestions && searchQuery.length >= 2 && (
+                <div
+                  className="absolute top-full right-0 left-0 z-50 mt-1 max-h-80 overflow-y-auto rounded-md border bg-white shadow-lg"
+                  data-testid="desktop-search-suggestions"
+                >
+                  {getSearchSuggestions(searchQuery).length > 0 ? (
+                    <div className="p-2">
+                      {getSearchSuggestions(searchQuery).map(product => (
+                        <button
+                          key={product.id}
+                          type="button"
+                          onClick={() => {
+                            setSearchQuery(product.title);
+                            setShowSuggestions(false);
+                            handleSearch(product.title);
+                          }}
+                          className="w-full rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100"
+                          data-testid={`desktop-suggestion-${product.id}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
+                              <Image
+                                src={product.imageSrc}
+                                alt={product.imageAlt || product.title}
+                                width={32}
+                                height={32}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                            <span className="truncate">{product.title}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div
+                      className="p-3 text-center text-sm text-gray-500"
+                      data-testid="desktop-no-suggestions"
+                    >
+                      No suggestions found
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             {isAuthenticated && (
               <Button

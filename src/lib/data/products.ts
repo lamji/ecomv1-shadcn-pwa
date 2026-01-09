@@ -34,6 +34,17 @@ export type Product = {
    * Summer collection flag
    */
   isSummerCollection?: boolean;
+  /**
+   * Product reviews
+   */
+  reviews?: {
+    id: string;
+    rating: 1 | 2 | 3 | 4 | 5;
+    comment?: string;
+    isVerified: boolean;
+    createdAt: string | Date;
+    customerName?: string;
+  }[];
 };
 
 export type Category = {
@@ -70,6 +81,63 @@ const baseProducts: Product[] = [
     categoryId: 'cat-footwear',
     category: 'Footwear',
     type: 'flash',
+    reviews: [
+      {
+        id: 'p1-r1',
+        rating: 5,
+        comment: 'Very good quality! Fast delivery 👍',
+        isVerified: true,
+        createdAt: '2025-12-28T09:12:00Z',
+        customerName: 'John D.',
+      },
+      {
+        id: 'p1-r2',
+        rating: 4,
+        comment: 'Item is okay, packaging could be better.',
+        isVerified: true,
+        createdAt: '2025-12-20T14:45:00Z',
+        customerName: 'Sarah M.',
+      },
+      {
+        id: 'p1-r3',
+        rating: 5,
+        comment: 'Highly recommended seller!',
+        isVerified: false,
+        createdAt: '2025-11-02T08:30:00Z',
+        customerName: 'Mike R.',
+      },
+      {
+        id: 'p1-r4',
+        rating: 3,
+        comment: 'Average product. Works as expected.',
+        isVerified: true,
+        createdAt: '2025-08-15T16:20:00Z',
+        customerName: 'Emily L.',
+      },
+      {
+        id: 'p1-r5',
+        rating: 1,
+        comment: 'Received damaged item 😡',
+        isVerified: true,
+        createdAt: '2024-12-10T10:05:00Z',
+        customerName: 'Alex K.',
+      },
+      {
+        id: 'p1-r6',
+        rating: 5,
+        isVerified: true,
+        createdAt: '2025-12-30T11:00:00Z',
+        customerName: 'Lisa W.',
+      },
+      {
+        id: 'p1-r7',
+        rating: 4,
+        comment: 'Good for the price.',
+        isVerified: false,
+        createdAt: '2025-10-05T07:40:00Z',
+        customerName: 'Tom B.',
+      },
+    ],
   },
   {
     id: 'p2',
@@ -95,6 +163,48 @@ const baseProducts: Product[] = [
     categoryId: 'cat-footwear',
     category: 'Footwear',
     type: 'flash',
+    reviews: [
+      {
+        id: 'p2-r1',
+        rating: 5,
+        comment: 'Excellent quality leather shoes!',
+        isVerified: true,
+        createdAt: '2025-12-25T10:15:00Z',
+        customerName: 'David S.',
+      },
+      {
+        id: 'p2-r2',
+        rating: 4,
+        comment: 'Good shoes but a bit stiff initially.',
+        isVerified: true,
+        createdAt: '2025-12-18T16:30:00Z',
+        customerName: 'Robert J.',
+      },
+      {
+        id: 'p2-r3',
+        rating: 5,
+        comment: 'Perfect for formal occasions!',
+        isVerified: false,
+        createdAt: '2025-11-15T09:20:00Z',
+        customerName: 'James L.',
+      },
+      {
+        id: 'p2-r4',
+        rating: 3,
+        comment: 'Average quality for the price.',
+        isVerified: true,
+        createdAt: '2025-09-10T14:45:00Z',
+        customerName: 'Michael T.',
+      },
+      {
+        id: 'p2-r5',
+        rating: 4,
+        comment: 'Comfortable after break-in period.',
+        isVerified: true,
+        createdAt: '2025-08-20T11:30:00Z',
+        customerName: 'William H.',
+      },
+    ],
   },
   {
     id: 'p3',
@@ -120,6 +230,40 @@ const baseProducts: Product[] = [
     category: 'Footwear',
     type: 'new',
     soldCount: 128,
+    reviews: [
+      {
+        id: 'p3-r1',
+        rating: 5,
+        comment: 'Very comfortable sneakers!',
+        isVerified: true,
+        createdAt: '2025-12-22T08:45:00Z',
+        customerName: 'Chris P.',
+      },
+      {
+        id: 'p3-r2',
+        rating: 4,
+        comment: 'Good value for money.',
+        isVerified: true,
+        createdAt: '2025-12-15T13:20:00Z',
+        customerName: 'Kevin M.',
+      },
+      {
+        id: 'p3-r3',
+        rating: 5,
+        comment: 'Perfect for daily wear!',
+        isVerified: false,
+        createdAt: '2025-11-28T10:10:00Z',
+        customerName: 'Steve R.',
+      },
+      {
+        id: 'p3-r4',
+        rating: 4,
+        comment: 'Lightweight and breathable.',
+        isVerified: true,
+        createdAt: '2025-10-12T15:30:00Z',
+        customerName: 'Jason D.',
+      },
+    ],
   },
   {
     id: 'p4',
@@ -145,6 +289,32 @@ const baseProducts: Product[] = [
     category: "Women's Clothing",
     type: 'new',
     soldCount: 128,
+    reviews: [
+      {
+        id: 'p4-r1',
+        rating: 5,
+        comment: 'Beautiful dress! Perfect fit.',
+        isVerified: true,
+        createdAt: '2025-12-20T18:30:00Z',
+        customerName: 'Maria G.',
+      },
+      {
+        id: 'p4-r2',
+        rating: 4,
+        comment: 'Elegant and well-made.',
+        isVerified: true,
+        createdAt: '2025-12-10T12:15:00Z',
+        customerName: 'Sophia L.',
+      },
+      {
+        id: 'p4-r3',
+        rating: 5,
+        comment: 'Stunning color and design!',
+        isVerified: false,
+        createdAt: '2025-11-05T14:40:00Z',
+        customerName: 'Emma W.',
+      },
+    ],
   },
   {
     id: 'p5',
@@ -168,6 +338,16 @@ const baseProducts: Product[] = [
     categoryId: 'cat-womens-clothing',
     category: "Women's Clothing",
     type: 'regular',
+    reviews: [
+      {
+        id: 'p5-r1',
+        rating: 5,
+        comment: 'Absolutely love this outfit! Fits perfectly.',
+        isVerified: true,
+        createdAt: '2025-12-15T10:30:00Z',
+        customerName: 'Jennifer A.',
+      },
+    ],
   },
   {
     id: 'p6',
@@ -191,6 +371,32 @@ const baseProducts: Product[] = [
     categoryId: 'cat-mens-clothing',
     category: "Men's Clothing",
     type: 'new',
+    reviews: [
+      {
+        id: 'p6-r1',
+        rating: 5,
+        comment: 'Great shirt! Very comfortable.',
+        isVerified: true,
+        createdAt: '2025-12-25T14:20:00Z',
+        customerName: 'Mark T.',
+      },
+      {
+        id: 'p6-r2',
+        rating: 4,
+        comment: 'Good fit and quality.',
+        isVerified: true,
+        createdAt: '2025-12-12T10:45:00Z',
+        customerName: 'Brian K.',
+      },
+      {
+        id: 'p6-r3',
+        rating: 4,
+        comment: 'Nice casual shirt.',
+        isVerified: false,
+        createdAt: '2025-11-20T13:15:00Z',
+        customerName: 'Ryan S.',
+      },
+    ],
   },
   {
     id: 'p7',
@@ -214,6 +420,32 @@ const baseProducts: Product[] = [
     categoryId: 'cat-mens-clothing',
     category: "Men's Clothing",
     type: 'flash',
+    reviews: [
+      {
+        id: 'p7-r1',
+        rating: 5,
+        comment: 'Great jeans! Perfect fit.',
+        isVerified: true,
+        createdAt: '2025-12-23T12:30:00Z',
+        customerName: 'John D.',
+      },
+      {
+        id: 'p7-r2',
+        rating: 4,
+        comment: 'Good quality denim.',
+        isVerified: true,
+        createdAt: '2025-12-14T15:45:00Z',
+        customerName: 'Mike R.',
+      },
+      {
+        id: 'p7-r3',
+        rating: 5,
+        comment: 'Classic style, very comfortable!',
+        isVerified: false,
+        createdAt: '2025-11-18T10:20:00Z',
+        customerName: 'Sarah L.',
+      },
+    ],
   },
   {
     id: 'p8',
@@ -237,6 +469,16 @@ const baseProducts: Product[] = [
     categoryId: 'cat-mens-clothing',
     category: "Men's Clothing",
     type: 'regular',
+    reviews: [
+      {
+        id: 'p8-r1',
+        rating: 5,
+        comment: 'Great quality polo shirt. Highly recommended!',
+        isVerified: true,
+        createdAt: '2025-12-20T09:15:00Z',
+        customerName: 'David K.',
+      },
+    ],
   },
   {
     id: 'p9',
@@ -380,6 +622,7 @@ const baseProducts: Product[] = [
     category: 'Electronics',
     type: 'new',
     stock: 75,
+    soldCount: 89,
   },
   {
     id: 'p15',
@@ -427,6 +670,7 @@ const baseProducts: Product[] = [
     category: 'Home & Living',
     type: 'new',
     stock: 75,
+    soldCount: 45,
   },
   {
     id: 'p17',
@@ -644,6 +888,24 @@ const baseProducts: Product[] = [
     categoryId: 'cat-footwear',
     category: 'Footwear',
     type: 'regular',
+    reviews: [
+      {
+        id: 'p25-r1',
+        rating: 5,
+        comment: 'Excellent hiking boots! Completely waterproof.',
+        isVerified: true,
+        createdAt: '2025-12-19T15:30:00Z',
+        customerName: 'Trail Hiker',
+      },
+      {
+        id: 'p25-r2',
+        rating: 5,
+        comment: 'Great ankle support, very comfortable on long hikes.',
+        isVerified: true,
+        createdAt: '2025-12-08T11:20:00Z',
+        customerName: 'Mountain Man',
+      },
+    ],
   },
   {
     id: 'p26',
@@ -668,6 +930,24 @@ const baseProducts: Product[] = [
     categoryId: 'cat-womens-clothing',
     category: "Women's Clothing",
     type: 'regular',
+    reviews: [
+      {
+        id: 'p26-r1',
+        rating: 4,
+        comment: 'Nice top, very comfortable and breathable.',
+        isVerified: true,
+        createdAt: '2025-12-14T12:45:00Z',
+        customerName: 'Fashion Girl',
+      },
+      {
+        id: 'p26-r2',
+        rating: 4,
+        comment: 'Good quality fabric, fits as expected.',
+        isVerified: false,
+        createdAt: '2025-11-20T10:30:00Z',
+        customerName: 'Casual Wearer',
+      },
+    ],
   },
   {
     id: 'p27',
@@ -692,6 +972,24 @@ const baseProducts: Product[] = [
     categoryId: 'cat-mens-clothing',
     category: "Men's Clothing",
     type: 'regular',
+    reviews: [
+      {
+        id: 'p27-r1',
+        rating: 5,
+        comment: 'Perfect for workouts! Moisture-wicking really works.',
+        isVerified: true,
+        createdAt: '2025-12-21T14:15:00Z',
+        customerName: 'Gym Rat',
+      },
+      {
+        id: 'p27-r2',
+        rating: 4,
+        comment: 'Good athletic shorts, comfortable and lightweight.',
+        isVerified: true,
+        createdAt: '2025-12-03T09:40:00Z',
+        customerName: 'Fitness Fan',
+      },
+    ],
   },
   {
     id: 'p28',
@@ -764,6 +1062,24 @@ const baseProducts: Product[] = [
     categoryId: 'cat-home-living',
     category: 'Home & Living',
     type: 'regular',
+    reviews: [
+      {
+        id: 'p30-r1',
+        rating: 5,
+        comment: "Best coffee maker I've ever owned! Perfect brew every time.",
+        isVerified: true,
+        createdAt: '2025-12-22T08:30:00Z',
+        customerName: 'Coffee Lover',
+      },
+      {
+        id: 'p30-r2',
+        rating: 4,
+        comment: 'Great coffee, easy to use and clean.',
+        isVerified: false,
+        createdAt: '2025-11-15T14:20:00Z',
+        customerName: 'Mark R.',
+      },
+    ],
   },
   // Additional Summer Products for Testing
   {
@@ -789,6 +1105,24 @@ const baseProducts: Product[] = [
     categoryId: 'cat-accessories',
     category: 'Accessories',
     type: 'new',
+    reviews: [
+      {
+        id: 'p31-r1',
+        rating: 5,
+        comment: 'Perfect sun hat! Great coverage and stylish.',
+        isVerified: true,
+        createdAt: '2025-12-25T11:10:00Z',
+        customerName: 'Beach Girl',
+      },
+      {
+        id: 'p31-r2',
+        rating: 4,
+        comment: 'Good sun protection, fits well.',
+        isVerified: true,
+        createdAt: '2025-12-12T09:45:00Z',
+        customerName: 'Sun Lover',
+      },
+    ],
   },
   {
     id: 'p32',
@@ -813,6 +1147,24 @@ const baseProducts: Product[] = [
     categoryId: 'cat-footwear',
     category: 'Footwear',
     type: 'flash',
+    reviews: [
+      {
+        id: 'p32-r1',
+        rating: 5,
+        comment: 'Super comfortable! Great for beach days.',
+        isVerified: true,
+        createdAt: '2025-12-20T10:15:00Z',
+        customerName: 'Sarah K.',
+      },
+      {
+        id: 'p32-r2',
+        rating: 4,
+        comment: 'Good quality flip flops, very lightweight.',
+        isVerified: true,
+        createdAt: '2025-12-08T14:30:00Z',
+        customerName: 'Chris M.',
+      },
+    ],
   },
   {
     id: 'p33',
@@ -837,6 +1189,24 @@ const baseProducts: Product[] = [
     categoryId: 'cat-accessories',
     category: 'Accessories',
     type: 'new',
+    reviews: [
+      {
+        id: 'p33-r1',
+        rating: 5,
+        comment: 'Love the tropical style! Great UV protection.',
+        isVerified: true,
+        createdAt: '2025-12-15T11:45:00Z',
+        customerName: 'Jessica R.',
+      },
+      {
+        id: 'p33-r2',
+        rating: 4,
+        comment: 'Stylish and functional. Good value for money.',
+        isVerified: false,
+        createdAt: '2025-11-28T09:20:00Z',
+        customerName: 'Ryan T.',
+      },
+    ],
   },
   {
     id: 'p34',
@@ -861,6 +1231,24 @@ const baseProducts: Product[] = [
     categoryId: 'cat-mens-clothing',
     category: "Men's Clothing",
     type: 'flash',
+    reviews: [
+      {
+        id: 'p34-r1',
+        rating: 5,
+        comment: 'Perfect for summer! Very comfortable and stylish.',
+        isVerified: true,
+        createdAt: '2025-12-22T14:30:00Z',
+        customerName: 'Michael B.',
+      },
+      {
+        id: 'p34-r2',
+        rating: 4,
+        comment: 'Good quality linen, fits well.',
+        isVerified: true,
+        createdAt: '2025-12-10T11:15:00Z',
+        customerName: 'Tom H.',
+      },
+    ],
   },
   {
     id: 'p35',

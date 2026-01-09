@@ -6,6 +6,7 @@ export type Review = {
   comment?: string; // 💬 optional comment
   isVerified: boolean;
   createdAt: string | Date;
+  customerName?: string; // 👤 optional customer name
 };
 
 export type RatingOptions = {

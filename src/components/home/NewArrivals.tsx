@@ -172,6 +172,7 @@ export default function NewArrivals({
                     priceColor="white"
                     badgeColor="yellow"
                     id={p.id}
+                    reviews={p.reviews}
                   />
                 </div>
               ))}
@@ -198,11 +199,12 @@ export default function NewArrivals({
                   rating={p.rating}
                   reviewCount={p.reviewCount}
                   soldCount={p.soldCount}
-                  priority={idx < responsiveItemsPerView}
+                  priority={idx < 4}
                   textColor="white"
                   priceColor="white"
                   badgeColor="yellow"
                   id={p.id}
+                  reviews={p.reviews}
                 />
               </div>
             ))}

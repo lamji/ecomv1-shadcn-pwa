@@ -6,6 +6,8 @@ import { StarRating } from './StarRating';
 import { ShoppingCart, Star } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useAddToCart } from '@/lib/hooks/useAddToCart';
+import { useProductReviews } from '@/lib/hooks/useProductReviews';
+import type { Review } from '@/lib/hooks/useProductReviews';
 
 type ProductCardProps = {
   id: string; // Product ID
@@ -32,6 +34,7 @@ type ProductCardProps = {
   priceColor?: 'white' | 'black' | 'gray';
   badgeColor?: 'yellow' | 'red' | 'blue';
   stock?: number;
+  reviews?: Review[]; // Product reviews data
 };
 
 export default function ProductCard({
@@ -53,11 +56,15 @@ export default function ProductCard({
   priceColor = 'black',
   badgeColor = 'red',
   stock,
+  reviews,
 }: ProductCardProps) {
   const { addToCart } = useAddToCart();
   const router = useRouter();
   const hasDiscount = typeof discountPercent === 'number' && discountPercent > 0;
   const isOutOfStock = stock === 0;
+
+  // Get reviews data using the hook
+  const reviewsData = useProductReviews(reviews || []);
 
   const formatSoldCount = (count: number) => {
     if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}m`;
@@ -222,14 +229,12 @@ export default function ProductCard({
         >
           {title}
         </h3>
-        {typeof soldCount === 'number' && (
-          <div
-            className={`text-xs ${textColor === 'white' ? 'text-gray-200' : 'text-gray-500'}`}
-            data-testid="product-card-sold-count"
-          >
-            Sold: {formatSoldCount(soldCount)}
-          </div>
-        )}
+        <div
+          className={`text-xs ${textColor === 'white' ? 'text-gray-200' : 'text-gray-500'}`}
+          data-testid="product-card-sold-count"
+        >
+          Sold: {formatSoldCount(soldCount || 0)}
+        </div>
         <div className="flex items-center gap-2">
           <span
             className={`text-base font-bold ${colorClasses[priceColor].price}`}
@@ -252,14 +257,20 @@ export default function ProductCard({
             </span>
           )}
         </div>
-        {rating !== undefined && (
-          <div className="flex items-center gap-1">
-            <StarRating rating={rating} size={14} />
-            {reviewCount !== undefined && (
-              <span className="text-xs text-gray-500">({reviewCount})</span>
-            )}
-          </div>
-        )}
+        {/* Rating Display */}
+        <div className="flex items-center gap-1">
+          {reviewsData && reviewsData.count > 0 ? (
+            <>
+              <StarRating rating={reviewsData.rating} size={14} />
+              <span className="text-xs text-gray-500">({reviewsData.count})</span>
+            </>
+          ) : (
+            <>
+              <StarRating rating={0} size={14} />
+              <span className="text-xs text-gray-500">(0)</span>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

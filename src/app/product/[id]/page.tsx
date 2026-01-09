@@ -1,15 +1,29 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ShoppingCart, Minus, Plus, Truck, Shield, RefreshCw } from 'lucide-react';
+import {
+  ArrowLeft,
+  ShoppingCart,
+  Minus,
+  Plus,
+  Truck,
+  Shield,
+  RefreshCw,
+  User,
+  ThumbsUp,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { StarRating } from '@/components/shared/StarRating';
+import FlashSale from '@/components/home/FlashSale';
 import { formatCurrency } from '@/lib/helper/currency';
 import { useProductDetailsHooks } from '@/lib/hooks/useProductDetailsHooks';
 import { useAddToCart } from '@/lib/hooks/useAddToCart';
+import { useProductReviews } from '@/lib/hooks/useProductReviews';
+import { useSimilarProducts } from '@/lib/hooks/useSimilarProducts';
+import { flashSaleProducts } from '@/lib/data/products';
 
 export default function ProductPage() {
   const {
@@ -30,6 +44,36 @@ export default function ProductPage() {
   const { addToCart } = useAddToCart();
   const router = useRouter();
 
+  // State for managing visible reviews
+  const [visibleReviewsCount, setVisibleReviewsCount] = useState(3);
+
+  // Load more reviews function
+  const handleLoadMoreReviews = () => {
+    setVisibleReviewsCount((prev: number) => prev + 3);
+  };
+
+  // Get reviews data with enhanced rating calculation
+  const reviewsData = useProductReviews(product?.reviews || [], {
+    globalAverage: 4.0, // Lower baseline for more realistic ratings
+    minReviews: 10, // Fewer reviews needed for Bayesian adjustment
+    verifiedWeight: 1.2, // Give more weight to verified purchases
+    unverifiedWeight: 0.6, // Reduce weight of unverified reviews
+    halfLifeDays: 90, // Reviews decay faster (90 days instead of 180)
+    minCommentLength: 3, // Include shorter comments
+  });
+
+  // Get similar products
+  const { similarProducts, hasSimilarProducts } = useSimilarProducts(
+    product || null,
+    flashSaleProducts,
+    {
+      maxProducts: 6,
+      sameCategory: true,
+      priceRange: 40, // 40% price variance
+      excludeCurrent: true,
+    },
+  );
+
   const handleAddToCart = () => {
     if (!isOutOfStock && product) {
       addToCart(product, quantity);
@@ -46,7 +90,24 @@ export default function ProductPage() {
           <h1 className="mb-4 text-2xl font-bold text-gray-900" data-testid="not-found-title">
             Product Not Found
           </h1>
-          <Button onClick={() => router.back()} data-testid="go-back-button" variant="outline">
+          <Button
+            onClick={() => {
+              // Navigate back and then scroll to top
+              if (window.history.length > 1) {
+                router.back();
+                // Use setTimeout to ensure navigation completes before scrolling
+                setTimeout(() => {
+                  window.scrollTo(0, 0);
+                }, 100);
+              } else {
+                // If no history, go to home page
+                router.push('/');
+                window.scrollTo(0, 0);
+              }
+            }}
+            data-testid="go-back-button"
+            variant="outline"
+          >
             Go Back
           </Button>
         </div>
@@ -58,11 +119,24 @@ export default function ProductPage() {
     <div className="min-h-screen bg-gray-50" data-testid="product-page">
       {/* Header */}
       <header className="bg-white shadow-none" data-testid="product-header">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-0 sm:px-0 lg:px-0">
           <div className="flex h-16 items-center justify-between">
             <Button
               variant="ghost"
-              onClick={() => router.back()}
+              onClick={() => {
+                // Navigate back and then scroll to top
+                if (window.history.length > 1) {
+                  router.back();
+                  // Use setTimeout to ensure navigation completes before scrolling
+                  setTimeout(() => {
+                    window.scrollTo(0, 0);
+                  }, 100);
+                } else {
+                  // If no history, go to home page
+                  router.push('/');
+                  window.scrollTo(0, 0);
+                }
+              }}
               className="flex items-center gap-2"
               data-testid="back-button"
             >
@@ -162,14 +236,17 @@ export default function ProductPage() {
               </div>
 
               {/* Rating */}
-              {product.rating && (
-                <div className="flex items-center gap-2" data-testid="rating-section">
-                  <StarRating rating={product.rating} size={20} />
-                  <span className="text-sm text-gray-600" data-testid="rating-text">
-                    {product.rating} ({product.reviewCount} reviews)
-                  </span>
-                </div>
-              )}
+              <div className="flex items-center gap-2" data-testid="rating-section">
+                <StarRating
+                  rating={reviewsData && reviewsData.count > 0 ? reviewsData.rating : 0}
+                  size={20}
+                />
+                <span className="text-sm text-gray-600" data-testid="rating-text">
+                  {reviewsData && reviewsData.count > 0
+                    ? `(${reviewsData.count} reviews)`
+                    : '(0 reviewss)'}
+                </span>
+              </div>
 
               {/* Stock Status */}
               <div className="mt-2" data-testid="stock-section">
@@ -325,6 +402,160 @@ export default function ProductPage() {
           </div>
         </div>
       </main>
+
+      {/* Reviews Section */}
+      {reviewsData && reviewsData.count > 0 && (
+        <section
+          className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
+          data-testid="reviews-section"
+        >
+          <h5 className="mb-6 text-xl font-semibold text-gray-900">Reviews and Ratings</h5>
+          <div className="border-t pt-8">
+            {/* Rating Summary */}
+            <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div
+                className="flex flex-col items-center justify-center space-y-3"
+                data-testid="rating-summary"
+              >
+                <div className="flex items-center space-x-3">
+                  <span className="text-3xl font-bold text-gray-900 sm:text-4xl md:text-5xl">
+                    {reviewsData.rating}
+                  </span>
+                  <div className="flex">
+                    <div className="block sm:hidden">
+                      <StarRating rating={reviewsData.rating} size={20} />
+                    </div>
+                    <div className="hidden sm:block md:hidden">
+                      <StarRating rating={reviewsData.rating} size={24} />
+                    </div>
+                    <div className="hidden md:block">
+                      <StarRating rating={reviewsData.rating} size={28} />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-600 sm:text-base">
+                  Based on {reviewsData.count} reviews
+                </p>
+              </div>
+
+              {/* Rating Distribution */}
+              <div className="space-y-2" data-testid="rating-distribution">
+                {[5, 4, 3, 2, 1].map(ratingValue => (
+                  <div key={ratingValue} className="flex items-center gap-2">
+                    <span className="w-3 text-sm text-gray-600">{ratingValue}</span>
+                    <span className="text-sm text-gray-600">⭐</span>
+                    <div className="h-2 flex-1 rounded-full bg-gray-200">
+                      <div
+                        className="h-2 rounded-full bg-yellow-400"
+                        style={{
+                          width: `${
+                            reviewsData.count > 0
+                              ? (reviewsData.distribution[
+                                  ratingValue as keyof typeof reviewsData.distribution
+                                ] /
+                                  reviewsData.count) *
+                                100
+                              : 0
+                          }%`,
+                        }}
+                      />
+                    </div>
+                    <span className="w-8 text-right text-sm text-gray-600">
+                      {
+                        reviewsData.distribution[
+                          ratingValue as keyof typeof reviewsData.distribution
+                        ]
+                      }
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Reviews List */}
+            <div className="space-y-6" data-testid="reviews-list">
+              {reviewsData.latestComments.slice(0, visibleReviewsCount).map(review => (
+                <div
+                  key={review.id}
+                  className="border-b pb-6 last:border-b-0"
+                  data-testid={`review-${review.id}`}
+                >
+                  <div className="mb-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">
+                        <User className="h-4 w-4 text-gray-600" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {review.customerName || 'Anonymous Customer'}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <StarRating rating={review.rating} size={16} />
+                          {review.isVerified && (
+                            <Badge
+                              variant="secondary"
+                              className="bg-green-100 text-xs text-green-800"
+                              data-testid="verified-badge"
+                            >
+                              <ThumbsUp className="mr-1 h-3 w-3" />
+                              Verified
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {new Date(review.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+
+                  {review.comment && (
+                    <p
+                      className="leading-relaxed text-gray-700"
+                      data-testid={`review-comment-${review.id}`}
+                    >
+                      {review.comment}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {reviewsData.latestComments.length > visibleReviewsCount && (
+              <div className="mt-6 text-center">
+                <Button
+                  variant="outline"
+                  data-testid="load-more-reviews"
+                  onClick={handleLoadMoreReviews}
+                >
+                  Load More Reviews (
+                  {Math.min(3, reviewsData.latestComments.length - visibleReviewsCount)} more)
+                </Button>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Similar Products Section */}
+      {hasSimilarProducts && (
+        <section
+          className="mx-auto max-w-7xl px-0 py-8 sm:px-6 lg:px-8"
+          data-testid="similar-products-section"
+        >
+          <div className="border-t pt-8">
+            <FlashSale
+              title="Similar Products"
+              showCountdown={false}
+              showArrows={true}
+              showType={true}
+              productsData={similarProducts}
+              limit={false}
+              hideCategories={true}
+            />
+          </div>
+        </section>
+      )}
 
       {/* Floating Add to Cart - Mobile Only */}
       <div

@@ -40,14 +40,14 @@ export default function SummerCategorySidebar({
 
         {/* All Categories Option */}
         <div
-          className="grid grid-cols-3 gap-2 pb-3 md:flex-col md:gap-2 md:space-y-2 md:overflow-x-visible md:pb-0"
+          className="grid grid-cols-3 gap-2 pb-3 md:flex md:flex-col md:gap-2 md:space-y-2 md:overflow-x-visible md:pb-0"
           data-testid="summer-category-list-items"
         >
           <button
-            className={`group flex shrink-0 cursor-pointer flex-col items-center justify-center rounded-lg bg-white p-2 transition-all hover:bg-gray-50 md:w-full md:flex-row md:justify-start md:rounded-lg md:bg-transparent md:p-0 ${
+            className={`group flex shrink-0 cursor-pointer flex-col items-center justify-center rounded-lg bg-white p-2 transition-all hover:bg-gray-50 md:w-full md:flex-row md:justify-start md:rounded-lg md:border-0 md:bg-transparent md:p-0 ${
               selectedCategory === null
-                ? 'border border-orange-200 bg-orange-50'
-                : 'border border-gray-200'
+                ? 'border border-orange-200 bg-orange-50 md:border-0 md:bg-transparent'
+                : 'border border-gray-200 md:border-0'
             }`}
             data-testid="summer-category-all"
             onClick={() => handleCategoryClick(null)}
@@ -83,10 +83,10 @@ export default function SummerCategorySidebar({
           {categoriesWithSummerProducts.map(category => (
             <button
               key={category.id}
-              className={`group flex shrink-0 cursor-pointer flex-col items-center justify-center rounded-lg bg-white p-2 transition-all hover:bg-gray-50 md:w-full md:flex-row md:justify-start md:rounded-lg md:bg-transparent md:p-0 ${
+              className={`group flex shrink-0 cursor-pointer flex-col items-center justify-center rounded-lg bg-white p-2 transition-all hover:bg-gray-50 md:w-full md:flex-row md:justify-start md:rounded-lg md:border-0 md:bg-transparent md:p-0 ${
                 selectedCategory === category.id
-                  ? 'border border-orange-200 bg-orange-50'
-                  : 'border border-gray-200'
+                  ? 'border border-orange-200 bg-orange-50 md:border-0 md:bg-transparent'
+                  : 'border border-gray-200 md:border-0'
               }`}
               data-testid={`summer-category-item-${category.id}`}
               onClick={() => handleCategoryClick(category.id)}

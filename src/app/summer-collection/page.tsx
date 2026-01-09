@@ -26,7 +26,7 @@ export default function SummerCollectionPage() {
     setSelectedCategory(categoryId);
   };
   return (
-    <div className="min-h-screen bg-gray-50" data-testid="summer-collection-page">
+    <div className="min-h-screen bg-gray-50 pt-5" data-testid="summer-collection-page">
       {/* Main Content */}
       <div
         className="mx-auto max-w-7xl px-4 py-0 sm:px-6 lg:px-8"

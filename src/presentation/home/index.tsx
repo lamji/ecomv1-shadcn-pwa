@@ -55,6 +55,7 @@ export default function Homepage() {
           showType={true}
           productsData={flashSaleProducts}
           limit={true}
+          initialLimit={12}
         />
       </div>
 

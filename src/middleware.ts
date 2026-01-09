@@ -11,6 +11,8 @@ const PUBLIC_ROUTES = [
   '/new-arrivals',
   '/summer-collection',
   '/view-all',
+  '/search',
+  '/profile',
 ];
 
 /**

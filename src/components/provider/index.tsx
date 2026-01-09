@@ -34,7 +34,10 @@ export default function ReactProvider({
 
   const pathname = usePathname();
   const isAuthRoute =
-    pathname === '/login' || pathname === '/signup' || pathname.startsWith('/product/');
+    pathname === '/login' ||
+    pathname === '/signup' ||
+    pathname.startsWith('/product/') ||
+    pathname === '/search';
 
   return (
     <Providers bearer={false} queryClient={queryClient}>

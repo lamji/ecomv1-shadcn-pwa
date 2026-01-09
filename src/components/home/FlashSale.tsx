@@ -19,6 +19,7 @@ type FlashSaleProps = {
   showType?: boolean;
   productsData?: Product[];
   limit?: boolean;
+  initialLimit?: number;
   showFilter?: boolean;
   defaultFilter?: Partial<FilterOptions>;
   hideCategories?: boolean;
@@ -32,6 +33,7 @@ export default function Products({
   productsData,
   showType = false,
   limit = false,
+  initialLimit = 6,
   showFilter = false,
   defaultFilter,
   hideCategories = false,
@@ -40,7 +42,12 @@ export default function Products({
   const shouldShowGrid =
     limit || // Force grid view when limit is true
     (typeof window !== 'undefined' &&
-      GRID_VIEW_ROUTES.some(route => window.location.pathname.includes(route)));
+      GRID_VIEW_ROUTES.some(route => window.location.pathname === route));
+
+  // Check if we're on view-all page or home page for special grid layout
+  const isViewAllPage =
+    typeof window !== 'undefined' &&
+    (window.location.pathname === '/view-all' || window.location.pathname === '/');
 
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
@@ -77,8 +84,8 @@ export default function Products({
     filteredProducts,
   } = useFlashSalesHooks(products.length, products, appliedFilters);
 
-  // Apply limit if enabled - show exactly 6 products
-  const displayProducts = limit ? filteredProducts.slice(0, 6) : filteredProducts;
+  // Apply limit if enabled - use initialLimit prop
+  const displayProducts = limit ? filteredProducts.slice(0, initialLimit) : filteredProducts;
 
   const handleApplyFilters = (filters: FilterOptions) => {
     setAppliedFilters(filters);
@@ -229,7 +236,13 @@ export default function Products({
       <div className="relative mt-4">
         {/* Mobile/Tablet Container - Grid View */}
         {shouldShowGrid ? (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
+          <div
+            className={`grid grid-cols-2 gap-3 sm:grid-cols-3 ${
+              isViewAllPage
+                ? 'md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+                : 'md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3'
+            }`}
+          >
             {displayProducts.map((p, idx) => (
               <ProductCard
                 key={p.id}
@@ -250,6 +263,7 @@ export default function Products({
                 priority={idx < 4}
                 stock={p.stock}
                 id={p.id}
+                reviews={p.reviews}
               />
             ))}
           </div>
@@ -257,7 +271,7 @@ export default function Products({
           <>
             {/* Mobile Swipeable Container */}
             <div className="md:hidden">
-              <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2">
+              <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto px-0 pb-2 md:px-4">
                 {displayProducts.map((p, idx) => (
                   <div key={p.id} className="w-[45%] flex-shrink-0 snap-center">
                     <ProductCard
@@ -278,6 +292,7 @@ export default function Products({
                       priority={idx < 4}
                       stock={p.stock}
                       id={p.id}
+                      reviews={p.reviews}
                     />
                   </div>
                 ))}
@@ -303,9 +318,10 @@ export default function Products({
                   soldCount={p.soldCount}
                   showType={showType}
                   productType={p.type}
-                  priority={idx < itemsPerView}
+                  priority={idx < 4}
                   stock={p.stock}
                   id={p.id}
+                  reviews={p.reviews}
                 />
               ))}
             </div>

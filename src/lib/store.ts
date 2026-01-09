@@ -4,6 +4,7 @@ import { persistReducer, persistStore } from 'redux-persist';
 import themeReducer from './features/themeSlice';
 import alertReducer from './features/alertSlice';
 import loadingReducer from './features/loadingSlice';
+import searchReducer from './features/searchSlice';
 import storage from 'redux-persist/lib/storage';
 
 const persistConfig = {
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   theme: themeReducer,
   alert: alertReducer,
   loading: loadingReducer,
+  search: searchReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
