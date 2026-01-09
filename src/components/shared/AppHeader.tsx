@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Search, ShoppingCart, User, Menu, X, ShoppingBag } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
+import { useAuth } from '@/lib/hooks/useAuth';
 
 interface AppHeaderProps {
   title?: string;
@@ -27,6 +29,7 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
   const [cartCount, setCartCount] = useState(3); // Example cart count
   const headerRef = useRef<HTMLDivElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const { isAuthenticated, isLoading } = useAuth();
 
   // Keep a global CSS var with the current header height for sticky layouts
   useEffect(() => {
@@ -73,12 +76,12 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
       <div className="w-full">
         <div className="flex items-center justify-between">
           {/* Left Section - Menu Button (Mobile) & Title/Logo */}
-          <div className="flex items-center gap-2" data-testid="header-title">
+          <div className="flex items-center gap-1" data-testid="header-title">
             {/* Mobile menu button */}
             <Button
               variant="ghost"
               size="icon"
-              className="cursor-pointer lg:hidden"
+              className="cursor-pointer gap-0 lg:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
               data-testid="mobile-menu-button"
@@ -89,10 +92,25 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
             <Button
               variant="ghost"
               onClick={() => router.push('/')}
-              className="flex items-center gap-2 p-2"
+              className="-ml-2.5 flex items-center gap-2 p-1 lg:ml-0"
               data-testid="header-logo-button"
             >
-              <ShoppingBag className="h-6 w-6" />
+              <div className="relative h-8 w-8 overflow-hidden">
+                <Image
+                  src="/logo.png"
+                  alt="E-HotShop Logo"
+                  width={32}
+                  height={32}
+                  className="object-contain"
+                  priority
+                  onError={e => {
+                    console.error('Logo failed to load:', e);
+                  }}
+                  onLoadingComplete={() => {
+                    console.log('Logo loaded successfully');
+                  }}
+                />
+              </div>
               <h1 className="text-foreground hidden text-2xl font-bold lg:block">{title}</h1>
             </Button>
           </div>
@@ -167,14 +185,21 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
               )}
             </Button>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.push('/profile')}
-              className="hidden cursor-pointer lg:flex"
-            >
-              <User className="h-5 w-5" />
-            </Button>
+            {!isLoading && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => router.push(isAuthenticated ? '/profile' : '/login')}
+                className="cursor-pointer"
+                data-testid={isAuthenticated ? 'profile-button' : 'login-button'}
+              >
+                {isAuthenticated ? (
+                  <User className="h-5 w-5" />
+                ) : (
+                  <span className="text-xs font-medium sm:text-sm">Login</span>
+                )}
+              </Button>
+            )}
           </div>
         </div>
 

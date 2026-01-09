@@ -252,8 +252,8 @@ export default function ProductPage() {
               </div>
             </div>
 
-            {/* Add to Cart */}
-            <div className="space-y-4" data-testid="add-to-cart-section">
+            {/* Add to Cart - Desktop Only */}
+            <div className="hidden space-y-4 md:block" data-testid="add-to-cart-section">
               <div
                 className="flex items-center justify-between rounded-lg bg-gray-50 p-4"
                 data-testid="total-price-section"
@@ -317,6 +317,42 @@ export default function ProductPage() {
           </div>
         </div>
       </main>
+
+      {/* Floating Add to Cart - Mobile Only */}
+      <div
+        className="fixed right-0 bottom-0 left-0 z-50 border-t bg-white shadow-lg md:hidden"
+        data-testid="floating-add-to-cart"
+      >
+        <div className="flex items-center justify-between p-4">
+          <div className="flex-1">
+            <div className="text-xs text-gray-500" data-testid="floating-price-label">
+              Total
+            </div>
+            <div className="text-lg font-bold text-gray-900" data-testid="floating-price">
+              {formatCurrency(totalPrice)}
+            </div>
+          </div>
+          <Button
+            size="lg"
+            className="max-w-xs flex-1"
+            disabled={!!isOutOfStock}
+            onClick={() => {
+              // TODO: Add to cart functionality
+              console.log('Added to cart:', {
+                product: product.title,
+                quantity,
+                size: selectedSize,
+                price: displayPrice,
+                total: totalPrice,
+              });
+            }}
+            data-testid="floating-add-to-cart-button"
+          >
+            <ShoppingCart className="mr-2 h-5 w-5" />
+            {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

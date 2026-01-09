@@ -42,7 +42,7 @@ export default function Homepage() {
       </div>
 
       {/* Middle Banner */}
-      <div className="mt-8 px-0 md:px-6">
+      <div className="mt-8 px-4 md:px-6">
         <MiddleBanner />
       </div>
 

@@ -216,7 +216,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
                     onClick={() => toggleCategory(category.name)}
                     data-testid={`category-${category.name.toLowerCase().replace(/\s+/g, '-')}`}
                   >
-                    {category.icon} {category.name} ({category.productCount})
+                    {category.icon} {category.name}
                   </Badge>
                 ))}
               </div>

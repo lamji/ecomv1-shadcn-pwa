@@ -8,6 +8,9 @@ import { Button } from '../ui/button';
 import { ArrowRight, Filter, X } from 'lucide-react';
 import FilterModal, { FilterOptions } from './FilterModal';
 
+// Routes that should display grid view instead of swipeable on mobile/tablet
+const GRID_VIEW_ROUTES = ['/new-arrivals', '/view-all', '/category/'];
+
 type FlashSaleProps = {
   title?: string;
   className?: string;
@@ -33,6 +36,11 @@ export default function Products({
   defaultFilter,
   hideCategories = false,
 }: FlashSaleProps) {
+  // Check if current route should display grid view instead of swipeable
+  const shouldShowGrid =
+    typeof window !== 'undefined' &&
+    GRID_VIEW_ROUTES.some(route => window.location.pathname.includes(route));
+
   // Helper function to get default filter options
   const getDefaultFilterOptions = (): FilterOptions => ({
     priceRange: { min: 0, max: 1000 },
@@ -214,12 +222,66 @@ export default function Products({
         )}
       </div>
       <div className="relative mt-4">
-        {/* Mobile Swipeable Container */}
-        <div className="md:hidden">
-          <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2">
+        {/* Mobile/Tablet Container - Grid View */}
+        {shouldShowGrid ? (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {displayProducts.map((p, idx) => (
-              <div key={p.id} className="w-[45%] flex-shrink-0 snap-center">
+              <ProductCard
+                key={p.id}
+                imageSrc={p.imageSrc}
+                imageAlt={p.imageAlt || p.title}
+                images={p.images}
+                description={p.description}
+                sizes={p.sizes}
+                title={p.title}
+                price={p?.price}
+                originalPrice={p.originalPrice}
+                discountPercent={p.discountPercent}
+                rating={p.rating}
+                reviewCount={p.reviewCount}
+                soldCount={p.soldCount}
+                showType={showType}
+                productType={p.type}
+                priority={idx < 4}
+                stock={p.stock}
+              />
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* Mobile Swipeable Container */}
+            <div className="md:hidden">
+              <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2">
+                {displayProducts.map((p, idx) => (
+                  <div key={p.id} className="w-[45%] flex-shrink-0 snap-center">
+                    <ProductCard
+                      imageSrc={p.imageSrc}
+                      imageAlt={p.imageAlt || p.title}
+                      images={p.images}
+                      description={p.description}
+                      sizes={p.sizes}
+                      title={p.title}
+                      price={p?.price}
+                      originalPrice={p.originalPrice}
+                      discountPercent={p.discountPercent}
+                      rating={p.rating}
+                      reviewCount={p.reviewCount}
+                      soldCount={p.soldCount}
+                      showType={showType}
+                      productType={p.type}
+                      priority={idx < 4}
+                      stock={p.stock}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop Grid */}
+            <div className="hidden md:grid md:grid-cols-4 md:gap-3">
+              {visibleProducts.map((p, idx) => (
                 <ProductCard
+                  key={p.id}
                   imageSrc={p.imageSrc}
                   imageAlt={p.imageAlt || p.title}
                   images={p.images}
@@ -234,38 +296,13 @@ export default function Products({
                   soldCount={p.soldCount}
                   showType={showType}
                   productType={p.type}
-                  priority={idx < 4}
+                  priority={idx < itemsPerView}
                   stock={p.stock}
                 />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Desktop Grid */}
-        <div className="hidden md:grid md:grid-cols-4 md:gap-3">
-          {visibleProducts.map((p, idx) => (
-            <ProductCard
-              key={p.id}
-              imageSrc={p.imageSrc}
-              imageAlt={p.imageAlt || p.title}
-              images={p.images}
-              description={p.description}
-              sizes={p.sizes}
-              title={p.title}
-              price={p?.price}
-              originalPrice={p.originalPrice}
-              discountPercent={p.discountPercent}
-              rating={p.rating}
-              reviewCount={p.reviewCount}
-              soldCount={p.soldCount}
-              showType={showType}
-              productType={p.type}
-              priority={idx < itemsPerView}
-              stock={p.stock}
-            />
-          ))}
-        </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Filter Modal */}

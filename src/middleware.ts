@@ -14,6 +14,7 @@ const PUBLIC_ROUTES = [
   '/product/[id]',
   '/view-all',
   '/category/[id]',
+  '/new-arrivals',
 ];
 
 /**
@@ -48,7 +49,9 @@ function isPublicRoute(pathname: string): boolean {
     pathname.startsWith('/_rsc') ||
     pathname.startsWith('/favicon.ico') ||
     pathname.startsWith('/robots.txt') ||
-    pathname.startsWith('/sitemap.xml')
+    pathname.startsWith('/sitemap.xml') ||
+    pathname.startsWith('/logo.') ||
+    pathname.startsWith('/icons/')
   ) {
     return true;
   }

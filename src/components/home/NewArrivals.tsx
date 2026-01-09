@@ -9,6 +9,7 @@ import ProductCard from '../shared/ProductCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Sparkles, ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type NewArrivalsProps = {
   title?: string;
@@ -27,6 +28,8 @@ export default function NewArrivals({
   showBadge = true,
   productsData,
 }: NewArrivalsProps) {
+  const router = useRouter();
+
   // Use custom productsData if provided, otherwise use default flashSaleProducts
   const products = productsData || flashSaleProducts;
   const { startIndex, canPrev, canNext, handlePrev, handleNext } = useFlashSalesHooks(
@@ -93,7 +96,7 @@ export default function NewArrivals({
             <Button
               variant="ghost"
               onClick={() => {
-                window.location.href = '/view-all?type=new-arrivals';
+                router.push('/new-arrivals');
               }}
               data-testid="view-all-new-arrivals-button"
               className="flex items-center gap-2 border border-white/20 bg-white/10 text-white backdrop-blur-sm hover:border-yellow-300/50 hover:bg-white/20 hover:text-yellow-300"

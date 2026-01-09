@@ -22,7 +22,9 @@ const nextConfig: NextConfig = {
       'source.unsplash.com',
       'cdn.mos.cms.futurecdn.net',
       'www.pricekeeda.com',
+      'localhost',
     ],
+    unoptimized: true,
   },
 
   /**
