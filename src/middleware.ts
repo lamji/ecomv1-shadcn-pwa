@@ -13,6 +13,7 @@ const PUBLIC_ROUTES = [
   '/verify-email',
   '/product/[id]',
   '/view-all',
+  '/category/[id]',
 ];
 
 /**
@@ -33,6 +34,9 @@ function isPublicRoute(pathname: string): boolean {
 
   // Handle dynamic product routes
   if (pathname.startsWith('/product/')) return true;
+
+  // Handle dynamic category routes
+  if (pathname.startsWith('/category/')) return true;
 
   if (PUBLIC_API_ROUTES.some(route => pathname.startsWith(route))) {
     return true;

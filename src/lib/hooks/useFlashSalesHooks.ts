@@ -32,6 +32,8 @@ export function useFlashSalesHooks(
   const endTimeRef = useRef<number>(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  console.log('Filters:', filters);
+
   // Carousel state
   const [itemsPerView, setItemsPerView] = useState<number>(4);
   const [startIndex, setStartIndex] = useState<number>(0);
@@ -115,18 +117,6 @@ export function useFlashSalesHooks(
         return false;
       }
 
-      // Sold filter - hardcoded minimum of 200
-      const soldCount = product.soldCount || 0;
-      if (soldCount < 200) {
-        return false;
-      }
-
-      // Review filter - hardcoded minimum of 50
-      const reviewCount = product.reviewCount || 0;
-      if (reviewCount < 50) {
-        return false;
-      }
-
       // Stock filter
       if (filters.inStockOnly && product.stock === 0) {
         return false;
@@ -143,11 +133,38 @@ export function useFlashSalesHooks(
         }
       }
 
+      // Type filter
+      if (filters.types.length > 0) {
+        if (!product.type || !filters.types.includes(product.type)) {
+          return false;
+        }
+      }
+
       return true;
     });
 
+    // Sold filter - apply after all other filters, only when sortBy is "sold"
+    if (filters.sortBy === 'sold') {
+      // Get products with any sold count, sorted by sold count
+      const sortedBySold = [...filtered].sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0));
+      // Return top 50% or top 10 items, whichever is larger
+      const cutoff = Math.max(Math.ceil(sortedBySold.length * 0.5), 10);
+      return sortedBySold.slice(0, cutoff);
+    }
+
+    // Review filter - apply after all other filters, only when sortBy is "reviews"
+    if (filters.sortBy === 'reviews') {
+      // Get products with any review count, sorted by review count
+      const sortedByReviews = [...filtered].sort(
+        (a, b) => (b.reviewCount || 0) - (a.reviewCount || 0),
+      );
+      // Return top 50% or top 10 items, whichever is larger
+      const cutoff = Math.max(Math.ceil(sortedByReviews.length * 0.5), 10);
+      return sortedByReviews.slice(0, cutoff);
+    }
+
     // Sort products
-    switch (filters.sortBy) {
+    switch (filters.sortBy as 'price-low' | 'price-high' | 'reviews' | 'sold') {
       case 'price-low':
         return filtered.sort(
           (a, b) => (a.originalPrice || a.price || 0) - (b.originalPrice || b.price || 0),

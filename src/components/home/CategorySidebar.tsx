@@ -1,9 +1,16 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { categories } from '@/lib/data/products';
 
 export default function CategorySidebar() {
+  const router = useRouter();
+
+  const handleCategoryClick = (categoryId: string) => {
+    router.push(`/category/${categoryId}`);
+  };
+
   return (
     <div className="h-full w-full px-2 py-5" data-testid="category-sidebar">
       <div data-testid="category-list">
@@ -28,6 +35,7 @@ export default function CategorySidebar() {
               key={category.id}
               className="group flex shrink-0 cursor-pointer list-none items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2 whitespace-nowrap transition-colors hover:bg-gray-50 md:w-full md:border-0 md:bg-transparent md:p-0"
               data-testid={`category-item-${category.id}`}
+              onClick={() => handleCategoryClick(category.id)}
             >
               <div className="flex items-center gap-3">
                 {category.icon && (

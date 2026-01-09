@@ -17,6 +17,8 @@ type FlashSaleProps = {
   productsData?: Product[];
   limit?: boolean;
   showFilter?: boolean;
+  defaultFilter?: Partial<FilterOptions>;
+  hideCategories?: boolean;
 };
 
 export default function Products({
@@ -28,9 +30,22 @@ export default function Products({
   showType = false,
   limit = false,
   showFilter = false,
+  defaultFilter,
+  hideCategories = false,
 }: FlashSaleProps) {
+  // Helper function to get default filter options
+  const getDefaultFilterOptions = (): FilterOptions => ({
+    priceRange: { min: 0, max: 1000 },
+    inStockOnly: false,
+    sortBy: 'price-low',
+    categories: [],
+    types: [],
+  });
+
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [appliedFilters, setAppliedFilters] = useState<FilterOptions | null>(null);
+  const [appliedFilters, setAppliedFilters] = useState<FilterOptions | null>(
+    defaultFilter ? { ...getDefaultFilterOptions(), ...defaultFilter } : null,
+  );
 
   // Use custom productsData if provided, otherwise use default flashSaleProducts
   const products = productsData || flashSaleProducts;
@@ -264,6 +279,7 @@ export default function Products({
         isOpen={isFilterModalOpen}
         onClose={() => setIsFilterModalOpen(false)}
         onApplyFilters={handleApplyFilters}
+        hideCategories={hideCategories}
       />
     </section>
   );
