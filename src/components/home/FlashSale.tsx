@@ -38,8 +38,9 @@ export default function Products({
 }: FlashSaleProps) {
   // Check if current route should display grid view instead of swipeable
   const shouldShowGrid =
-    typeof window !== 'undefined' &&
-    GRID_VIEW_ROUTES.some(route => window.location.pathname.includes(route));
+    limit || // Force grid view when limit is true
+    (typeof window !== 'undefined' &&
+      GRID_VIEW_ROUTES.some(route => window.location.pathname.includes(route)));
 
   // Helper function to get default filter options
   const getDefaultFilterOptions = (): FilterOptions => ({
@@ -72,8 +73,8 @@ export default function Products({
     filteredProducts,
   } = useFlashSalesHooks(products.length, products, appliedFilters);
 
-  // Apply limit if enabled
-  const displayProducts = limit ? filteredProducts.slice(0, 8) : filteredProducts;
+  // Apply limit if enabled - show exactly 6 products
+  const displayProducts = limit ? filteredProducts.slice(0, 6) : filteredProducts;
 
   const handleApplyFilters = (filters: FilterOptions) => {
     setAppliedFilters(filters);
@@ -105,12 +106,12 @@ export default function Products({
         {title}
       </h2> */}
       <div
-        className="border-l-primary mt-5 flex items-center justify-between border-l-[10px] p-2"
+        className="border-l-primary mt-0 flex items-center justify-between border-l-[10px] p-2 md:mt-5"
         data-testid="flashsale-header-wrapper"
       >
         <div className="mr-5 flex items-center gap-4" data-testid="flashsale-left-section">
           <h1
-            className="mb-3 pl-3 text-lg font-bold font-semibold text-gray-900 md:mr-10 md:text-xl"
+            className="mb-0 pl-3 text-sm font-bold font-semibold text-gray-900 md:mr-10 md:text-xl"
             data-testid="flashsale-main-title"
           >
             {title}
@@ -224,7 +225,7 @@ export default function Products({
       <div className="relative mt-4">
         {/* Mobile/Tablet Container - Grid View */}
         {shouldShowGrid ? (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
             {displayProducts.map((p, idx) => (
               <ProductCard
                 key={p.id}

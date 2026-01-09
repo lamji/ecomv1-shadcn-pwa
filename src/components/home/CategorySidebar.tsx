@@ -12,7 +12,7 @@ export default function CategorySidebar() {
   };
 
   return (
-    <div className="h-full w-full px-2 py-5" data-testid="category-sidebar">
+    <div className="h-full w-full px-2 py-0 md:py-5" data-testid="category-sidebar">
       <div data-testid="category-list">
         <h2
           className="mb-2 text-lg font-bold text-gray-900 md:block"
