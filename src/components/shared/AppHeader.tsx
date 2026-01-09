@@ -115,23 +115,6 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
             </Button>
           </div>
 
-          {/* Middle Section - Navigation Links */}
-          <nav className="hidden items-center space-x-6 lg:flex" data-testid="desktop-nav">
-            {navLinks.map(link => (
-              <Button
-                key={link.path}
-                variant="ghost"
-                className={`text-muted-foreground hover:text-foreground cursor-pointer rounded-none px-0 py-0 ${
-                  pathname === link.path ? 'border-foreground text-foreground border-b-2' : ''
-                }`}
-                onClick={() => router.push(link.path)}
-                data-testid={`nav-${link.name.toLowerCase()}`}
-              >
-                {link.name}
-              </Button>
-            ))}
-          </nav>
-
           {/* Right Section - Search, Cart, Profile */}
           <div className="flex items-center gap-2" data-testid="header-actions">
             {/* Mobile Search */}
@@ -168,22 +151,24 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
               <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
             </form>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.push('/cart')}
-              className="relative cursor-pointer"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center p-0 text-xs"
-                >
-                  {cartCount}
-                </Badge>
-              )}
-            </Button>
+            {isAuthenticated && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => router.push('/cart')}
+                className="relative cursor-pointer"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center p-0 text-xs"
+                  >
+                    {cartCount}
+                  </Badge>
+                )}
+              </Button>
+            )}
 
             {!isLoading && (
               <Button

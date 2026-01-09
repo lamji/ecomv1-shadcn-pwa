@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
@@ -19,6 +20,12 @@ export default function MiddleBanner({
   backgroundImage = 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&h=400&fit=crop',
   className,
 }: MiddleBannerProps) {
+  const router = useRouter();
+
+  const handleShopNow = () => {
+    router.push('/summer-collection');
+  };
+
   return (
     <div className={`relative w-full overflow-hidden rounded-lg ${className}`}>
       {/* Background Image with Overlay */}
@@ -41,6 +48,7 @@ export default function MiddleBanner({
             <Button
               size="lg"
               className="w-full bg-white font-semibold text-black hover:bg-gray-100 sm:w-auto"
+              onClick={handleShopNow}
             >
               {buttonText}
               <ArrowRight className="ml-2 h-4 w-4" />

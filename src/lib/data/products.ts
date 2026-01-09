@@ -30,6 +30,10 @@ export type Product = {
    * Product type for classification
    */
   type?: 'flash' | 'new' | 'regular';
+  /**
+   * Summer collection flag
+   */
+  isSummerCollection?: boolean;
 };
 
 export type Category = {
@@ -53,6 +57,7 @@ const baseProducts: Product[] = [
     reviewCount: 128,
     soldCount: 128,
     stock: 150,
+    isSummerCollection: true,
     images: [
       'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800&h=800&fit=crop',
       'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=800&fit=crop',
@@ -77,6 +82,7 @@ const baseProducts: Product[] = [
     rating: 4.2,
     reviewCount: 89,
     stock: 85,
+    isSummerCollection: true,
     images: [
       'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=800&h=800&fit=crop',
       'https://images.unsplash.com/photo-1525874684015-58379d421a52?w=800&h=800&fit=crop',
@@ -757,6 +763,127 @@ const baseProducts: Product[] = [
       'Professional-grade coffee maker with programmable settings and thermal carafe. Brews perfect coffee every time.',
     categoryId: 'cat-home-living',
     category: 'Home & Living',
+    type: 'regular',
+  },
+  // Additional Summer Products for Testing
+  {
+    id: 'p31',
+    imageSrc: 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=400&h=400&fit=crop',
+    imageAlt: 'Summer Beach Hat',
+    title: 'Wide Brim Sun Hat',
+    price: 24.99,
+    originalPrice: 49.99,
+    discountPercent: 50,
+    rating: 4.6,
+    reviewCount: 189,
+    stock: 85,
+    isSummerCollection: true,
+    images: [
+      'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=800&fit=crop',
+    ],
+    sizes: ['One Size', 'One Size+'],
+    description:
+      'Stylish wide brim sun hat perfect for beach days and outdoor activities. Provides excellent UV protection while keeping you cool.',
+    categoryId: 'cat-accessories',
+    category: 'Accessories',
+    type: 'new',
+  },
+  {
+    id: 'p32',
+    imageSrc: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=400&fit=crop',
+    imageAlt: 'Summer Sandals',
+    title: 'Beach Flip Flops',
+    price: 15.99,
+    originalPrice: 31.99,
+    discountPercent: 50,
+    rating: 4.4,
+    reviewCount: 267,
+    stock: 150,
+    isSummerCollection: true,
+    images: [
+      'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&h=800&fit=crop',
+    ],
+    sizes: ['US 6', 'US 7', 'US 8', 'US 9', 'US 10', 'US 11'],
+    description:
+      'Comfortable and lightweight beach flip flops with soft footbed. Perfect for pool days, beach walks, and casual summer outings.',
+    categoryId: 'cat-footwear',
+    category: 'Footwear',
+    type: 'flash',
+  },
+  {
+    id: 'p33',
+    imageSrc: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=400&fit=crop',
+    imageAlt: 'Summer Sunglasses',
+    title: 'Tropical Sunglasses',
+    price: 32.99,
+    originalPrice: 65.99,
+    discountPercent: 50,
+    rating: 4.7,
+    reviewCount: 145,
+    stock: 95,
+    isSummerCollection: true,
+    images: [
+      'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1511499767150-a1a227e6b692?w=800&h=800&fit=crop',
+    ],
+    sizes: ['One Size'],
+    description:
+      'Trendy tropical-style sunglasses with UV400 protection. Lightweight frame and polarized lenses for ultimate summer eye protection.',
+    categoryId: 'cat-accessories',
+    category: 'Accessories',
+    type: 'new',
+  },
+  {
+    id: 'p34',
+    imageSrc: 'https://images.unsplash.com/photo-1586473219010-2ff574e13e85?w=400&h=400&fit=crop',
+    imageAlt: 'Summer Shorts',
+    title: 'Linen Beach Shorts',
+    price: 28.99,
+    originalPrice: 57.99,
+    discountPercent: 50,
+    rating: 4.5,
+    reviewCount: 198,
+    stock: 120,
+    isSummerCollection: true,
+    images: [
+      'https://images.unsplash.com/photo-1586473219010-2ff574e13e85?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1620012253295-c15cc3e65df4?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&h=800&fit=crop',
+    ],
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    description:
+      'Breathable linen beach shorts perfect for summer days. Lightweight fabric with elastic waistband for maximum comfort.',
+    categoryId: 'cat-mens-clothing',
+    category: "Men's Clothing",
+    type: 'flash',
+  },
+  {
+    id: 'p35',
+    imageSrc: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=400&fit=crop',
+    imageAlt: 'Summer Tank Top',
+    title: 'Cotton Tank Top',
+    price: 12.99,
+    originalPrice: 25.99,
+    discountPercent: 50,
+    rating: 4.3,
+    reviewCount: 234,
+    stock: 200,
+    isSummerCollection: true,
+    images: [
+      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=800&h=800&fit=crop',
+    ],
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    description:
+      'Soft cotton tank top ideal for hot summer days. Classic design with comfortable fit, perfect for layering or wearing alone.',
+    categoryId: 'cat-womens-clothing',
+    category: "Women's Clothing",
     type: 'regular',
   },
 ];

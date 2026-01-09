@@ -6,15 +6,10 @@ import { NextRequest, NextResponse } from 'next/server';
 const PUBLIC_ROUTES = [
   '/',
   '/login',
-  '/signup',
   '/register',
   '/forgot-password',
-  '/reset-password',
-  '/verify-email',
-  '/product/[id]',
-  '/view-all',
-  '/category/[id]',
   '/new-arrivals',
+  '/summer-collection',
 ];
 
 /**
