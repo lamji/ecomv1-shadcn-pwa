@@ -28,19 +28,23 @@ export default function SummerCollectionPage() {
   return (
     <div className="min-h-screen bg-gray-50" data-testid="summer-collection-page">
       {/* Main Content */}
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
+      <div
+        className="mx-auto max-w-7xl px-4 py-0 sm:px-6 lg:px-8"
+        data-testid="summer-main-content"
+      >
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 lg:gap-8" data-testid="summer-grid">
           {/* Category Sidebar */}
           <div className="lg:col-span-1" data-testid="section-category-sidebar">
             <SummerCategorySidebar
               summerProducts={summerCollectionProducts}
               onCategoryFilter={handleCategoryFilter}
               selectedCategory={selectedCategory}
+              data-testid="summer-category-sidebar"
             />
           </div>
 
           {/* Products Section */}
-          <div className="lg:col-span-3" data-testid="section-products">
+          <div className="-mt-4 lg:col-span-3" data-testid="section-products">
             <FlashSale
               title=" Summer Essentials"
               showCountdown={false}
@@ -48,11 +52,12 @@ export default function SummerCollectionPage() {
               showType={true}
               productsData={filteredSummerProducts}
               limit={false}
+              data-testid="summer-flash-sale"
             />
 
             {filteredSummerProducts.length === 0 && (
-              <div className="py-12 text-center" data-testid="no-products">
-                <div className="mb-4 text-gray-400">
+              <div className="py-12 text-center" data-testid="no-summer-products">
+                <div className="mb-4 text-gray-400" data-testid="no-products-icon">
                   <svg
                     className="mx-auto h-12 w-12"
                     fill="none"
@@ -67,8 +72,15 @@ export default function SummerCollectionPage() {
                     />
                   </svg>
                 </div>
-                <h3 className="mb-2 text-lg font-medium text-gray-900">No summer products yet</h3>
-                <p className="text-gray-500">Check back soon for our summer collection!</p>
+                <h3
+                  className="mb-2 text-lg font-medium text-gray-900"
+                  data-testid="no-products-title"
+                >
+                  No summer products yet
+                </h3>
+                <p className="text-gray-500" data-testid="no-products-message">
+                  Check back soon for our summer collection!
+                </p>
               </div>
             )}
           </div>

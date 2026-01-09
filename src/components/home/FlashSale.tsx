@@ -9,7 +9,7 @@ import { ArrowRight, Filter, X } from 'lucide-react';
 import FilterModal, { FilterOptions } from './FilterModal';
 
 // Routes that should display grid view instead of swipeable on mobile/tablet
-const GRID_VIEW_ROUTES = ['/new-arrivals', '/view-all', '/category/'];
+const GRID_VIEW_ROUTES = ['/new-arrivals', '/view-all', '/category/', '/summer-collection'];
 
 type FlashSaleProps = {
   title?: string;

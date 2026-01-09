@@ -136,10 +136,10 @@ export default function AdSlider({
         )}
 
         {/* Ad Button */}
-        <div className="absolute inset-0 flex items-end justify-start p-6">
+        <div className="absolute inset-0 flex items-end justify-start p-3 md:p-6">
           <Button
             variant="default"
-            className="bg-primary hover:bg-primary/90 px-4 py-2 text-lg font-semibold text-white"
+            className="bg-primary hover:bg-primary/90 px-2 py-1 text-xs font-semibold text-white md:px-4 md:py-2 md:text-lg"
             data-testid="shop-now-button"
             onClick={() => {
               if (currentAd.buttonLink) {

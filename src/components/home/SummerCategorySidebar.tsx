@@ -23,7 +23,7 @@ export default function SummerCategorySidebar({
   };
 
   return (
-    <div className="h-full w-full px-2 py-5" data-testid="summer-category-sidebar">
+    <div className="h-full w-full px-0 py-0" data-testid="summer-category-sidebar">
       <div data-testid="summer-category-list">
         <h2
           className="mb-2 text-lg font-bold text-gray-900 md:block"
@@ -39,63 +39,97 @@ export default function SummerCategorySidebar({
         </p>
 
         {/* All Categories Option */}
-        <ul
-          className="flex flex-nowrap gap-2 overflow-x-auto pb-2 md:flex-col md:gap-2 md:space-y-2 md:overflow-x-visible md:pb-0"
+        <div
+          className="grid grid-cols-3 gap-2 pb-3 md:flex-col md:gap-2 md:space-y-2 md:overflow-x-visible md:pb-0"
           data-testid="summer-category-list-items"
         >
-          <li
-            className={`group flex shrink-0 cursor-pointer list-none items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2 whitespace-nowrap transition-colors md:w-full md:border-0 md:bg-transparent md:p-0 ${
-              selectedCategory === null ? 'border-blue-200 bg-blue-50' : 'hover:bg-gray-50'
+          <button
+            className={`group flex shrink-0 cursor-pointer flex-col items-center justify-center rounded-lg bg-white p-2 transition-all hover:bg-gray-50 md:w-full md:flex-row md:justify-start md:rounded-lg md:bg-transparent md:p-0 ${
+              selectedCategory === null
+                ? 'border border-orange-200 bg-orange-50'
+                : 'border border-gray-200'
             }`}
             data-testid="summer-category-all"
             onClick={() => handleCategoryClick(null)}
           >
-            <div className="flex items-center gap-3">
-              <span className="text-lg" data-testid="category-icon">
-                🌞
-              </span>
-              <span
-                className={`text-sm font-medium transition-colors md:group-hover:underline ${
-                  selectedCategory === null
-                    ? 'text-blue-600'
-                    : 'text-gray-900 group-hover:text-blue-600'
-                }`}
-                data-testid="category-name"
+            <div
+              className="mb-1 flex h-6 w-6 items-center justify-center md:mr-3 md:mb-0 md:h-6 md:w-6"
+              data-testid="category-icon-bg"
+            >
+              <svg
+                className="h-4 w-4 text-orange-500 md:h-5 md:w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                All Summer
-              </span>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              </svg>
             </div>
-          </li>
+            <span
+              className={`text-[10px] font-medium text-gray-700 transition-colors md:text-sm ${
+                selectedCategory === null ? 'font-semibold text-orange-600' : ''
+              }`}
+              data-testid="category-name"
+            >
+              All
+            </span>
+          </button>
 
           {categoriesWithSummerProducts.map(category => (
-            <li
+            <button
               key={category.id}
-              className={`group flex shrink-0 cursor-pointer list-none items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2 whitespace-nowrap transition-colors hover:bg-gray-50 md:w-full md:border-0 md:bg-transparent md:p-0 ${
-                selectedCategory === category.id ? 'border-blue-200 bg-blue-50' : ''
+              className={`group flex shrink-0 cursor-pointer flex-col items-center justify-center rounded-lg bg-white p-2 transition-all hover:bg-gray-50 md:w-full md:flex-row md:justify-start md:rounded-lg md:bg-transparent md:p-0 ${
+                selectedCategory === category.id
+                  ? 'border border-orange-200 bg-orange-50'
+                  : 'border border-gray-200'
               }`}
               data-testid={`summer-category-item-${category.id}`}
               onClick={() => handleCategoryClick(category.id)}
             >
-              <div className="flex items-center gap-3">
-                {category.icon && (
-                  <span className="text-lg" data-testid="category-icon">
+              <div
+                className="mb-1 flex h-6 w-6 items-center justify-center md:mr-3 md:mb-0 md:h-6 md:w-6"
+                data-testid="category-icon-bg"
+              >
+                {category.icon ? (
+                  <span
+                    className="text-sm text-orange-500 md:text-base"
+                    role="img"
+                    aria-label={category.name}
+                  >
                     {category.icon}
                   </span>
+                ) : (
+                  <svg
+                    className="h-4 w-4 text-orange-500 md:h-5 md:w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    />
+                  </svg>
                 )}
-                <span
-                  className={`text-sm font-medium transition-colors md:group-hover:underline ${
-                    selectedCategory === category.id
-                      ? 'text-blue-600'
-                      : 'text-gray-900 group-hover:text-blue-600'
-                  }`}
-                  data-testid="category-name"
-                >
-                  {category.name}
-                </span>
               </div>
-            </li>
+              <span
+                className={`text-[10px] font-medium text-gray-700 transition-colors md:text-sm ${
+                  selectedCategory === category.id ? 'font-semibold text-orange-600' : ''
+                }`}
+                data-testid="category-name"
+              >
+                {category.name}
+              </span>
+            </button>
           ))}
-        </ul>
+        </div>
       </div>
     </div>
   );

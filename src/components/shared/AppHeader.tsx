@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Search, ShoppingCart, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -14,21 +14,11 @@ interface AppHeaderProps {
   title?: string;
 }
 
-const navLinks = [
-  { name: 'Home', path: '/' },
-  { name: 'About', path: '/about' },
-  { name: 'Contact', path: '/contact' },
-  { name: 'Login', path: '/login' },
-];
-
 export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
   const router = useRouter();
-  const pathname = usePathname();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [cartCount, setCartCount] = useState(3); // Example cart count
   const headerRef = useRef<HTMLDivElement | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null);
   const { isAuthenticated, isLoading } = useAuth();
 
   // Keep a global CSS var with the current header height for sticky layouts
@@ -41,24 +31,6 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
     window.addEventListener('resize', applyHeaderHeightVar);
     return () => window.removeEventListener('resize', applyHeaderHeightVar);
   }, []);
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        isMenuOpen &&
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node) &&
-        headerRef.current &&
-        !headerRef.current.contains(event.target as Node)
-      ) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isMenuOpen]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,20 +47,8 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
     >
       <div className="w-full">
         <div className="flex items-center justify-between">
-          {/* Left Section - Menu Button (Mobile) & Title/Logo */}
+          {/* Left Section - Title/Logo */}
           <div className="flex items-center gap-1" data-testid="header-title">
-            {/* Mobile menu button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="cursor-pointer gap-0 lg:hidden"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-              data-testid="mobile-menu-button"
-            >
-              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
-
             <Button
               variant="ghost"
               onClick={() => router.push('/')}
@@ -187,46 +147,6 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
             )}
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <Card
-            ref={menuRef}
-            className="absolute top-full right-0 left-0 z-50 mt-0 p-4 lg:hidden"
-            data-testid="mobile-menu"
-          >
-            <div className="flex flex-col space-y-2" data-testid="mobile-nav">
-              {navLinks.map(link => (
-                <Button
-                  key={link.path}
-                  variant="ghost"
-                  className={`w-full justify-start rounded-none px-0 py-0 ${
-                    pathname === link.path ? 'border-foreground text-foreground border-b-2' : ''
-                  }`}
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    router.push(link.path);
-                  }}
-                  data-testid={`mobile-nav-${link.name.toLowerCase()}`}
-                >
-                  {link.name}
-                </Button>
-              ))}
-              <Button
-                variant="ghost"
-                className="w-full justify-start rounded-none px-0 py-0"
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  router.push('/profile');
-                }}
-                data-testid="mobile-nav-profile"
-              >
-                <User className="mr-2 h-4 w-4" />
-                Profile
-              </Button>
-            </div>
-          </Card>
-        )}
       </div>
     </Card>
   );
