@@ -55,7 +55,7 @@ export const dummyProfile: UserProfile = {
       orderDate: '2025-01-10T16:20:00Z',
       shippedDate: undefined,
       deliveredDate: undefined,
-      status: 'ordered',
+      status: 'pending',
       totalAmount: flashSaleProducts[4].price,
       items: [
         {
@@ -79,6 +79,79 @@ export const dummyProfile: UserProfile = {
       trackingNumber: undefined,
       carrier: undefined,
       estimatedDelivery: '2025-01-15T16:00:00Z',
+    },
+    {
+      id: 'order_5',
+      orderNumber: 'ORD-2024-005',
+      date: '2025-01-12',
+      orderDate: '2025-01-12T14:30:00Z',
+      shippedDate: undefined,
+      deliveredDate: undefined,
+      status: 'pending',
+      totalAmount: flashSaleProducts[0].price + flashSaleProducts[1].price,
+      items: [
+        {
+          product: flashSaleProducts[0],
+          quantity: 2,
+          price: flashSaleProducts[0].price,
+        },
+        {
+          product: flashSaleProducts[1],
+          quantity: 1,
+          price: flashSaleProducts[1].price,
+        },
+      ],
+      shippingAddress: {
+        street: '456 Oak Avenue',
+        city: 'Makati',
+        state: 'Metro Manila',
+        zipCode: '1200',
+        country: 'Philippines',
+      },
+      paymentMethod: {
+        type: 'credit_card',
+        lastFour: '8888',
+        brand: 'Mastercard',
+        paidAt: '2025-01-12T14:32:00Z',
+        transactionId: 'txn_888999000',
+      },
+      trackingNumber: undefined,
+      carrier: undefined,
+      estimatedDelivery: '2025-01-17T16:00:00Z',
+    },
+    {
+      id: 'order_6',
+      orderNumber: 'ORD-2024-006',
+      date: '2025-01-08',
+      orderDate: '2025-01-08T11:20:00Z',
+      shippedDate: undefined,
+      deliveredDate: undefined,
+      status: 'cancelled',
+      totalAmount: flashSaleProducts[2].price,
+      items: [
+        {
+          product: flashSaleProducts[2],
+          quantity: 1,
+          price: flashSaleProducts[2].price,
+        },
+      ],
+      shippingAddress: {
+        street: '789 Pine Street',
+        city: 'Pasig',
+        state: 'Metro Manila',
+        zipCode: '1600',
+        country: 'Philippines',
+      },
+      paymentMethod: {
+        type: 'credit_card',
+        lastFour: '3333',
+        brand: 'Visa',
+        paidAt: '2025-01-08T11:22:00Z',
+        transactionId: 'txn_333444555',
+      },
+      trackingNumber: undefined,
+      carrier: undefined,
+      estimatedDelivery: '2025-01-13T16:00:00Z',
     },
     {
       id: 'order_1',
@@ -283,10 +356,8 @@ export const dummyProfile: UserProfile = {
 // Helper functions
 export const getOrderStatusColor = (status: Order['status']) => {
   switch (status) {
-    case 'ordered':
-      return 'bg-gray-100 text-gray-800';
     case 'pending':
-      return 'bg-yellow-100 text-yellow-800';
+      return 'bg-gray-100 text-gray-800';
     case 'processing':
       return 'bg-blue-100 text-blue-800';
     case 'shipped':
@@ -302,8 +373,6 @@ export const getOrderStatusColor = (status: Order['status']) => {
 
 export const getOrderStatusText = (status: Order['status']) => {
   switch (status) {
-    case 'ordered':
-      return 'Ordered';
     case 'pending':
       return 'Pending';
     case 'processing':

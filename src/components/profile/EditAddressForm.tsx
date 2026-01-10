@@ -113,12 +113,18 @@ export default function EditAddressForm({ address, onSave, onCancel }: EditAddre
   }, []);
 
   return (
-    <form onSubmit={formik.handleSubmit} className="max-h-[80vh] space-y-4 overflow-y-auto">
+    <form
+      onSubmit={formik.handleSubmit}
+      className="max-h-[80vh] space-y-4 overflow-y-auto"
+      data-testid="edit-address-form"
+    >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* Region */}
-        <div className="space-y-2">
-          <Label htmlFor="region">Region *</Label>
-          <div className="relative">
+        <div className="space-y-2" data-testid="region-field">
+          <Label htmlFor="region" data-testid="region-label">
+            Region *
+          </Label>
+          <div className="relative" data-testid="region-input-container">
             <Input
               ref={regionInputRef}
               id="region"
@@ -130,17 +136,20 @@ export default function EditAddressForm({ address, onSave, onCancel }: EditAddre
               onFocus={() => setShowRegions(true)}
               onBlur={() => setTimeout(() => setShowRegions(false), 200)}
               className={formik.errors.region ? 'border-red-500' : ''}
+              data-testid="region-input"
             />
             {showRegions && filteredRegions.length > 0 && (
               <div
                 ref={dropdownRef}
                 className="absolute top-full right-0 left-0 z-[120] mt-1 max-h-48 overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg"
+                data-testid="region-dropdown"
               >
                 {filteredRegions.map(region => (
                   <div
                     key={region}
                     onClick={() => handleRegionSelect(region)}
                     className="cursor-pointer px-3 py-2 text-left text-sm hover:bg-gray-100"
+                    data-testid={`region-option-${region.replace(/[^a-zA-Z0-9]/g, '-')}`}
                   >
                     {region}
                   </div>
@@ -148,12 +157,18 @@ export default function EditAddressForm({ address, onSave, onCancel }: EditAddre
               </div>
             )}
           </div>
-          {formik.errors.region && <p className="text-sm text-red-500">{formik.errors.region}</p>}
+          {formik.errors.region && (
+            <p className="text-sm text-red-500" data-testid="region-error">
+              {formik.errors.region}
+            </p>
+          )}
         </div>
 
         {/* Province */}
-        <div className="space-y-2">
-          <Label htmlFor="province">Province *</Label>
+        <div className="space-y-2" data-testid="province-field">
+          <Label htmlFor="province" data-testid="province-label">
+            Province *
+          </Label>
           <Input
             id="province"
             name="province"
@@ -161,17 +176,22 @@ export default function EditAddressForm({ address, onSave, onCancel }: EditAddre
             value={formik.values.province}
             onChange={formik.handleChange}
             className={formik.errors.province ? 'border-red-500' : ''}
+            data-testid="province-input"
           />
           {formik.errors.province && (
-            <p className="text-sm text-red-500">{formik.errors.province}</p>
+            <p className="text-sm text-red-500" data-testid="province-error">
+              {formik.errors.province}
+            </p>
           )}
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* City/Municipality */}
-        <div className="space-y-2">
-          <Label htmlFor="city">City/Municipality *</Label>
+        <div className="space-y-2" data-testid="city-field">
+          <Label htmlFor="city" data-testid="city-label">
+            City/Municipality *
+          </Label>
           <Input
             id="city"
             name="city"
@@ -179,13 +199,20 @@ export default function EditAddressForm({ address, onSave, onCancel }: EditAddre
             value={formik.values.city}
             onChange={formik.handleChange}
             className={formik.errors.city ? 'border-red-500' : ''}
+            data-testid="city-input"
           />
-          {formik.errors.city && <p className="text-sm text-red-500">{formik.errors.city}</p>}
+          {formik.errors.city && (
+            <p className="text-sm text-red-500" data-testid="city-error">
+              {formik.errors.city}
+            </p>
+          )}
         </div>
 
         {/* Barangay */}
-        <div className="space-y-2">
-          <Label htmlFor="barangay">Barangay *</Label>
+        <div className="space-y-2" data-testid="barangay-field">
+          <Label htmlFor="barangay" data-testid="barangay-label">
+            Barangay *
+          </Label>
           <Input
             id="barangay"
             name="barangay"
@@ -193,16 +220,21 @@ export default function EditAddressForm({ address, onSave, onCancel }: EditAddre
             value={formik.values.barangay}
             onChange={formik.handleChange}
             className={formik.errors.barangay ? 'border-red-500' : ''}
+            data-testid="barangay-input"
           />
           {formik.errors.barangay && (
-            <p className="text-sm text-red-500">{formik.errors.barangay}</p>
+            <p className="text-sm text-red-500" data-testid="barangay-error">
+              {formik.errors.barangay}
+            </p>
           )}
         </div>
       </div>
 
       {/* Street Address */}
-      <div className="space-y-2">
-        <Label htmlFor="street">Street Address *</Label>
+      <div className="space-y-2" data-testid="street-field">
+        <Label htmlFor="street" data-testid="street-label">
+          Street Address *
+        </Label>
         <Input
           id="street"
           name="street"
@@ -210,14 +242,21 @@ export default function EditAddressForm({ address, onSave, onCancel }: EditAddre
           value={formik.values.street}
           onChange={formik.handleChange}
           className={formik.errors.street ? 'border-red-500' : ''}
+          data-testid="street-input"
         />
-        {formik.errors.street && <p className="text-sm text-red-500">{formik.errors.street}</p>}
+        {formik.errors.street && (
+          <p className="text-sm text-red-500" data-testid="street-error">
+            {formik.errors.street}
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* Postal Code */}
-        <div className="space-y-2">
-          <Label htmlFor="zipCode">Postal Code *</Label>
+        <div className="space-y-2" data-testid="zipcode-field">
+          <Label htmlFor="zipCode" data-testid="zipcode-label">
+            Postal Code *
+          </Label>
           <Input
             id="zipCode"
             name="zipCode"
@@ -230,13 +269,20 @@ export default function EditAddressForm({ address, onSave, onCancel }: EditAddre
               formik.setFieldValue('zipCode', value);
             }}
             className={formik.errors.zipCode ? 'border-red-500' : ''}
+            data-testid="zipcode-input"
           />
-          {formik.errors.zipCode && <p className="text-sm text-red-500">{formik.errors.zipCode}</p>}
+          {formik.errors.zipCode && (
+            <p className="text-sm text-red-500" data-testid="zipcode-error">
+              {formik.errors.zipCode}
+            </p>
+          )}
         </div>
 
         {/* Country */}
-        <div className="space-y-2">
-          <Label htmlFor="country">Country</Label>
+        <div className="space-y-2" data-testid="country-field">
+          <Label htmlFor="country" data-testid="country-label">
+            Country
+          </Label>
           <Input
             id="country"
             name="country"
@@ -244,16 +290,19 @@ export default function EditAddressForm({ address, onSave, onCancel }: EditAddre
             value={formik.values.country}
             onChange={formik.handleChange}
             disabled
+            data-testid="country-input"
           />
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex justify-end space-x-3 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
+      <div className="flex justify-end space-x-3 pt-4" data-testid="form-actions">
+        <Button type="button" variant="outline" onClick={onCancel} data-testid="cancel-button">
           Cancel
         </Button>
-        <Button type="submit">{address ? 'Update Address' : 'Add Address'}</Button>
+        <Button type="submit" data-testid="submit-button">
+          {address ? 'Update Address' : 'Add Address'}
+        </Button>
       </div>
     </form>
   );

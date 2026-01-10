@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAlert } from './useAlert';
 import { useProductNavigation } from './useProductNavigation';
 import { Product } from '@/lib/data/products';
+import { type Order } from '@/types/profile';
 
 interface ConfirmDialogState {
   open: boolean;
@@ -19,6 +20,10 @@ export function useOrderManagement() {
     isOpen: false,
     selectedProduct: null,
   });
+  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [showAllOrders, setShowAllOrders] = useState(false);
+  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   const { showSuccess, showWarning } = useAlert();
   const { navigateToProduct } = useProductNavigation();
@@ -84,10 +89,43 @@ export function useOrderManagement() {
     );
   };
 
+  // Toggle order expansion
+  const toggleOrderExpansion = (orderId: string) => {
+    setExpandedOrders(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(orderId)) {
+        newSet.delete(orderId);
+      } else {
+        newSet.add(orderId);
+      }
+      return newSet;
+    });
+  };
+
+  // Handle order row click for mobile/tablet view
+  const handleOrderClick = (order: Order) => {
+    // Only open modal on mobile and tablet (width < 1024px)
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setSelectedOrder(order);
+    }
+  };
+
+  // Close order details modal
+  const closeOrderModal = () => {
+    setSelectedOrder(null);
+  };
+
   return {
     // State
     confirmDialog,
     reviewModal,
+    selectedStatus,
+    setSelectedStatus,
+    showAllOrders,
+    setShowAllOrders,
+    expandedOrders,
+    selectedOrder,
+    setSelectedOrder,
 
     // Product actions
     handleViewProduct,
@@ -97,6 +135,9 @@ export function useOrderManagement() {
     handleCancelOrder,
     handleConfirmCancel,
     handleCancelConfirm,
+    toggleOrderExpansion,
+    handleOrderClick,
+    closeOrderModal,
 
     // Review actions
     handleReviewModalClose,

@@ -7,7 +7,7 @@ export interface Order {
   orderDate: string;
   shippedDate?: string;
   deliveredDate?: string;
-  status: 'ordered' | 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   totalAmount: number;
   items: {
     product: Product;
