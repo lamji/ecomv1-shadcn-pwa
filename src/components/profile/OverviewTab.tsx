@@ -44,11 +44,16 @@ export default function OverviewTab({ profile }: OverviewTabProps) {
     handleReviewSubmit,
   } = useOrderManagement();
 
-  // Filter orders based on selected status
-  const filteredOrders = profile.orders.filter((order: Order) => {
-    const matches = selectedStatus === 'all' ? true : order.status === selectedStatus;
-    return matches;
-  });
+  // Filter orders based on selected status and sort by date (latest first)
+  const filteredOrders = profile.orders
+    .filter((order: Order) => {
+      const matches = selectedStatus === 'all' ? true : order.status === selectedStatus;
+      return matches;
+    })
+    .sort((a: Order, b: Order) => {
+      // Sort by date descending (latest first)
+      return new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime();
+    });
 
   return (
     <div className="space-y-6">
