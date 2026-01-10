@@ -3,17 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import {
-  ArrowLeft,
-  ShoppingCart,
-  Minus,
-  Plus,
-  Truck,
-  Shield,
-  RefreshCw,
-  User,
-  ThumbsUp,
-} from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Minus, Plus, User, ThumbsUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { StarRating } from '@/components/shared/StarRating';
@@ -311,11 +301,20 @@ export default function ProductPage() {
             )}
 
             {/* Quantity Selector */}
-            <div data-testid="quantity-selector-section">
-              <h2 className="mb-2 text-lg font-semibold text-gray-900" data-testid="quantity-title">
+            <div
+              data-testid="quantity-selector-section"
+              className="mb-0 rounded-lg bg-gray-500 p-2"
+            >
+              <h2
+                className="mb-2 text-center text-lg font-semibold text-white"
+                data-testid="quantity-title"
+              >
                 Quantity
               </h2>
-              <div className="flex items-center gap-3" data-testid="quantity-controls">
+              <div
+                className="flex items-center justify-center gap-3"
+                data-testid="quantity-controls"
+              >
                 <Button
                   variant="outline"
                   size="icon"
@@ -325,7 +324,10 @@ export default function ProductPage() {
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <span className="w-12 text-center font-medium" data-testid="quantity-value">
+                <span
+                  className="w-12 text-center font-medium text-white"
+                  data-testid="quantity-value"
+                >
                   {quantity}
                 </span>
                 <Button
@@ -341,7 +343,7 @@ export default function ProductPage() {
             </div>
 
             {/* Add to Cart Button */}
-            <div data-testid="add-to-cart-section">
+            <div data-testid="add-to-cart-section" className="hidden sm:block">
               <div
                 className="flex items-center justify-between rounded-lg bg-gray-50 p-4"
                 data-testid="total-price-section"
@@ -364,36 +366,6 @@ export default function ProductPage() {
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
               </Button>
-            </div>
-
-            {/* Product Features */}
-            <div data-testid="product-features-section">
-              <div
-                className="grid grid-cols-1 gap-4 border-t pt-6 sm:grid-cols-3"
-                data-testid="product-features"
-              >
-                <div
-                  className="flex items-center gap-3 text-sm text-gray-600"
-                  data-testid="free-shipping-feature"
-                >
-                  <Truck className="h-5 w-5 text-gray-400" />
-                  <span>Free Shipping</span>
-                </div>
-                <div
-                  className="flex items-center gap-3 text-sm text-gray-600"
-                  data-testid="secure-payment-feature"
-                >
-                  <Shield className="h-5 w-5 text-gray-400" />
-                  <span>Secure Payment</span>
-                </div>
-                <div
-                  className="flex items-center gap-3 text-sm text-gray-600"
-                  data-testid="returns-feature"
-                >
-                  <RefreshCw className="h-5 w-5 text-gray-400" />
-                  <span>30-Day Returns</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>
