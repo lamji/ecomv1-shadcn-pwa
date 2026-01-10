@@ -182,6 +182,7 @@ export default function OverviewTab({ profile }: OverviewTabProps) {
               variant="ghost"
               size="sm"
               onClick={() => setShowAllOrders(!showAllOrders)}
+              className="text-primary hover:text-primary"
               data-testid="view-all-orders-link"
             >
               {showAllOrders

@@ -70,7 +70,7 @@ export default function AddressBook({
                       disabled={address.isDefault}
                       className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors ${
                         address.isDefault
-                          ? 'cursor-not-allowed bg-blue-600'
+                          ? 'bg-primary cursor-not-allowed'
                           : 'cursor-pointer bg-gray-200 hover:bg-gray-300'
                       }`}
                       data-testid={`default-toggle-${address.id}`}
@@ -114,13 +114,15 @@ export default function AddressBook({
           ))}
 
           {addresses.length > 2 && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={onToggleShowAll}
-              className="w-full pt-1 text-center text-xs text-blue-600 transition-colors hover:text-blue-800"
+              className="text-primary hover:text-primary w-full pt-1 text-xs"
               data-testid="toggle-show-all-addresses"
             >
               {showAllAddresses ? 'Show less addresses' : `+${addresses.length - 2} more addresses`}
-            </button>
+            </Button>
           )}
         </div>
       ) : (

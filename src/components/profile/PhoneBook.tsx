@@ -69,7 +69,7 @@ export default function PhoneBook({
                       disabled={phone.isPrimary}
                       className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors ${
                         phone.isPrimary
-                          ? 'cursor-not-allowed bg-blue-600'
+                          ? 'bg-primary cursor-not-allowed'
                           : 'cursor-pointer bg-gray-200 hover:bg-gray-300'
                       }`}
                     >
@@ -105,12 +105,14 @@ export default function PhoneBook({
           ))}
 
           {profile.phones.length > 2 && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={onToggleShowAll}
-              className="w-full pt-1 text-center text-xs text-blue-600 transition-colors hover:text-blue-800"
+              className="text-primary hover:text-primary w-full pt-1 text-xs"
             >
               {showAllPhones ? 'Show less' : `+${remainingCount} more`}
-            </button>
+            </Button>
           )}
         </div>
       ) : (

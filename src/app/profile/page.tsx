@@ -32,7 +32,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" data-testid="profile-page">
+    <div className="min-h-screen bg-gray-50 sm:bg-white" data-testid="profile-page">
       {/* Profile Content */}
       <div className="mx-auto max-w-7xl px-0 py-8 sm:px-6 lg:px-8" data-testid="profile-content">
         <div className="flex flex-col gap-8 lg:flex-row" data-testid="profile-layout">
