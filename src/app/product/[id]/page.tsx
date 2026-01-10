@@ -119,7 +119,7 @@ export default function ProductPage() {
     <div className="min-h-screen bg-gray-50" data-testid="product-page">
       {/* Header */}
       <header className="bg-white shadow-none" data-testid="product-header">
-        <div className="mx-auto max-w-7xl px-0 sm:px-0 lg:px-0">
+        <div className="mx-auto max-w-7xl px-0 sm:px-0 lg:px-0" data-testid="header-container">
           <div className="flex h-16 items-center justify-between">
             <Button
               variant="ghost"
@@ -152,10 +152,13 @@ export default function ProductPage() {
       </header>
 
       {/* Product Content */}
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main
+        className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
+        data-testid="product-main-content"
+      >
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* Images */}
-          <div className="space-y-4" data-testid="product-images">
+          <div className="space-y-4" data-testid="product-images-section">
             <div
               className="relative aspect-square overflow-hidden rounded-lg bg-white"
               data-testid="main-product-image"
@@ -207,23 +210,23 @@ export default function ProductPage() {
           </div>
 
           {/* Product Info */}
-          <div className="space-y-6" data-testid="product-info">
-            {/* Title and Price */}
-            <div data-testid="product-title-section">
+          <div className="space-y-6" data-testid="product-info-section">
+            {/* Rating and Reviews */}
+            <div data-testid="rating-reviews-section">
               <h1 className="mb-2 text-3xl font-bold text-gray-900" data-testid="product-title">
                 {product.title}
               </h1>
 
-              <div className="mb-4 flex items-center gap-4" data-testid="price-section">
+              <div className="mb-4 flex items-center gap-4" data-testid="price-display-section">
                 <div className="flex items-center gap-2">
-                  <span className="text-3xl font-bold text-gray-900" data-testid="product-price">
+                  <span className="text-3xl font-bold text-gray-900" data-testid="current-price">
                     {formatCurrency(displayPrice)}
                   </span>
                   {hasDiscount && (
                     <>
                       <span
                         className="text-lg text-gray-400 line-through"
-                        data-testid="original-price"
+                        data-testid="discounted-price"
                       >
                         {formatCurrency(Number(product.originalPrice))}
                       </span>
@@ -244,7 +247,7 @@ export default function ProductPage() {
                 <span className="text-sm text-gray-600" data-testid="rating-text">
                   {reviewsData && reviewsData.count > 0
                     ? `(${reviewsData.count} reviews)`
-                    : '(0 reviewss)'}
+                    : '(0 reviews)'}
                 </span>
               </div>
 
@@ -268,7 +271,7 @@ export default function ProductPage() {
 
             {/* Description */}
             {product.description && (
-              <div data-testid="description-section">
+              <div data-testid="product-description-section">
                 <h2
                   className="mb-2 text-lg font-semibold text-gray-900"
                   data-testid="description-title"
@@ -281,9 +284,9 @@ export default function ProductPage() {
               </div>
             )}
 
-            {/* Size Selector */}
+            {/* Size Selection */}
             {product.sizes && product.sizes.length > 0 && (
-              <div data-testid="size-selector">
+              <div data-testid="size-selection-section">
                 <h2 className="mb-2 text-lg font-semibold text-gray-900" data-testid="size-title">
                   Size
                 </h2>
@@ -308,7 +311,7 @@ export default function ProductPage() {
             )}
 
             {/* Quantity Selector */}
-            <div data-testid="quantity-selector">
+            <div data-testid="quantity-selector-section">
               <h2 className="mb-2 text-lg font-semibold text-gray-900" data-testid="quantity-title">
                 Quantity
               </h2>
@@ -337,8 +340,8 @@ export default function ProductPage() {
               </div>
             </div>
 
-            {/* Add to Cart - Desktop Only */}
-            <div className="hidden space-y-4 md:block" data-testid="add-to-cart-section">
+            {/* Add to Cart Button */}
+            <div data-testid="add-to-cart-section">
               <div
                 className="flex items-center justify-between rounded-lg bg-gray-50 p-4"
                 data-testid="total-price-section"
@@ -355,16 +358,7 @@ export default function ProductPage() {
                 size="lg"
                 className="w-full"
                 disabled={!!isOutOfStock}
-                onClick={() => {
-                  // TODO: Add to cart functionality
-                  console.log('Added to cart:', {
-                    product: product.title,
-                    quantity,
-                    size: selectedSize,
-                    price: displayPrice,
-                    total: totalPrice,
-                  });
-                }}
+                onClick={handleAddToCart}
                 data-testid="add-to-cart-button"
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
@@ -372,31 +366,33 @@ export default function ProductPage() {
               </Button>
             </div>
 
-            {/* Features */}
-            <div
-              className="grid grid-cols-1 gap-4 border-t pt-6 sm:grid-cols-3"
-              data-testid="product-features"
-            >
+            {/* Product Features */}
+            <div data-testid="product-features-section">
               <div
-                className="flex items-center gap-3 text-sm text-gray-600"
-                data-testid="free-shipping-feature"
+                className="grid grid-cols-1 gap-4 border-t pt-6 sm:grid-cols-3"
+                data-testid="product-features"
               >
-                <Truck className="h-5 w-5 text-gray-400" />
-                <span>Free Shipping</span>
-              </div>
-              <div
-                className="flex items-center gap-3 text-sm text-gray-600"
-                data-testid="secure-payment-feature"
-              >
-                <Shield className="h-5 w-5 text-gray-400" />
-                <span>Secure Payment</span>
-              </div>
-              <div
-                className="flex items-center gap-3 text-sm text-gray-600"
-                data-testid="returns-feature"
-              >
-                <RefreshCw className="h-5 w-5 text-gray-400" />
-                <span>30-Day Returns</span>
+                <div
+                  className="flex items-center gap-3 text-sm text-gray-600"
+                  data-testid="free-shipping-feature"
+                >
+                  <Truck className="h-5 w-5 text-gray-400" />
+                  <span>Free Shipping</span>
+                </div>
+                <div
+                  className="flex items-center gap-3 text-sm text-gray-600"
+                  data-testid="secure-payment-feature"
+                >
+                  <Shield className="h-5 w-5 text-gray-400" />
+                  <span>Secure Payment</span>
+                </div>
+                <div
+                  className="flex items-center gap-3 text-sm text-gray-600"
+                  data-testid="returns-feature"
+                >
+                  <RefreshCw className="h-5 w-5 text-gray-400" />
+                  <span>30-Day Returns</span>
+                </div>
               </div>
             </div>
           </div>

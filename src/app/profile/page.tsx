@@ -3,10 +3,11 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { dummyProfile, type UserProfile } from '@/lib/data/profile';
+import { dummyProfile } from '@/lib/data/profile';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import LoginPrompt from '@/components/profile/LoginPrompt';
 import OverviewTab from '@/components/profile/OverviewTab';
+import { type UserProfile } from '@/types/profile';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -33,7 +34,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50" data-testid="profile-page">
       {/* Profile Content */}
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8" data-testid="profile-content">
+      <div className="mx-auto max-w-7xl px-0 py-8 sm:px-6 lg:px-8" data-testid="profile-content">
         <div className="flex flex-col gap-8 lg:flex-row" data-testid="profile-layout">
           {/* Left Sidebar - Profile Header */}
           <div className="lg:w-80" data-testid="profile-sidebar">

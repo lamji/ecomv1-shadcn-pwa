@@ -29,10 +29,18 @@ export default function AddressBook({
   };
 
   return (
-    <div className="w-full border-t bg-slate-100 px-2 pt-4">
+    <div className="w-full border-t bg-slate-100 px-2 pt-4" data-testid="address-book">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-900">Shipping Addresses</h3>
-        <Button variant="outline" size="sm" onClick={onAddAddress} className="h-7 w-7 p-0">
+        <h3 className="text-sm font-medium text-gray-900" data-testid="address-book-title">
+          Shipping Addresses
+        </h3>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onAddAddress}
+          className="h-7 w-7 p-0"
+          data-testid="add-address-button"
+        >
           <Plus className="h-3 w-3" />
         </Button>
       </div>
@@ -43,13 +51,18 @@ export default function AddressBook({
             <div
               key={address.id}
               className="flex items-start gap-2 rounded-lg bg-gray-50 p-2 text-left"
+              data-testid={`address-item-${address.id}`}
             >
               <div className="mt-0.5 text-gray-400">{getAddressIcon()}</div>
               <div className="min-w-0 flex-1">
                 <div className="mb-1 flex items-center gap-2">
-                  <p className="text-xs font-medium text-gray-900">Address</p>
+                  <p className="text-xs font-medium text-gray-900" data-testid="address-label">
+                    Address
+                  </p>
                   <div className="flex items-center gap-1">
-                    <span className="text-xs text-gray-500">Default</span>
+                    <span className="text-xs text-gray-500" data-testid="default-label">
+                      Default
+                    </span>
                     <button
                       onClick={() => onToggleDefault(address.id)}
                       disabled={address.isDefault}
@@ -58,6 +71,7 @@ export default function AddressBook({
                           ? 'cursor-not-allowed bg-blue-600'
                           : 'cursor-pointer bg-gray-200 hover:bg-gray-300'
                       }`}
+                      data-testid={`default-toggle-${address.id}`}
                     >
                       <span
                         className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
@@ -67,7 +81,10 @@ export default function AddressBook({
                     </button>
                   </div>
                 </div>
-                <p className="truncate text-xs text-gray-600">
+                <p
+                  className="truncate text-xs text-gray-600"
+                  data-testid={`address-text-${address.id}`}
+                >
                   {address.street}, {address.city}
                 </p>
               </div>
@@ -77,6 +94,7 @@ export default function AddressBook({
                   size="sm"
                   onClick={() => onEditAddress(address.id)}
                   className="h-6 w-6 p-0"
+                  data-testid={`edit-address-${address.id}`}
                 >
                   <Edit2 className="h-3 w-3" />
                 </Button>
@@ -85,6 +103,7 @@ export default function AddressBook({
                   size="sm"
                   onClick={() => onDeleteAddress(address.id)}
                   className="h-6 w-6 p-0"
+                  data-testid={`delete-address-${address.id}`}
                 >
                   <Trash2 className="h-3 w-3" />
                 </Button>
@@ -96,6 +115,7 @@ export default function AddressBook({
             <button
               onClick={onToggleShowAll}
               className="w-full pt-1 text-center text-xs text-blue-600 transition-colors hover:text-blue-800"
+              data-testid="toggle-show-all-addresses"
             >
               {showAllAddresses ? 'Show less addresses' : `+${addresses.length - 2} more addresses`}
             </button>
@@ -103,8 +123,10 @@ export default function AddressBook({
         </div>
       ) : (
         <div className="py-3 text-center">
-          <MapPin className="mx-auto mb-2 h-6 w-6 text-gray-300" />
-          <p className="text-xs text-gray-500">No addresses saved</p>
+          <MapPin className="mx-auto mb-2 h-6 w-6 text-gray-300" data-testid="no-addresses-icon" />
+          <p className="text-xs text-gray-500" data-testid="no-addresses-text">
+            No addresses saved
+          </p>
         </div>
       )}
     </div>
