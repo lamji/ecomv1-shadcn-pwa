@@ -46,6 +46,7 @@ export interface Address {
   zipCode: string;
   country: string;
   phone: string;
+  nearestLandmark?: string;
 }
 
 export interface Phone {

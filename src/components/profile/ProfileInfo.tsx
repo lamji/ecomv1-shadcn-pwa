@@ -16,7 +16,6 @@ interface ProfileInfoProps {
   };
   onEditProfile: () => void;
   onUpdateEmail: () => void;
-  className?: string;
 }
 
 export default function ProfileInfo({
@@ -24,10 +23,9 @@ export default function ProfileInfo({
   currentBadge,
   onEditProfile,
   onUpdateEmail,
-  className,
 }: ProfileInfoProps) {
   return (
-    <div className={`p-2 mb-2${className}`}>
+    <div className={`mb-2 p-2`}>
       {/* Avatar */}
       <div className="relative mx-auto mb-4 h-20 w-20 overflow-hidden rounded-full bg-gray-200">
         {profile.avatar ? (

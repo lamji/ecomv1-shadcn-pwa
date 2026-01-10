@@ -57,6 +57,7 @@ export default function EditAddressForm({
       street: address?.street || '',
       zipCode: address?.zipCode || '',
       country: address?.country || 'Philippines',
+      nearestLandmark: address?.nearestLandmark || '',
       makeDefault: isFirstAddress ? true : Boolean(address?.isDefault || false),
     },
     validationSchema: Yup.object({
@@ -81,6 +82,7 @@ export default function EditAddressForm({
         zipCode: values.zipCode.trim(),
         country: values.country.trim(),
         phone: address?.phone || '', // Keep original phone
+        nearestLandmark: values.nearestLandmark?.trim() || '',
         isDefault: values.makeDefault,
       });
     },
@@ -258,6 +260,21 @@ export default function EditAddressForm({
             {formik.errors.street}
           </p>
         )}
+      </div>
+
+      {/* Nearest Landmark */}
+      <div className="space-y-2" data-testid="landmark-field">
+        <Label htmlFor="nearestLandmark" data-testid="landmark-label">
+          Nearest Landmark (Optional)
+        </Label>
+        <Input
+          id="nearestLandmark"
+          name="nearestLandmark"
+          placeholder="e.g., Behind SM Mall, Across from Park, Near Building"
+          value={formik.values.nearestLandmark || ''}
+          onChange={formik.handleChange}
+          data-testid="landmark-input"
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

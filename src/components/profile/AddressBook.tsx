@@ -83,12 +83,20 @@ export default function AddressBook({
                     </button>
                   </div>
                 </div>
-                <p
-                  className="truncate text-xs text-gray-600"
-                  data-testid={`address-text-${address.id}`}
-                >
-                  {address.street}, {address.city}
+                <p className="text-xs text-gray-600" data-testid={`address-text-${address.id}`}>
+                  {address.street}, {address.city}, {address.zipCode}, {address.country}
                 </p>
+                {address.nearestLandmark && (
+                  <>
+                    <div className="my-3 border-t border-gray-200"></div>
+                    <p
+                      className="text-xs text-gray-500"
+                      data-testid={`address-landmark-${address.id}`}
+                    >
+                      📍 {address.nearestLandmark}
+                    </p>
+                  </>
+                )}
               </div>
               <div className="flex items-center gap-1">
                 <Button

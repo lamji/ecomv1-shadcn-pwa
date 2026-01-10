@@ -19,7 +19,7 @@ import { useRouter } from 'next/navigation';
 
 const api: TransactionsApiResponse = dataJson as unknown as TransactionsApiResponse;
 
-export default function TransactionsHistory() {
+export default function Notification() {
   const items = React.useMemo(() => api.data ?? [], []);
   // Track read/unread transaction IDs
   const [readIds, setReadIds] = React.useState<Set<string>>(new Set());
@@ -151,7 +151,7 @@ export default function TransactionsHistory() {
               <li key={t.id}>
                 <button
                   type="button"
-                  className={`flex w-full items-center justify-between gap-3 px-4 py-3.5 transition sm:py-4 hover:bg-accent/40 ${
+                  className={`hover:bg-accent/40 flex w-full items-center justify-between gap-3 px-4 py-3.5 transition sm:py-4 ${
                     read ? '' : 'bg-accent/20'
                   }`}
                   onClick={() => {
@@ -174,7 +174,7 @@ export default function TransactionsHistory() {
                           {dateStr}
                         </p>
                         {!read && (
-                          <span className="bg-blue-500 inline-block h-2 w-2 rounded-full" />
+                          <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
                         )}
                         <span
                           className={`inline-flex shrink-0 items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ${statusClasses}`}
@@ -286,7 +286,7 @@ export default function TransactionsHistory() {
                   <p className="text-muted-foreground text-xs">Status</p>
                   <span
                     className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium capitalize ${
-                      (selected.status === 'success' || selected.status === 'completed')
+                      selected.status === 'success' || selected.status === 'completed'
                         ? 'bg-emerald-100 text-emerald-700'
                         : selected.status === 'pending'
                           ? 'bg-amber-100 text-amber-700'

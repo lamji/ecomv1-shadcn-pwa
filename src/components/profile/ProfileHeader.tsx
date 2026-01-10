@@ -16,7 +16,7 @@ export default function ProfileHeader({ profile, onProfileUpdate }: ProfileHeade
   const profileHook = useProfile(profile, onProfileUpdate);
 
   return (
-    <div className="mb-6">
+    <div className="mb-6 rounded-lg bg-white p-0 sm:bg-gray-200 sm:p-5">
       <div className="flex flex-col items-center text-center">
         {/* profile */}
         <ProfileInfo
@@ -24,7 +24,6 @@ export default function ProfileHeader({ profile, onProfileUpdate }: ProfileHeade
           currentBadge={profileHook.currentBadge}
           onEditProfile={profileHook.handleEditProfile}
           onUpdateEmail={profileHook.handleUpdateEmail}
-          className="bg-white"
         />
         <PhoneBook
           profile={profile}

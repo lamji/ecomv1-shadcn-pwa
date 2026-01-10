@@ -273,6 +273,7 @@ export const dummyProfile: UserProfile = {
       zipCode: '1100',
       country: 'Philippines',
       phone: '09172345678',
+      nearestLandmark: 'Behind SM North Edsa Annex Building',
     },
     {
       id: 'addr_2',
@@ -286,6 +287,7 @@ export const dummyProfile: UserProfile = {
       zipCode: '1200',
       country: 'Philippines',
       phone: '09283456789',
+      nearestLandmark: 'Across from Ayala Triangle Gardens',
     },
     {
       id: 'addr_3',
@@ -299,6 +301,7 @@ export const dummyProfile: UserProfile = {
       zipCode: '6000',
       country: 'Philippines',
       phone: '09334567890',
+      nearestLandmark: 'Near Ayala Center Cebu Mall Entrance',
     },
   ],
   wishlist: [
