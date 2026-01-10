@@ -16,7 +16,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
           {children}
           <GlobalAlert />
           <GlobalSpinner />
-          <PwaInstallPromptWrapper />
+          <div className="md:hidden">
+            <PwaInstallPromptWrapper />
+          </div>
         </ReactProvider>
       </PersistGate>
     </Provider>
