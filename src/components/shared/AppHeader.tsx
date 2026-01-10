@@ -18,16 +18,13 @@ interface AppHeaderProps {
 
 export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
   const router = useRouter();
-  const [cartCount, setCartCount] = useState(0); // Example cart count
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
   const headerRef = useRef<HTMLDivElement | null>(null);
   const { isAuthenticated, isLoading } = useAuth();
   const notifications = useAppSelector(state => state.notifications.items);
 
-  useEffect(() => {
-    setUnreadCount(notifications.filter(n => !n.read).length);
-  }, [notifications]);
+  // Calculate unread count directly from Redux store for real-time updates
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   // Use search hooks for search functionality
   const { searchQuery, setSearchQuery, handleSearch, getSearchSuggestions } = useSearchHooks();
@@ -236,14 +233,6 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
                 className="relative cursor-pointer"
               >
                 <ShoppingCart className="h-5 w-5" />
-                {cartCount > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-1.5 -right-1.5 flex h-3 w-3 items-center justify-center p-0 text-[8px] md:h-5 md:w-5 md:text-xs"
-                  >
-                    {cartCount}
-                  </Badge>
-                )}
               </Button>
             )}
 

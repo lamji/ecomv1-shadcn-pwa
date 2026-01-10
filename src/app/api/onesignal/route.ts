@@ -20,54 +20,75 @@ export async function POST(request: NextRequest) {
     // Get notification data from request body
     const notificationData = await request.json();
 
-    // Call OneSignal API
-    const response = await fetch('https://onesignal.com/api/v1/notifications', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${apiKey}`,
-      },
-      body: JSON.stringify({
-        app_id: appId,
-        ...notificationData,
-      }),
-    });
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return NextResponse.json(
-        { error: data.errors?.[0] || 'Failed to send notification' },
-        { status: response.status },
-      );
-    }
-
-    // Emit Socket.IO event for real-time updates
     try {
-      const io = global.io;
-      if (io) {
-        // Create a message object for the UI
-        const newMessage = {
-          id: data.id,
-          contents: notificationData.contents || {},
-          headings: notificationData.headings || {},
-          completed_at: Math.floor(Date.now() / 1000),
-          successful: 0,
-          failed: 0,
-          converted: 0,
-          remaining: 1,
-          data: notificationData.data || {},
-        };
+      // Call OneSignal API with timeout
+      const response = await fetch('https://onesignal.com/api/v1/notifications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${apiKey}`,
+        },
+        body: JSON.stringify({
+          app_id: appId,
+          ...notificationData,
+        }),
+        signal: controller.signal,
+      });
 
-        // Emit to all clients in the onesignal-messages room
-        io.to('onesignal-messages').emit('newMessage', newMessage);
-        console.log('Emitted new message event via Socket.IO');
+      clearTimeout(timeoutId);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return NextResponse.json(
+          { error: data.errors?.[0] || 'Failed to send notification' },
+          { status: response.status },
+        );
       }
-    } catch (socketError) {
-      console.error('Socket.IO emission error:', socketError);
-    }
 
-    return NextResponse.json(data, { status: 200 });
+      // Emit Socket.IO event for real-time updates
+      try {
+        const io = global.io;
+        if (io) {
+          // Create a message object for the UI
+          const newMessage = {
+            id: data.id,
+            contents: notificationData.contents || {},
+            headings: notificationData.headings || {},
+            completed_at: Math.floor(Date.now() / 1000),
+            successful: 0,
+            failed: 0,
+            converted: 0,
+            remaining: 1,
+            data: notificationData.data || {},
+          };
+
+          // Emit to all clients in the onesignal-messages room
+          io.to('onesignal-messages').emit('newMessage', newMessage);
+          console.log('Emitted new message event via Socket.IO');
+        }
+      } catch (socketError) {
+        console.error('Socket.IO emission error:', socketError);
+      }
+
+      return NextResponse.json(data, { status: 200 });
+    } catch (fetchError: unknown) {
+      clearTimeout(timeoutId);
+
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        console.error('OneSignal API timeout after 10 seconds');
+        return NextResponse.json(
+          { error: 'OneSignal API timeout - please try again' },
+          { status: 408 },
+        );
+      }
+
+      throw fetchError;
+    }
   } catch (error) {
     console.error('OneSignal send error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

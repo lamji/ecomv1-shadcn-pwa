@@ -138,18 +138,28 @@ export const useNotifications = () => {
 
     const setupSocket = () => {
       const socketUrl = typeof window !== 'undefined' ? window.location.origin : '';
+      console.log('Setting up Socket.IO connection to:', socketUrl);
       const socket = io(socketUrl, {
         path: '/api/socket/io',
         addTrailingSlash: false,
       });
 
       socket.on('connect', () => {
-        console.log('useNotifications: Connected to Socket.IO');
+        console.log('useNotifications: Connected to Socket.IO with ID:', socket.id);
         socket.emit('joinRoom', 'onesignal-messages');
+        console.log('useNotifications: Joined onesignal-messages room');
+      });
+
+      socket.on('disconnect', () => {
+        console.log('useNotifications: Disconnected from Socket.IO');
+      });
+
+      socket.on('connect_error', error => {
+        console.error('useNotifications: Socket.IO connection error:', error);
       });
 
       socket.on('newMessage', (msg: OneSignalMessage) => {
-        console.log('useNotifications: New real-time message:', msg);
+        console.log('useNotifications: New real-time message received:', msg);
         const newNotif: NotificationItem = {
           id: msg.id,
           type: (msg.data?.type as NotificationItem['type']) || 'promotion',
@@ -164,10 +174,12 @@ export const useNotifications = () => {
               ? parseFloat(msg.data.amount)
               : (msg.data?.amount as number),
         };
+        console.log('useNotifications: Dispatching new notification to Redux:', newNotif);
         dispatch(addNotification(newNotif));
       });
 
       return () => {
+        console.log('useNotifications: Cleaning up Socket.IO connection');
         socket.disconnect();
       };
     };
