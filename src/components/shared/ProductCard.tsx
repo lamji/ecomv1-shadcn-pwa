@@ -1,41 +1,14 @@
 import React from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { formatCurrency } from '@/lib/helper/currency';
+import { useProductNavigation } from '@/lib/hooks/useProductNavigation';
+import { useProductCardLogic } from '@/lib/hooks/useProductCardLogic';
 import { StarRating } from './StarRating';
 import { ShoppingCart, Star } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useAddToCart } from '@/lib/hooks/useAddToCart';
 import { useProductReviews } from '@/lib/hooks/useProductReviews';
-import type { Review } from '@/lib/hooks/useProductReviews';
-
-type ProductCardProps = {
-  id: string; // Product ID
-  imageSrc: string;
-  imageAlt?: string;
-  title: string;
-  price?: number | string;
-  originalPrice?: number | string;
-  discountPercent?: number; // e.g., 50 for -50%
-  rating?: number; // e.g., 4.5
-  reviewCount?: number; // e.g., 24
-  soldCount?: number;
-  showType?: boolean;
-  productType?: 'flash' | 'new' | 'regular';
-  className?: string;
-  // If true, load image eagerly with high fetch priority (use for above-the-fold items)
-  priority?: boolean;
-  images?: string[];
-  description?: string;
-  sizes?: string[];
-  onClick?: () => void;
-  // Text color customization for different backgrounds
-  textColor?: 'white' | 'black' | 'gray';
-  priceColor?: 'white' | 'black' | 'gray';
-  badgeColor?: 'yellow' | 'red' | 'blue';
-  stock?: number;
-  reviews?: Review[]; // Product reviews data
-};
+import type { ProductCardProps } from '@/lib/types/product';
 
 export default function ProductCard({
   id,
@@ -51,7 +24,6 @@ export default function ProductCard({
   showType,
   productType,
   priority = false,
-
   textColor = 'black',
   priceColor = 'black',
   badgeColor = 'red',
@@ -59,84 +31,18 @@ export default function ProductCard({
   reviews,
 }: ProductCardProps) {
   const { addToCart } = useAddToCart();
-  const router = useRouter();
-  const hasDiscount = typeof discountPercent === 'number' && discountPercent > 0;
-  const isOutOfStock = stock === 0;
+  const { navigateToProduct } = useProductNavigation();
+  const {
+    hasDiscount,
+    isOutOfStock,
+    formatSoldCount,
+    colorClasses,
+    handleAddToCart,
+    handleProductClick,
+  } = useProductCardLogic(discountPercent, stock, addToCart, navigateToProduct);
 
   // Get reviews data using the hook
   const reviewsData = useProductReviews(reviews || []);
-
-  const formatSoldCount = (count: number) => {
-    if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}m`;
-    if (count >= 1_000) return `${(count / 1_000).toFixed(1)}k`;
-    return String(count);
-  };
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!isOutOfStock) {
-      // Create product object for the cart
-      const product = {
-        id, // Use the actual product ID
-        title,
-        price: Number(originalPrice || price || 0),
-        originalPrice: originalPrice ? Number(originalPrice) : undefined,
-        discountPercent,
-        rating: rating || 0,
-        reviewCount: reviewCount || 0,
-        soldCount: soldCount || 0,
-        imageSrc,
-        imageAlt,
-        stock: stock || 0,
-        description: '',
-        categoryId: '',
-        category: '',
-        type: productType || 'regular',
-        images: [],
-        sizes: [],
-      };
-
-      console.log('handleAddToCart', { product, id });
-
-      addToCart(product, 1);
-    }
-  };
-
-  const handleProductClick = () => {
-    // Extract product ID from the data or generate it
-    const productId = title
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '');
-
-    // Navigate to product page
-    router.push(`/product/${productId}`);
-  };
-
-  // Color classes for different backgrounds
-  const colorClasses = {
-    white: {
-      title: 'text-white',
-      price: 'text-white',
-      originalPrice: 'text-gray-300',
-      badge: 'bg-yellow-600 text-white',
-      typeBadge: 'bg-white/20 text-white',
-    },
-    black: {
-      title: 'text-gray-900',
-      price: 'text-gray-900',
-      originalPrice: 'text-gray-500',
-      badge: 'bg-red-600 text-white',
-      typeBadge: 'bg-gray-100 text-gray-700',
-    },
-    gray: {
-      title: 'text-gray-700',
-      price: 'text-gray-700',
-      originalPrice: 'text-gray-400',
-      badge: 'bg-red-600 text-white',
-      typeBadge: 'bg-gray-100 text-gray-700',
-    },
-  };
 
   return (
     <div
@@ -153,7 +59,23 @@ export default function ProductCard({
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-black/50 p-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <Button
             className="flex w-full max-w-[180px] items-center justify-center gap-2 rounded-full bg-white px-6 py-2 text-sm font-medium text-gray-900 shadow-lg hover:bg-gray-100"
-            onClick={handleAddToCart}
+            onClick={e => {
+              e.stopPropagation();
+              handleAddToCart({
+                id,
+                title,
+                price,
+                originalPrice,
+                discountPercent,
+                rating,
+                reviewCount,
+                soldCount,
+                imageSrc,
+                imageAlt,
+                stock,
+                productType,
+              });
+            }}
             disabled={isOutOfStock}
           >
             <ShoppingCart className="h-4 w-4" />
@@ -167,7 +89,7 @@ export default function ProductCard({
             onClick={e => {
               e.stopPropagation();
               if (!isOutOfStock) {
-                handleProductClick();
+                handleProductClick(title);
               }
             }}
             disabled={isOutOfStock}

@@ -1,119 +1,42 @@
-import { Product } from './products';
-
-export interface Order {
-  id: string;
-  orderNumber: string;
-  date: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  totalAmount: number;
-  items: {
-    product: Product;
-    quantity: number;
-    price: number;
-  }[];
-  shippingAddress: {
-    street: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-  };
-  paymentMethod: string;
-  trackingNumber?: string;
-}
-
-export interface Address {
-  id: string;
-  type: 'home' | 'work' | 'other';
-  isDefault: boolean;
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-  phone: string;
-}
-
-export interface PaymentMethod {
-  id: string;
-  type: 'credit_card' | 'debit_card' | 'paypal' | 'apple_pay' | 'google_pay';
-  isDefault: boolean;
-  last4?: string;
-  brand?: string;
-  expiryMonth?: number;
-  expiryYear?: number;
-  email?: string;
-}
-
-export interface WishlistItem {
-  id: string;
-  product: Product;
-  addedDate: string;
-}
-
-export interface Review {
-  id: string;
-  product: Product;
-  rating: number;
-  title: string;
-  content: string;
-  date: string;
-  helpful: number;
-  verified: boolean;
-}
-
-export interface ProfileStats {
-  totalOrders: number;
-  totalSpent: number;
-  averageOrderValue: number;
-  favoriteCategories: string[];
-  loyaltyPoints: number;
-  memberSince: string;
-}
-
-export interface UserProfile {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  avatar?: string;
-  dateOfBirth?: string;
-  gender?: 'male' | 'female' | 'other';
-  bio?: string;
-  preferences: {
-    newsletter: boolean;
-    smsNotifications: boolean;
-    pushNotifications: boolean;
-    language: string;
-    currency: string;
-  };
-  stats: ProfileStats;
-  orders: Order[];
-  addresses: Address[];
-  paymentMethods: PaymentMethod[];
-  wishlist: WishlistItem[];
-  reviews: Review[];
-  recentlyViewed: Product[];
-}
+import { flashSaleProducts } from './products';
+import { type Order, type UserProfile } from '../../types/profile';
 
 // Dummy profile data
 export const dummyProfile: UserProfile = {
-  id: 'user_123',
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'john.doe@example.com',
-  phone: '+1 (555) 123-4567',
-  avatar: '/images/avatar.jpg',
+  id: 'user_12345',
+  firstName: 'Juan',
+  lastName: 'Santos',
+  email: 'juan.santos@example.com',
+  phones: [
+    {
+      id: 'phone_1',
+      type: 'mobile',
+      number: '+6391712345678',
+      isPrimary: true,
+    },
+    {
+      id: 'phone_2',
+      type: 'home',
+      number: '+6392876543210',
+      isPrimary: false,
+    },
+    {
+      id: 'phone_3',
+      type: 'work',
+      number: '+6393456789012',
+      isPrimary: false,
+    },
+  ],
+  emailVerified: true,
+  avatar: undefined,
   dateOfBirth: '1990-05-15',
   gender: 'male',
-  bio: 'Fashion enthusiast and tech lover. Always looking for the latest trends and best deals.',
   preferences: {
     newsletter: true,
-    smsNotifications: false,
+    smsNotifications: true,
     pushNotifications: true,
     language: 'en',
-    currency: 'USD',
+    currency: 'PHP',
   },
   stats: {
     totalOrders: 12,
@@ -123,88 +46,145 @@ export const dummyProfile: UserProfile = {
     loyaltyPoints: 1250,
     memberSince: '2022-03-15',
   },
+  paymentMethods: [],
   orders: [
     {
-      id: 'order_1',
-      orderNumber: 'ORD-2024-001',
-      date: '2024-01-15',
-      status: 'delivered',
-      totalAmount: 299.99,
+      id: 'order_4',
+      orderNumber: 'ORD-2024-004',
+      date: '2025-01-10',
+      orderDate: '2025-01-10T16:20:00Z',
+      shippedDate: undefined,
+      deliveredDate: undefined,
+      status: 'ordered',
+      totalAmount: flashSaleProducts[4].price,
       items: [
         {
-          product: {
-            id: 'p1',
-            title: "Classic Men's Leather Shoes",
-            price: 299.99,
-            imageSrc: '/images/products/shoes-1.jpg',
-            imageAlt: "Classic Men's Leather Shoes",
-            description: 'Premium leather shoes for formal occasions',
-            category: 'Footwear',
-            type: 'regular',
-            rating: 4.5,
-            reviewCount: 128,
-            soldCount: 456,
-            discountPercent: 0,
-            originalPrice: 399.99,
-            sizes: ['7', '8', '9', '10', '11'],
-            images: ['/images/products/shoes-1.jpg', '/images/products/shoes-2.jpg'],
-            stock: 15,
-            reviews: [],
-          },
+          product: flashSaleProducts[4],
           quantity: 1,
-          price: 299.99,
+          price: flashSaleProducts[4].price,
         },
       ],
       shippingAddress: {
         street: '123 Main Street',
-        city: 'New York',
-        state: 'NY',
-        zipCode: '10001',
-        country: 'United States',
+        city: 'Quezon City',
+        state: 'Metro Manila',
+        zipCode: '1100',
+        country: 'Philippines',
       },
-      paymentMethod: 'Credit Card ending in 4242',
+      paymentMethod: {
+        type: 'apple_pay',
+        paidAt: '2025-01-10T16:21:00Z',
+        transactionId: 'apple_pay_111222333',
+      },
+      trackingNumber: undefined,
+      carrier: undefined,
+      estimatedDelivery: '2025-01-15T16:00:00Z',
+    },
+    {
+      id: 'order_1',
+      orderNumber: 'ORD-2024-001',
+      date: '2024-01-15',
+      orderDate: '2024-01-15T10:30:00Z',
+      shippedDate: '2024-01-16T14:00:00Z',
+      deliveredDate: '2024-01-18T16:45:00Z',
+      status: 'delivered',
+      totalAmount: flashSaleProducts[0].price,
+      items: [
+        {
+          product: flashSaleProducts[0],
+          quantity: 1,
+          price: flashSaleProducts[0].price,
+        },
+      ],
+      shippingAddress: {
+        street: '123 Main Street',
+        city: 'Quezon City',
+        state: 'Metro Manila',
+        zipCode: '1100',
+        country: 'Philippines',
+      },
+      paymentMethod: {
+        type: 'credit_card',
+        lastFour: '4242',
+        brand: 'Visa',
+        paidAt: '2024-01-15T10:32:00Z',
+        transactionId: 'txn_123456789',
+      },
       trackingNumber: 'TRK123456789',
+      carrier: 'FedEx',
+      estimatedDelivery: '2024-01-18T16:00:00Z',
     },
     {
       id: 'order_2',
       orderNumber: 'ORD-2024-002',
       date: '2024-01-20',
+      orderDate: '2024-01-20T09:15:00Z',
+      shippedDate: '2024-01-21T11:30:00Z',
+      deliveredDate: undefined,
       status: 'shipped',
-      totalAmount: 189.99,
+      totalAmount: flashSaleProducts[1].price + flashSaleProducts[2].price,
       items: [
         {
-          product: {
-            id: 'p2',
-            title: 'Wireless Bluetooth Headphones',
-            price: 189.99,
-            imageSrc: '/images/products/headphones-1.jpg',
-            imageAlt: 'Wireless Bluetooth Headphones',
-            description: 'High-quality wireless headphones with noise cancellation',
-            category: 'Electronics',
-            type: 'flash',
-            rating: 4.8,
-            reviewCount: 89,
-            soldCount: 234,
-            discountPercent: 20,
-            originalPrice: 239.99,
-            sizes: [],
-            images: ['/images/products/headphones-1.jpg', '/images/products/headphones-2.jpg'],
-            stock: 8,
-            reviews: [],
-          },
+          product: flashSaleProducts[1],
           quantity: 1,
-          price: 189.99,
+          price: flashSaleProducts[1].price,
+        },
+        {
+          product: flashSaleProducts[2],
+          quantity: 1,
+          price: flashSaleProducts[2].price,
         },
       ],
       shippingAddress: {
         street: '123 Main Street',
-        city: 'New York',
-        state: 'NY',
-        zipCode: '10001',
-        country: 'United States',
+        city: 'Quezon City',
+        state: 'Metro Manila',
+        zipCode: '1100',
+        country: 'Philippines',
       },
-      paymentMethod: 'PayPal',
+      paymentMethod: {
+        type: 'paypal',
+        email: 'juan.santos@example.com',
+        paidAt: '2024-01-20T09:16:00Z',
+        transactionId: 'paypal_987654321',
+      },
       trackingNumber: 'TRK987654321',
+      carrier: 'UPS',
+      estimatedDelivery: '2024-01-25T14:00:00Z',
+    },
+    {
+      id: 'order_3',
+      orderNumber: 'ORD-2024-003',
+      date: '2024-01-25',
+      orderDate: '2024-01-25T14:45:00Z',
+      shippedDate: undefined,
+      deliveredDate: undefined,
+      status: 'processing',
+      totalAmount: flashSaleProducts[3].price,
+      items: [
+        {
+          product: flashSaleProducts[3],
+          quantity: 1,
+          price: flashSaleProducts[3].price,
+        },
+      ],
+      shippingAddress: {
+        street: '123 Main Street',
+        city: 'Quezon City',
+        state: 'Metro Manila',
+        zipCode: '1100',
+        country: 'Philippines',
+      },
+      paymentMethod: {
+        type: 'credit_card',
+        lastFour: '5555',
+        brand: 'Mastercard',
+        paidAt: '2024-01-25T14:46:00Z',
+        transactionId: 'txn_555666777',
+      },
+      trackingNumber: undefined,
+      carrier: undefined,
+      estimatedDelivery: '2024-01-30T16:00:00Z',
     },
   ],
   addresses: [
@@ -212,123 +192,99 @@ export const dummyProfile: UserProfile = {
       id: 'addr_1',
       type: 'home',
       isDefault: true,
-      street: '123 Main Street',
-      city: 'New York',
-      state: 'NY',
-      zipCode: '10001',
-      country: 'United States',
-      phone: '+1 (555) 123-4567',
+      street: '123 Main Street, Phase 2',
+      barangay: 'Barangay 123',
+      city: 'Quezon City',
+      province: 'Metro Manila',
+      region: 'National Capital Region (NCR)',
+      zipCode: '1100',
+      country: 'Philippines',
+      phone: '09172345678',
     },
     {
       id: 'addr_2',
       type: 'work',
       isDefault: false,
-      street: '456 Business Ave',
-      city: 'New York',
-      state: 'NY',
-      zipCode: '10002',
-      country: 'United States',
-      phone: '+1 (555) 987-6543',
-    },
-  ],
-  paymentMethods: [
-    {
-      id: 'pm_1',
-      type: 'credit_card',
-      isDefault: true,
-      last4: '4242',
-      brand: 'Visa',
-      expiryMonth: 12,
-      expiryYear: 2025,
+      street: '456 Business Avenue, 25th Floor',
+      barangay: 'Barangay 456',
+      city: 'Makati City',
+      province: 'Metro Manila',
+      region: 'National Capital Region (NCR)',
+      zipCode: '1200',
+      country: 'Philippines',
+      phone: '09283456789',
     },
     {
-      id: 'pm_2',
-      type: 'paypal',
+      id: 'addr_3',
+      type: 'other',
       isDefault: false,
-      email: 'john.doe@example.com',
+      street: '789 Vacation Road',
+      barangay: 'Barangay 789',
+      city: 'Cebu City',
+      province: 'Cebu',
+      region: 'Central Visayas (Region VII)',
+      zipCode: '6000',
+      country: 'Philippines',
+      phone: '09334567890',
     },
   ],
   wishlist: [
     {
       id: 'wish_1',
-      product: {
-        id: 'p3',
-        title: 'Smart Watch Series 5',
-        price: 349.99,
-        imageSrc: '/images/products/watch-1.jpg',
-        imageAlt: 'Smart Watch Series 5',
-        description: 'Advanced smartwatch with health tracking',
-        category: 'Electronics',
-        type: 'new',
-        rating: 4.7,
-        reviewCount: 156,
-        soldCount: 89,
-        discountPercent: 0,
-        originalPrice: 399.99,
-        sizes: [],
-        images: ['/images/products/watch-1.jpg', '/images/products/watch-2.jpg'],
-        stock: 12,
-        reviews: [],
-      },
-      addedDate: '2024-01-10',
+      product: flashSaleProducts[0],
+      addedDate: '2024-01-10T10:15:00Z',
+    },
+    {
+      id: 'wish_2',
+      product: flashSaleProducts[1],
+      addedDate: '2024-01-12T14:20:00Z',
+    },
+    {
+      id: 'wish_3',
+      product: flashSaleProducts[2],
+      addedDate: '2024-01-14T09:45:00Z',
     },
   ],
   reviews: [
     {
-      id: 'review_1',
-      product: {
-        id: 'p1',
-        title: "Classic Men's Leather Shoes",
-        price: 299.99,
-        imageSrc: '/images/products/shoes-1.jpg',
-        imageAlt: "Classic Men's Leather Shoes",
-        description: 'Premium leather shoes for formal occasions',
-        category: 'Footwear',
-        type: 'regular',
-        rating: 4.5,
-        reviewCount: 128,
-        soldCount: 456,
-        discountPercent: 0,
-        originalPrice: 399.99,
-        sizes: ['7', '8', '9', '10', '11'],
-        images: ['/images/products/shoes-1.jpg', '/images/products/shoes-2.jpg'],
-        stock: 15,
-        reviews: [],
-      },
+      id: 'rev_1',
+      product: flashSaleProducts[0],
       rating: 5,
-      title: 'Excellent Quality!',
-      content: 'These shoes are amazing! Perfect fit and great quality. Highly recommend!',
-      date: '2024-01-16',
+      title: 'Great product!',
+      content: 'Very satisfied with my purchase. Highly recommended!',
+      date: '2024-01-16T11:30:00Z',
       helpful: 12,
       verified: true,
     },
-  ],
-  recentlyViewed: [
     {
-      id: 'p4',
-      title: 'Designer Sunglasses',
-      price: 159.99,
-      imageSrc: '/images/products/sunglasses-1.jpg',
-      imageAlt: 'Designer Sunglasses',
-      description: 'Stylish designer sunglasses with UV protection',
-      category: 'Accessories',
-      type: 'regular',
-      rating: 4.6,
-      reviewCount: 67,
-      soldCount: 123,
-      discountPercent: 0,
-      originalPrice: 199.99,
-      sizes: [],
-      images: ['/images/products/sunglasses-1.jpg', '/images/products/sunglasses-2.jpg'],
-      stock: 25,
-      reviews: [],
+      id: 'rev_2',
+      product: flashSaleProducts[1],
+      rating: 4,
+      title: 'Good quality',
+      content: 'Product as described. Fast shipping.',
+      date: '2024-01-18T16:20:00Z',
+      helpful: 8,
+      verified: true,
+    },
+    {
+      id: 'rev_3',
+      product: flashSaleProducts[2],
+      rating: 5,
+      title: 'Excellent service',
+      content: 'Customer service was very helpful and responsive.',
+      date: '2024-01-20T13:45:00Z',
+      helpful: 15,
+      verified: true,
     },
   ],
+  recentlyViewed: [flashSaleProducts[0], flashSaleProducts[1], flashSaleProducts[2]],
 };
 
 // Helper functions
 export const getOrderStatusColor = (status: Order['status']) => {
   switch (status) {
+    case 'ordered':
+      return 'bg-gray-100 text-gray-800';
     case 'pending':
       return 'bg-yellow-100 text-yellow-800';
     case 'processing':
@@ -346,6 +302,8 @@ export const getOrderStatusColor = (status: Order['status']) => {
 
 export const getOrderStatusText = (status: Order['status']) => {
   switch (status) {
+    case 'ordered':
+      return 'Ordered';
     case 'pending':
       return 'Pending';
     case 'processing':
@@ -361,8 +319,8 @@ export const getOrderStatusText = (status: Order['status']) => {
   }
 };
 
-export const formatCurrency = (amount: number, currency: string = 'USD') => {
-  return new Intl.NumberFormat('en-US', {
+export const formatCurrency = (amount: number, currency: string = 'PHP') => {
+  return new Intl.NumberFormat('en-PH', {
     style: 'currency',
     currency,
   }).format(amount);
@@ -370,8 +328,19 @@ export const formatCurrency = (amount: number, currency: string = 'USD') => {
 
 export const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
+    month: '2-digit',
+    day: '2-digit',
     year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  });
+};
+
+export const formatDateTime = (dateString: string) => {
+  return new Date(dateString).toLocaleString('en-US', {
+    month: '2-digit',
+    day: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
   });
 };

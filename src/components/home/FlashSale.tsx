@@ -47,7 +47,9 @@ export default function Products({
   // Check if we're on view-all page or home page for special grid layout
   const isViewAllPage =
     typeof window !== 'undefined' &&
-    (window.location.pathname === '/view-all' || window.location.pathname === '/');
+    (window.location.pathname === '/view-all' ||
+      window.location.pathname === '/' ||
+      window.location.pathname === '/search');
 
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { Button } from '@/components/ui/button';
 
@@ -9,6 +9,7 @@ type ConfirmDialogProps = {
   confirmText?: string;
   cancelText?: string;
   destructive?: boolean;
+  hideConfirm?: boolean;
   onConfirm: () => void | Promise<void>;
   onCancel: () => void;
 };
@@ -20,6 +21,7 @@ export default function ConfirmDialog({
   confirmText = 'Confirm',
   cancelText = 'Cancel',
   destructive = true,
+  hideConfirm = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -36,12 +38,12 @@ export default function ConfirmDialog({
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
         aria-describedby="confirm-dialog-message"
-        className="relative mx-4 w-full max-w-sm rounded-lg border bg-background p-4 shadow-lg"
+        className="bg-background relative mx-4 w-full max-w-sm rounded-lg border p-4 shadow-lg"
       >
-        <h2 id="confirm-dialog-title" className="text-base font-semibold text-foreground">
+        <h2 id="confirm-dialog-title" className="text-foreground text-base font-semibold">
           {title}
         </h2>
-        <p id="confirm-dialog-message" className="mt-2 text-sm text-muted-foreground">
+        <p id="confirm-dialog-message" className="text-muted-foreground mt-2 text-sm">
           {message}
         </p>
 
@@ -49,9 +51,11 @@ export default function ConfirmDialog({
           <Button variant="secondary" onClick={onCancel}>
             {cancelText}
           </Button>
-          <Button variant={destructive ? 'destructive' : 'default'} onClick={onConfirm}>
-            {confirmText}
-          </Button>
+          {!hideConfirm && (
+            <Button variant={destructive ? 'destructive' : 'default'} onClick={onConfirm}>
+              {confirmText}
+            </Button>
+          )}
         </div>
       </div>
     </div>

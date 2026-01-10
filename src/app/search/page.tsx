@@ -67,12 +67,12 @@ export default function SearchPage() {
             <FlashSale
               title={`Found ${searchState.results.length} products`}
               showCountdown={false}
-              showArrows={true}
+              showArrows={false}
               showType={true}
               productsData={searchState.results}
-              limit={false}
+              limit={true}
               hideCategories={true}
-              initialLimit={6}
+              initialLimit={searchState.results.length}
             />
           </div>
         ) : (
