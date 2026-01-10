@@ -29,20 +29,22 @@ export default function AddressBook({
   };
 
   return (
-    <div className="w-full border-t bg-slate-100 px-2 pt-4" data-testid="address-book">
+    <div className="w-full border-t px-2 pt-4" data-testid="address-book">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-medium text-gray-900" data-testid="address-book-title">
           Shipping Addresses
         </h3>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onAddAddress}
-          className="h-7 w-7 p-0"
-          data-testid="add-address-button"
-        >
-          <Plus className="h-3 w-3" />
-        </Button>
+        {addresses.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onAddAddress}
+            className="h-7 w-7 p-0"
+            data-testid="add-address-button"
+          >
+            <Plus className="h-3 w-3" />
+          </Button>
+        )}
       </div>
 
       {addresses.length > 0 ? (
@@ -124,9 +126,18 @@ export default function AddressBook({
       ) : (
         <div className="py-3 text-center">
           <MapPin className="mx-auto mb-2 h-6 w-6 text-gray-300" data-testid="no-addresses-icon" />
-          <p className="text-xs text-gray-500" data-testid="no-addresses-text">
+          <p className="mb-3 text-xs text-gray-500" data-testid="no-addresses-text">
             No addresses saved
           </p>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={onAddAddress}
+            className="mx-auto h-8 px-4 text-xs"
+            data-testid="add-first-address-button"
+          >
+            Add Your First Address
+          </Button>
         </div>
       )}
     </div>

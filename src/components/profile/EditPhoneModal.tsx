@@ -9,13 +9,15 @@ import { Label } from '@/components/ui/label';
 
 interface EditPhoneModalProps {
   phone: string;
+  phones?: { id: string; type: string; number: string; isPrimary: boolean }[];
   isAdding?: boolean;
-  onSave: (phone: string) => void;
+  onSave: (phone: string, makePrimary?: boolean) => void;
   onCancel: () => void;
 }
 
 export default function EditPhoneModal({
   phone,
+  phones,
   isAdding = false,
   onSave,
   onCancel,
@@ -28,6 +30,7 @@ export default function EditPhoneModal({
 
   const initialValues = {
     phone: isAdding ? '' : phone,
+    makePrimary: isAdding ? true : false,
   };
 
   return (
@@ -50,7 +53,7 @@ export default function EditPhoneModal({
           initialValues={initialValues}
           validationSchema={phoneValidationSchema}
           onSubmit={values => {
-            onSave(values.phone);
+            onSave(values.phone, values.makePrimary);
           }}
         >
           {({ isSubmitting, errors, touched }) => (
@@ -71,6 +74,22 @@ export default function EditPhoneModal({
                   {msg => <div className="mt-1 text-xs text-red-500">{msg}</div>}
                 </ErrorMessage>
               </div>
+
+              {/* Make Primary Checkbox - Only show when phones array is empty */}
+              {phones && phones.length === 0 && (
+                <div className="flex items-center space-x-2">
+                  <Field
+                    type="checkbox"
+                    id="makePrimary"
+                    name="makePrimary"
+                    disabled={true}
+                    className="h-4 w-4 rounded border-blue-600 bg-blue-600 text-white focus:ring-blue-500 disabled:border-blue-600 disabled:bg-blue-600 disabled:opacity-75"
+                  />
+                  <Label htmlFor="makePrimary" className="text-sm text-gray-700">
+                    Make this my primary phone number (Default for new phone)
+                  </Label>
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="flex justify-end space-x-3 pt-4">

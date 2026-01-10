@@ -9,7 +9,9 @@ import { Label } from '@/components/ui/label';
 import { type Address } from '@/types/profile';
 
 interface EditAddressFormProps {
+  addresses?: Address[];
   address?: Address;
+  isFirstAddress?: boolean;
   onSave: (address: Omit<Address, 'id'>) => void;
   onCancel: () => void;
 }
@@ -34,7 +36,13 @@ const philippineRegions = [
   'Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)',
 ];
 
-export default function EditAddressForm({ address, onSave, onCancel }: EditAddressFormProps) {
+export default function EditAddressForm({
+  addresses,
+  address,
+  isFirstAddress = false,
+  onSave,
+  onCancel,
+}: EditAddressFormProps) {
   const [showRegions, setShowRegions] = useState(false);
   const [filteredRegions, setFilteredRegions] = useState(philippineRegions);
   const regionInputRef = useRef<HTMLInputElement>(null);
@@ -49,6 +57,7 @@ export default function EditAddressForm({ address, onSave, onCancel }: EditAddre
       street: address?.street || '',
       zipCode: address?.zipCode || '',
       country: address?.country || 'Philippines',
+      makeDefault: isFirstAddress ? true : Boolean(address?.isDefault || false),
     },
     validationSchema: Yup.object({
       region: Yup.string().required('Region is required'),
@@ -72,7 +81,7 @@ export default function EditAddressForm({ address, onSave, onCancel }: EditAddre
         zipCode: values.zipCode.trim(),
         country: values.country.trim(),
         phone: address?.phone || '', // Keep original phone
-        isDefault: address?.isDefault || false, // Keep original default status
+        isDefault: values.makeDefault,
       });
     },
   });
@@ -294,6 +303,24 @@ export default function EditAddressForm({ address, onSave, onCancel }: EditAddre
           />
         </div>
       </div>
+
+      {/* Make Default Checkbox - Only show when addresses array is empty */}
+      {addresses && addresses.length === 0 && (
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="makeDefault"
+            name="makeDefault"
+            disabled={true}
+            checked={true}
+            onChange={formik.handleChange}
+            className="h-4 w-4 rounded border-blue-600 bg-blue-600 text-white focus:ring-blue-500 disabled:border-blue-600 disabled:bg-blue-600 disabled:opacity-75"
+          />
+          <Label htmlFor="makeDefault" className="text-sm text-gray-700">
+            Make this my default address (Default for new address)
+          </Label>
+        </div>
+      )}
 
       {/* Action Buttons */}
       <div className="flex justify-end space-x-3 pt-4" data-testid="form-actions">

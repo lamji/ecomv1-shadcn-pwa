@@ -39,12 +39,14 @@ export default function PhoneBook({
   const remainingCount = profile.phones.length - 2;
 
   return (
-    <div className="w-full border-t bg-blue-50 px-2 pt-4">
+    <div className="w-full border-t px-2 pt-4" data-testid="phone-book">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-medium text-gray-900">Phone Numbers</h3>
-        <Button variant="outline" size="sm" onClick={onAddPhone} className="h-7 w-7 p-0">
-          <Plus className="h-3 w-3" />
-        </Button>
+        {profile.phones.length > 0 && (
+          <Button variant="outline" size="sm" onClick={onAddPhone} className="h-7 w-7 p-0">
+            <Plus className="h-3 w-3" />
+          </Button>
+        )}
       </div>
 
       {profile.phones.length > 0 ? (
@@ -59,7 +61,7 @@ export default function PhoneBook({
               </div>
               <div className="min-w-0 flex-1">
                 <div className="mb-1 flex items-center gap-2">
-                  <p className="text-xs font-medium text-gray-900 capitalize">{phone.type}</p>
+                  {/* <p className="text-xs font-medium text-gray-900 capitalize">{phone.type}</p> */}
                   <div className="flex items-center gap-1">
                     <span className="text-xs text-gray-500">Primary</span>
                     <button
@@ -114,7 +116,15 @@ export default function PhoneBook({
       ) : (
         <div className="py-3 text-center">
           <PhoneIcon className="mx-auto mb-2 h-6 w-6 text-gray-300" />
-          <p className="text-xs text-gray-500">No phone numbers saved</p>
+          <p className="mb-3 text-xs text-gray-500">No phone numbers saved</p>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={onAddPhone}
+            className="mx-auto h-8 px-4 text-xs"
+          >
+            Add Your First Phone Number
+          </Button>
         </div>
       )}
     </div>

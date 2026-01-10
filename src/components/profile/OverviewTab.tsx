@@ -58,7 +58,7 @@ export default function OverviewTab({ profile }: OverviewTabProps) {
   return (
     <div className="space-y-6">
       {/* Recent Orders */}
-      <div data-testid="recent-orders-card" className="bg-white py-6">
+      <div data-testid="recent-orders-card" className="bg-white p-0 py-6 sm:p-6">
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900">

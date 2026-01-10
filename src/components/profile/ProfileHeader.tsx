@@ -24,6 +24,7 @@ export default function ProfileHeader({ profile, onProfileUpdate }: ProfileHeade
           currentBadge={profileHook.currentBadge}
           onEditProfile={profileHook.handleEditProfile}
           onUpdateEmail={profileHook.handleUpdateEmail}
+          className="bg-white"
         />
         <PhoneBook
           profile={profile}
