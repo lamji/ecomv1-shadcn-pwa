@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useSearchHooks } from '@/lib/hooks/useSearchHooks';
+import { useAppSelector } from '@/lib/store';
 
 interface AppHeaderProps {
   title?: string;
@@ -18,10 +19,15 @@ interface AppHeaderProps {
 export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
   const router = useRouter();
   const [cartCount, setCartCount] = useState(0); // Example cart count
-  const [notificationCount, setNotificationCount] = useState(0); // Example notification count
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const headerRef = useRef<HTMLDivElement | null>(null);
   const { isAuthenticated, isLoading } = useAuth();
+  const notifications = useAppSelector(state => state.notifications.items);
+
+  useEffect(() => {
+    setUnreadCount(notifications.filter(n => !n.read).length);
+  }, [notifications]);
 
   // Use search hooks for search functionality
   const { searchQuery, setSearchQuery, handleSearch, getSearchSuggestions } = useSearchHooks();
@@ -250,12 +256,12 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
                 data-testid="notification-button"
               >
                 <Bell className="h-5 w-5" />
-                {notificationCount > 0 && (
+                {unreadCount > 0 && (
                   <Badge
                     variant="destructive"
                     className="absolute -top-1.5 -right-1.5 flex h-3 w-3 items-center justify-center p-0 text-[8px] md:h-5 md:w-5 md:text-xs"
                   >
-                    {notificationCount}
+                    {unreadCount}
                   </Badge>
                 )}
               </Button>

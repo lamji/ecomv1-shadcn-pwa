@@ -5,12 +5,13 @@ import themeReducer from './features/themeSlice';
 import alertReducer from './features/alertSlice';
 import loadingReducer from './features/loadingSlice';
 import searchReducer from './features/searchSlice';
+import notificationReducer from './features/notificationSlice';
 import storage from 'redux-persist/lib/storage';
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['theme'], // Only theme will be persisted
+  whitelist: ['theme', 'notifications'], // Persist theme and notifications
 };
 
 const rootReducer = combineReducers({
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   alert: alertReducer,
   loading: loadingReducer,
   search: searchReducer,
+  notifications: notificationReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

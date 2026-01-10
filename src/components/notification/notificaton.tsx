@@ -1,98 +1,42 @@
 'use client';
 
 import React from 'react';
-import { Bell, Package, Truck, CreditCard, X, ChevronLeft, Check } from 'lucide-react';
-import { formatCurrency } from '@/lib/helper/currency';
+import {
+  Bell,
+  Package,
+  Truck,
+  CreditCard,
+  ChevronLeft,
+  Check,
+  X,
+  Calendar,
+  Info,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-
-// Mock notification data for e-commerce
-const mockNotifications: NotificationItem[] = [
-  {
-    id: 'notif_1',
-    type: 'order',
-    title: 'Order Confirmed',
-    message: 'Your order #12345 has been confirmed and is being processed.',
-    status: 'success',
-    read: false,
-    date: '2024-01-15T10:30:00Z',
-    amount: 2999,
-    orderId: 'ORD-12345',
-  },
-  {
-    id: 'notif_2',
-    type: 'shipping',
-    title: 'Order Shipped',
-    message: 'Your order #12345 has been shipped and will arrive in 2-3 days.',
-    status: 'info',
-    read: false,
-    date: '2024-01-14T15:45:00Z',
-    trackingNumber: 'TRK-67890',
-    orderId: 'ORD-12345',
-  },
-  {
-    id: 'notif_3',
-    type: 'payment',
-    title: 'Payment Successful',
-    message: 'Payment of ₱2,999.00 for order #12344 has been processed successfully.',
-    status: 'success',
-    read: true,
-    date: '2024-01-13T09:20:00Z',
-    amount: 2999,
-    orderId: 'ORD-12344',
-  },
-  {
-    id: 'notif_4',
-    type: 'promotion',
-    title: 'Flash Sale Alert!',
-    message: 'Get 50% off on selected items. Limited time offer!',
-    status: 'warning',
-    read: true,
-    date: '2024-01-12T12:00:00Z',
-  },
-  {
-    id: 'notif_5',
-    type: 'delivery',
-    title: 'Order Delivered',
-    message: 'Your order #12343 has been delivered successfully.',
-    status: 'success',
-    read: true,
-    date: '2024-01-11T16:30:00Z',
-    orderId: 'ORD-12343',
-  },
-];
-
-interface NotificationItem {
-  id: string;
-  type: 'order' | 'shipping' | 'payment' | 'promotion' | 'delivery';
-  title: string;
-  message: string;
-  status: 'success' | 'info' | 'warning' | 'error';
-  read: boolean;
-  date: string;
-  amount?: number;
-  orderId?: string;
-  trackingNumber?: string;
-}
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { NotificationItem } from '@/lib/data/notifications';
+import { useAppDispatch, useAppSelector } from '@/lib/store';
+import { markAsRead, markAllAsRead } from '@/lib/features/notificationSlice';
 
 export default function Notification() {
-  const [notifications, setNotifications] = React.useState<NotificationItem[]>(mockNotifications);
+  const notifications = useAppSelector(state => state.notifications.items);
+  const dispatch = useAppDispatch();
   const [filter, setFilter] = React.useState<'all' | 'unread' | 'read'>('all');
+  const [selected, setSelected] = React.useState<NotificationItem | null>(null);
+  const [open, setOpen] = React.useState(false);
   const router = useRouter();
 
-  const markAsRead = React.useCallback((id: string) => {
-    setNotifications(prev =>
-      prev.map(notif => (notif.id === id ? { ...notif, read: true } : notif)),
-    );
-  }, []);
+  const handleMarkAsRead = React.useCallback(
+    (id: string) => {
+      dispatch(markAsRead(id));
+    },
+    [dispatch],
+  );
 
-  const markAllAsRead = React.useCallback(() => {
-    setNotifications(prev => prev.map(notif => ({ ...notif, read: true })));
-  }, []);
-
-  const deleteNotification = React.useCallback((id: string) => {
-    setNotifications(prev => prev.filter(notif => notif.id !== id));
-  }, []);
+  const handleMarkAllAsRead = React.useCallback(() => {
+    dispatch(markAllAsRead());
+  }, [dispatch]);
 
   // Derived lists and counts
   const unreadCount = React.useMemo(
@@ -186,7 +130,7 @@ export default function Notification() {
             <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Notifications</h1>
           </div>
           {unreadCount > 0 && (
-            <Button variant="outline" size="sm" onClick={markAllAsRead}>
+            <Button variant="outline" size="sm" onClick={handleMarkAllAsRead}>
               Mark all as read
             </Button>
           )}
@@ -231,9 +175,15 @@ export default function Notification() {
 
             return (
               <li key={notification.id}>
-                <div
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelected(notification);
+                    setOpen(true);
+                    handleMarkAsRead(notification.id);
+                  }}
                   className={`hover:bg-accent/40 flex w-full items-center justify-between gap-3 px-4 py-3.5 transition sm:py-4 ${
-                    notification.read ? '' : 'bg-accent/20'
+                    notification.read ? 'bg-white' : 'bg-blue-50/50'
                   }`}
                 >
                   <div className="flex min-w-0 items-center gap-3">
@@ -243,7 +193,7 @@ export default function Notification() {
                       <Icon className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="mb-1 flex items-center gap-2">
+                      <div className="flex items-center gap-2">
                         <p className="truncate text-left text-sm font-medium sm:text-base">
                           {notification.title}
                         </p>
@@ -256,54 +206,11 @@ export default function Notification() {
                           {notification.status}
                         </span>
                       </div>
-                      <p className="text-muted-foreground mb-2 text-left text-xs">
-                        {notification.message}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-muted-foreground text-left text-xs">{dateStr}</p>
-                        {notification.orderId && (
-                          <span className="text-muted-foreground text-xs">
-                            Order: {notification.orderId}
-                          </span>
-                        )}
-                        {notification.trackingNumber && (
-                          <span className="text-muted-foreground text-xs">
-                            Tracking: {notification.trackingNumber}
-                          </span>
-                        )}
-                      </div>
+                      <p className="text-muted-foreground text-left text-xs">{dateStr}</p>
                     </div>
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    {notification.amount && (
-                      <div className="text-right">
-                        <div className="text-sm font-semibold text-emerald-600">
-                          {formatCurrency(notification.amount)}
-                        </div>
-                      </div>
-                    )}
-                    <div className="flex gap-1">
-                      {!notification.read && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => markAsRead(notification.id)}
-                          className="h-8 w-8 p-0"
-                        >
-                          <Check className="h-4 w-4" />
-                        </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => deleteNotification(notification.id)}
-                        className="h-8 w-8 p-0 text-red-500 hover:text-red-600"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+                  <div className="flex shrink-0 items-center gap-2"></div>
+                </button>
               </li>
             );
           })}
@@ -321,6 +228,114 @@ export default function Notification() {
           )}
         </ul>
       </div>
+
+      {/* Details Modal */}
+      {open && selected && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="absolute inset-0" onClick={() => setOpen(false)} />
+          <Card className="animate-in slide-in-from-bottom sm:zoom-in-95 relative z-10 w-full max-w-lg overflow-hidden rounded-t-2xl shadow-2xl duration-300 sm:rounded-2xl">
+            <CardHeader className="border-b pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-full ${getIconBg(selected.type)}`}
+                  >
+                    {React.createElement(getNotificationIcon(selected.type), {
+                      className: 'h-5 w-5',
+                    })}
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">{selected.title}</CardTitle>
+                    <p className="text-muted-foreground text-xs">{formatDate(selected.date)}</p>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setOpen(false)}
+                  className="rounded-full"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6 pt-6 pb-8">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                  <Info className="text-primary h-4 w-4" />
+                  Message
+                </div>
+                <p className="rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm leading-relaxed text-gray-600">
+                  {selected.message}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
+                    Status
+                  </p>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${getStatusColor(selected.status)}`}
+                  >
+                    {selected.status}
+                  </span>
+                </div>
+                <div className="space-y-1 text-right">
+                  <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
+                    Date
+                  </p>
+                  <div className="flex items-center justify-end gap-1.5 text-xs text-gray-700">
+                    <Calendar className="h-3.5 w-3.5 text-gray-400" />
+                    {new Date(selected.date).toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {selected.orderId && (
+                <div className="border-t pt-4">
+                  <div className="bg-primary/5 border-primary/10 flex items-center justify-between rounded-lg border p-3">
+                    <div className="flex items-center gap-2">
+                      <Package className="text-primary h-4 w-4" />
+                      <span className="text-sm font-medium text-gray-900">Order ID</span>
+                    </div>
+                    <span className="text-primary font-mono text-sm font-bold">
+                      {selected.orderId}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {selected.trackingNumber && (
+                <div className="flex items-center justify-between rounded-lg border border-blue-100 bg-blue-50 p-3">
+                  <div className="flex items-center gap-2">
+                    <Truck className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm font-medium text-gray-900">Tracking</span>
+                  </div>
+                  <span className="font-mono text-sm font-bold text-blue-600">
+                    {selected.trackingNumber}
+                  </span>
+                </div>
+              )}
+
+              <Button
+                onClick={() => setOpen(false)}
+                className="shadow-primary/20 w-full py-6 text-base font-bold shadow-lg"
+              >
+                Close Details
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
