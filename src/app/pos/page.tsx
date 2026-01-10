@@ -207,6 +207,11 @@ export default function PosPage() {
           // Update local state
           setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: newStatus } : o)));
           console.log(`✅ Order ${orderId} status updated to ${newStatus} via OneSignal`);
+
+          // Only dispatch directly in production for real-time updates
+          if (process.env.NODE_ENV === 'production') {
+            await dispatchNotificationDirectly(notificationPayload);
+          }
         } else {
           if (oneSignalResponse.status === 408) {
             console.error('⏰ OneSignal API timeout - using fallback');
