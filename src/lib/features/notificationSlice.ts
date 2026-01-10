@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { mockNotifications, NotificationItem } from '../data/notifications';
+import { NotificationItem } from '../data/notifications';
 
 interface NotificationState {
   items: NotificationItem[];
 }
 
 const initialState: NotificationState = {
-  items: mockNotifications,
+  items: [],
 };
 
 const notificationSlice = createSlice({
@@ -32,8 +32,14 @@ const notificationSlice = createSlice({
     },
     addNotification: (state, action: PayloadAction<NotificationItem>) => {
       // Check if notification already exists to avoid duplicates
+      console.log('Redux addNotification called with:', action.payload);
+      console.log('Current notifications count:', state.items.length);
+
       if (!state.items.find(n => n.id === action.payload.id)) {
         state.items = [action.payload, ...state.items];
+        console.log('Notification added. New count:', state.items.length);
+      } else {
+        console.log('Duplicate notification prevented:', action.payload.id);
       }
     },
   },

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import moment from 'moment';
 import {
   Bell,
   Package,
@@ -98,24 +99,7 @@ export default function Notification() {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) {
-      return 'Today';
-    } else if (diffDays === 1) {
-      return 'Yesterday';
-    } else if (diffDays < 7) {
-      return `${diffDays} days ago`;
-    } else {
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: '2-digit',
-        year: 'numeric',
-      });
-    }
+    return moment(dateString).format('MMM DD, YYYY [at] hh:mm A');
   };
 
   return (

@@ -6,7 +6,7 @@ import { store, persistor } from '@/lib/store';
 import ReactProvider from './provider';
 import GlobalAlert from '@/components/shared/GlobalAlert';
 import GlobalSpinner from '@/components/shared/GlobalSpinner';
-import PwaInstallPromptWrapper from './pwa/PwaInstallPromptWrapper';
+// import PwaInstallPromptWrapper from './pwa/PwaInstallPromptWrapper';
 import { useNotifications } from '@/lib/hooks/useNotifications';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -18,9 +18,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
           {children}
           <GlobalAlert />
           <GlobalSpinner />
-          <div className="md:hidden">
+          {/* <div className="md:hidden">
             <PwaInstallPromptWrapper />
-          </div>
+          </div> */}
         </ReactProvider>
       </PersistGate>
     </Provider>

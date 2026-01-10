@@ -14,6 +14,7 @@ const PUBLIC_ROUTES = [
   '/search',
   '/profile',
   '/notifications',
+  '/pos',
 ];
 
 /**
@@ -24,6 +25,9 @@ const PUBLIC_API_ROUTES = [
   '/api/auth/register',
   '/api/auth/forgot-password',
   '/api/auth/reset-password',
+  '/api/notifications',
+  '/api/onesignal',
+  '/api/onesignal/messages',
 ];
 
 /**
