@@ -6,6 +6,7 @@ import { store, persistor } from '@/lib/store';
 import ReactProvider from './provider';
 import GlobalAlert from '@/components/shared/GlobalAlert';
 import GlobalSpinner from '@/components/shared/GlobalSpinner';
+import PwaInstallPromptWrapper from './pwa/PwaInstallPromptWrapper';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -15,6 +16,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           {children}
           <GlobalAlert />
           <GlobalSpinner />
+          <PwaInstallPromptWrapper />
         </ReactProvider>
       </PersistGate>
     </Provider>

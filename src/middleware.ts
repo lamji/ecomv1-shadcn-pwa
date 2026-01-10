@@ -13,6 +13,7 @@ const PUBLIC_ROUTES = [
   '/view-all',
   '/search',
   '/profile',
+  '/notifications',
 ];
 
 /**

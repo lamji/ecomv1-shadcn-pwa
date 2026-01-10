@@ -1,85 +1,195 @@
 'use client';
 
 import React from 'react';
-import dataJson from '@/lib/data/transactionResponseApi.json';
-import { TransactionsApiResponse } from '@/types/transactions';
-import {
-  ArrowDownRight,
-  Banknote,
-  Receipt,
-  X,
-  ChevronRight,
-  Copy,
-  ChevronLeft,
-} from 'lucide-react';
+import { Bell, Package, Truck, CreditCard, X, ChevronLeft, Check } from 'lucide-react';
 import { formatCurrency } from '@/lib/helper/currency';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardAction } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
 
-const api: TransactionsApiResponse = dataJson as unknown as TransactionsApiResponse;
+// Mock notification data for e-commerce
+const mockNotifications: NotificationItem[] = [
+  {
+    id: 'notif_1',
+    type: 'order',
+    title: 'Order Confirmed',
+    message: 'Your order #12345 has been confirmed and is being processed.',
+    status: 'success',
+    read: false,
+    date: '2024-01-15T10:30:00Z',
+    amount: 2999,
+    orderId: 'ORD-12345',
+  },
+  {
+    id: 'notif_2',
+    type: 'shipping',
+    title: 'Order Shipped',
+    message: 'Your order #12345 has been shipped and will arrive in 2-3 days.',
+    status: 'info',
+    read: false,
+    date: '2024-01-14T15:45:00Z',
+    trackingNumber: 'TRK-67890',
+    orderId: 'ORD-12345',
+  },
+  {
+    id: 'notif_3',
+    type: 'payment',
+    title: 'Payment Successful',
+    message: 'Payment of ₱2,999.00 for order #12344 has been processed successfully.',
+    status: 'success',
+    read: true,
+    date: '2024-01-13T09:20:00Z',
+    amount: 2999,
+    orderId: 'ORD-12344',
+  },
+  {
+    id: 'notif_4',
+    type: 'promotion',
+    title: 'Flash Sale Alert!',
+    message: 'Get 50% off on selected items. Limited time offer!',
+    status: 'warning',
+    read: true,
+    date: '2024-01-12T12:00:00Z',
+  },
+  {
+    id: 'notif_5',
+    type: 'delivery',
+    title: 'Order Delivered',
+    message: 'Your order #12343 has been delivered successfully.',
+    status: 'success',
+    read: true,
+    date: '2024-01-11T16:30:00Z',
+    orderId: 'ORD-12343',
+  },
+];
+
+interface NotificationItem {
+  id: string;
+  type: 'order' | 'shipping' | 'payment' | 'promotion' | 'delivery';
+  title: string;
+  message: string;
+  status: 'success' | 'info' | 'warning' | 'error';
+  read: boolean;
+  date: string;
+  amount?: number;
+  orderId?: string;
+  trackingNumber?: string;
+}
 
 export default function Notification() {
-  const items = React.useMemo(() => api.data ?? [], []);
-  // Track read/unread transaction IDs
-  const [readIds, setReadIds] = React.useState<Set<string>>(new Set());
+  const [notifications, setNotifications] = React.useState<NotificationItem[]>(mockNotifications);
   const [filter, setFilter] = React.useState<'all' | 'unread' | 'read'>('all');
-  const [open, setOpen] = React.useState(false);
-  const [selected, setSelected] = React.useState<(typeof items)[number] | null>(null);
   const router = useRouter();
 
-  // Close on Escape key
-  React.useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open]);
-
-  // Load read state from localStorage on mount
-  React.useEffect(() => {
-    try {
-      const raw = localStorage.getItem('tx_read_ids');
-      if (raw) {
-        const arr: string[] = JSON.parse(raw);
-        setReadIds(new Set(arr));
-      }
-    } catch {}
+  const markAsRead = React.useCallback((id: string) => {
+    setNotifications(prev =>
+      prev.map(notif => (notif.id === id ? { ...notif, read: true } : notif)),
+    );
   }, []);
 
-  // Persist readIds when it changes
-  React.useEffect(() => {
-    try {
-      localStorage.setItem('tx_read_ids', JSON.stringify(Array.from(readIds)));
-    } catch {}
-  }, [readIds]);
+  const markAllAsRead = React.useCallback(() => {
+    setNotifications(prev => prev.map(notif => ({ ...notif, read: true })));
+  }, []);
 
-  const isRead = React.useCallback((id?: string) => (id ? readIds.has(id) : false), [readIds]);
-  const markRead = React.useCallback((id?: string) => {
-    if (!id) return;
-    setReadIds(prev => (prev.has(id) ? prev : new Set(prev).add(id)));
+  const deleteNotification = React.useCallback((id: string) => {
+    setNotifications(prev => prev.filter(notif => notif.id !== id));
   }, []);
 
   // Derived lists and counts
-  const unreadCount = React.useMemo(() => items.filter(t => !isRead(t.id)).length, [items, isRead]);
-  const readCount = React.useMemo(() => items.filter(t => isRead(t.id)).length, [items, isRead]);
+  const unreadCount = React.useMemo(
+    () => notifications.filter(n => !n.read).length,
+    [notifications],
+  );
+  const readCount = React.useMemo(() => notifications.filter(n => n.read).length, [notifications]);
   const filtered = React.useMemo(() => {
-    if (filter === 'unread') return items.filter(t => !isRead(t.id));
-    if (filter === 'read') return items.filter(t => isRead(t.id));
-    return items;
-  }, [items, filter, isRead]);
+    if (filter === 'unread') return notifications.filter(n => !n.read);
+    if (filter === 'read') return notifications.filter(n => n.read);
+    return notifications;
+  }, [notifications, filter]);
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'order':
+        return Package;
+      case 'shipping':
+        return Truck;
+      case 'payment':
+        return CreditCard;
+      case 'delivery':
+        return Check;
+      default:
+        return Bell;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'success':
+        return 'bg-green-100 text-green-700 border-green-200';
+      case 'info':
+        return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'warning':
+        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'error':
+        return 'bg-red-100 text-red-700 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
+  const getIconBg = (type: string) => {
+    switch (type) {
+      case 'order':
+        return 'bg-purple-100 text-purple-600';
+      case 'shipping':
+        return 'bg-blue-100 text-blue-600';
+      case 'payment':
+        return 'bg-green-100 text-green-600';
+      case 'delivery':
+        return 'bg-emerald-100 text-emerald-600';
+      case 'promotion':
+        return 'bg-orange-100 text-orange-600';
+      default:
+        return 'bg-gray-100 text-gray-600';
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      return 'Today';
+    } else if (diffDays === 1) {
+      return 'Yesterday';
+    } else if (diffDays < 7) {
+      return `${diffDays} days ago`;
+    } else {
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric',
+      });
+    }
+  };
 
   return (
     <div className="container mx-auto p-3 sm:p-4 md:p-8">
       <div className="mb-3">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" aria-label="Back" onClick={() => router.back()}>
-            <ChevronLeft className="h-4 w-4" />
-            <span className="sr-only">Back</span>
-          </Button>
-          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Transactions</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" aria-label="Back" onClick={() => router.back()}>
+              <ChevronLeft className="h-4 w-4" />
+              <span className="sr-only">Back</span>
+            </Button>
+            <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Notifications</h1>
+          </div>
+          {unreadCount > 0 && (
+            <Button variant="outline" size="sm" onClick={markAllAsRead}>
+              Mark all as read
+            </Button>
+          )}
         </div>
         {/* Filters */}
         <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -89,7 +199,7 @@ export default function Notification() {
             className={filter === 'all' ? 'text-white' : undefined}
             onClick={() => setFilter('all')}
           >
-            All ({items.length})
+            All ({notifications.length})
           </Button>
           <Button
             variant={filter === 'unread' ? 'default' : 'outline'}
@@ -110,215 +220,107 @@ export default function Notification() {
         </div>
       </div>
 
-      {/* Mobile e-wallet style list */}
+      {/* Notifications List */}
       <div className="bg-background ring-border/50 overflow-hidden rounded-xl ring-1">
         <ul className="divide-y">
-          {filtered.map(t => {
-            const bank = t.details?.debt?.bankName ?? 'Unknown Bank';
-            const amount = formatCurrency(t.amount);
-            const ref = t.details?.bankReference ?? '-';
-            // Normalize status from API (e.g., "completed" -> treat as success for UI styling)
-            const normalizedStatus = t.status === 'completed' ? 'success' : t.status;
-            const read = isRead(t.id);
-            const badgeBg =
-              t.type === 'payment'
-                ? 'bg-emerald-100 text-emerald-700'
-                : t.type === 'loan'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-700';
-            const TypeIcon =
-              t.type === 'payment' ? ArrowDownRight : t.type === 'loan' ? Banknote : Receipt;
-            const amtColor =
-              t.type === 'payment'
-                ? 'text-emerald-600'
-                : t.type === 'loan'
-                  ? 'text-blue-600'
-                  : 'text-foreground';
-            const statusClasses =
-              normalizedStatus === 'success'
-                ? 'bg-emerald-100 text-emerald-700'
-                : normalizedStatus === 'pending'
-                  ? 'bg-amber-100 text-amber-700'
-                  : 'bg-rose-100 text-rose-700';
-            const dateStr = t.transactionDate
-              ? new Date(t.transactionDate).toLocaleDateString(undefined, {
-                  year: 'numeric',
-                  month: 'short',
-                  day: '2-digit',
-                })
-              : '-';
+          {filtered.map(notification => {
+            const Icon = getNotificationIcon(notification.type);
+            const iconBg = getIconBg(notification.type);
+            const statusColor = getStatusColor(notification.status);
+            const dateStr = formatDate(notification.date);
+
             return (
-              <li key={t.id}>
-                <button
-                  type="button"
+              <li key={notification.id}>
+                <div
                   className={`hover:bg-accent/40 flex w-full items-center justify-between gap-3 px-4 py-3.5 transition sm:py-4 ${
-                    read ? '' : 'bg-accent/20'
+                    notification.read ? '' : 'bg-accent/20'
                   }`}
-                  onClick={() => {
-                    setSelected(t);
-                    setOpen(true);
-                    // Mark as read when opening
-                    markRead(t.id);
-                  }}
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-full ${badgeBg}`}
+                      className={`flex h-10 w-10 items-center justify-center rounded-full ${iconBg}`}
                     >
-                      <TypeIcon className="h-5 w-5" />
+                      <Icon className="h-5 w-5" />
                     </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-left text-sm font-medium sm:text-base">{bank}</p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-muted-foreground truncate text-left text-xs">
-                          {dateStr}
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-1 flex items-center gap-2">
+                        <p className="truncate text-left text-sm font-medium sm:text-base">
+                          {notification.title}
                         </p>
-                        {!read && (
+                        {!notification.read && (
                           <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
                         )}
                         <span
-                          className={`inline-flex shrink-0 items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ${statusClasses}`}
+                          className={`inline-flex shrink-0 items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ${statusColor}`}
                         >
-                          {t.status}
+                          {notification.status}
                         </span>
                       </div>
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2 text-right">
-                    <div>
-                      <div className={`text-sm font-semibold ${amtColor}`}>{amount}</div>
-                      <div className="text-muted-foreground font-mono text-[10px] sm:text-xs">
-                        {ref}
+                      <p className="text-muted-foreground mb-2 text-left text-xs">
+                        {notification.message}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-muted-foreground text-left text-xs">{dateStr}</p>
+                        {notification.orderId && (
+                          <span className="text-muted-foreground text-xs">
+                            Order: {notification.orderId}
+                          </span>
+                        )}
+                        {notification.trackingNumber && (
+                          <span className="text-muted-foreground text-xs">
+                            Tracking: {notification.trackingNumber}
+                          </span>
+                        )}
                       </div>
                     </div>
-                    <ChevronRight className="text-muted-foreground xs:block hidden h-4 w-4" />
                   </div>
-                </button>
+                  <div className="flex shrink-0 items-center gap-2">
+                    {notification.amount && (
+                      <div className="text-right">
+                        <div className="text-sm font-semibold text-emerald-600">
+                          {formatCurrency(notification.amount)}
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex gap-1">
+                      {!notification.read && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => markAsRead(notification.id)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Check className="h-4 w-4" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteNotification(notification.id)}
+                        className="h-8 w-8 p-0 text-red-500 hover:text-red-600"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </li>
             );
           })}
           {filtered.length === 0 && (
-            <li>
-              <div className="text-muted-foreground py-8 text-center">No transactions found</div>
+            <li className="p-8 text-center">
+              <Bell className="mx-auto mb-4 h-12 w-12 text-gray-300" />
+              <p className="text-gray-500">
+                {filter === 'unread'
+                  ? 'No unread notifications'
+                  : filter === 'read'
+                    ? 'No read notifications'
+                    : 'No notifications'}
+              </p>
             </li>
           )}
         </ul>
       </div>
-
-      {/* Details Modal */}
-      {open && selected && (
-        <div
-          className="fixed inset-0 z-50 flex items-end justify-center md:items-center"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
-          <Card className="relative z-10 max-h-[85vh] w-full overflow-y-auto rounded-t-2xl p-0 shadow-xl md:max-w-lg md:rounded-2xl">
-            <CardHeader
-              className={`supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10 border-b py-3 backdrop-blur ${
-                selected.type === 'payment'
-                  ? 'bg-emerald-50'
-                  : selected.type === 'loan'
-                    ? 'bg-rose-50'
-                    : 'bg-gray-50'
-              }`}
-            >
-              <CardTitle className="text-base sm:text-lg">Transaction Details</CardTitle>
-              <CardAction>
-                <Button variant="ghost" size="sm" aria-label="Close" onClick={() => setOpen(false)}>
-                  <X className="h-5 w-5" />
-                </Button>
-              </CardAction>
-            </CardHeader>
-            <CardContent className="space-y-4 py-4">
-              {/* Amount and Type */}
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-muted-foreground text-xs">Amount</p>
-                  <p className="text-2xl leading-tight font-semibold sm:text-3xl">
-                    {formatCurrency(selected.amount)}
-                  </p>
-                </div>
-              </div>
-
-              {/* Bank and Reference */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <p className="text-muted-foreground text-xs">Bank</p>
-                  <p className="font-medium">{selected.details?.debt?.bankName ?? '-'}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs">Type</p>
-                  <p className="font-medium">{selected.type ?? '-'}</p>
-                </div>
-                <div>
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
-                      <p className="text-muted-foreground text-xs">Reference</p>
-                      <p className="font-mono text-sm break-all">
-                        {selected.details?.bankReference ?? '-'}
-                      </p>
-                    </div>
-                    {selected.details?.bankReference && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          navigator.clipboard.writeText(selected.details!.bankReference!)
-                        }
-                        className="shrink-0"
-                        title="Copy"
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment Method */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <p className="text-muted-foreground text-xs">Payment Method</p>
-                  <p className="font-medium">{selected.details?.paymentMethod ?? '-'}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs">Status</p>
-                  <span
-                    className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium capitalize ${
-                      selected.status === 'success' || selected.status === 'completed'
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : selected.status === 'pending'
-                          ? 'bg-amber-100 text-amber-700'
-                          : 'bg-rose-100 text-rose-700'
-                    }`}
-                  >
-                    {selected.status}
-                  </span>
-                </div>
-              </div>
-
-              {/* Description */}
-              <div className="border-t pt-4">
-                <p className="text-muted-foreground text-xs">Description</p>
-                <p className="text-sm whitespace-pre-wrap">{selected.description ?? '-'}</p>
-              </div>
-
-              {/* Dates */}
-              <div className="grid grid-cols-1 gap-4 border-t pt-4 sm:grid-cols-2">
-                <div>
-                  <p className="text-muted-foreground text-xs">Transaction Date</p>
-                  <p className="font-medium">
-                    {selected.transactionDate
-                      ? new Date(selected.transactionDate).toLocaleString()
-                      : '-'}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </div>
   );
 }

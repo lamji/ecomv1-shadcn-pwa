@@ -1,13 +1,10 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import theme, { generateCSSVars } from '@/lib/theme';
 
 interface ThemeContextType {
   isDark: boolean;
   toggleTheme: () => void;
-  colors: typeof theme.colors;
-  semantic: typeof theme.semantic;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -38,9 +35,7 @@ export function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProvide
     }
 
     // Apply CSS variables
-    const cssVars = generateCSSVars(isDark);
     const style = document.createElement('style');
-    style.textContent = `:root { ${cssVars} }`;
     style.id = 'theme-variables';
 
     // Remove existing theme variables
@@ -59,8 +54,6 @@ export function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProvide
   const value = {
     isDark,
     toggleTheme,
-    colors: isDark ? theme.dark : theme.colors,
-    semantic: theme.semantic,
   };
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
