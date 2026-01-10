@@ -49,6 +49,21 @@ export const useNotifications = () => {
 
       dispatch(addNotification(newNotif));
       console.log('New notification received via simulated API');
+
+      // Trigger native push notification if permissions are granted
+      if ('Notification' in window && Notification.permission === 'granted') {
+        navigator.serviceWorker.ready.then(registration => {
+          registration.showNotification(newNotif.title, {
+            body: newNotif.message,
+            icon: '/icons/apple-touch-icon.png',
+            badge: '/icons/favicon-96x96.png',
+            tag: newNotif.id, // Prevent duplicate notifications
+            data: {
+              url: '/notifications',
+            },
+          });
+        });
+      }
     }, 15000);
 
     const interval = setInterval(pollNotifications, 30000); // Poll every 30s
