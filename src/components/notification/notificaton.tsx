@@ -107,7 +107,7 @@ export default function Notification() {
       <div className="mb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" aria-label="Back" onClick={() => router.back()}>
+            <Button variant="ghost" size="sm" aria-label="Back" onClick={() => router.push('/')}>
               <ChevronLeft className="h-4 w-4" />
               <span className="sr-only">Back</span>
             </Button>
@@ -151,7 +151,7 @@ export default function Notification() {
       {/* Notifications List */}
       <div className="bg-background ring-border/50 overflow-hidden rounded-xl ring-1">
         <ul className="divide-y">
-          {filtered.map(notification => {
+          {filtered.map((notification) => {
             const Icon = getNotificationIcon(notification.type);
             const iconBg = getIconBg(notification.type);
             const statusColor = getStatusColor(notification.status);

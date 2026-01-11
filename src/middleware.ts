@@ -7,14 +7,13 @@ const PUBLIC_ROUTES = [
   '/',
   '/login',
   '/register',
+  '/signup',
+  '/otp',
   '/forgot-password',
   '/new-arrivals',
   '/summer-collection',
   '/view-all',
   '/search',
-  '/profile',
-  '/notifications',
-  '/pos',
 ];
 
 /**

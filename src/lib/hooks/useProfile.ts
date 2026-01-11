@@ -310,6 +310,23 @@ export const useProfile = (
     }
   };
 
+  const handleLogout = () => {
+    setConfirmDialog({
+      open: true,
+      title: 'Logout',
+      message: 'Are you sure you want to log out?',
+      confirmText: 'Logout',
+      cancelText: 'Cancel',
+      destructive: true,
+      onConfirm: () => {
+        setConfirmDialog(null);
+        // Trigger logout event - useAuth hook will handle the global loader
+        window.dispatchEvent(new Event('auth-logout'));
+      },
+      onCancel: () => setConfirmDialog(null),
+    });
+  };
+
   const handleCancelEditPhone = () => {
     setEditingPhone(null);
   };
@@ -400,6 +417,7 @@ export const useProfile = (
     handleCancelEdit,
     handleSavePhone,
     handleTogglePrimaryPhone,
+    handleLogout,
     handleCancelEditPhone,
     handleDeleteAddress,
 

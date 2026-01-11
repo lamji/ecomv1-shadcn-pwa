@@ -5,27 +5,14 @@ import { useRouter } from 'next/navigation';
 import { User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-interface LoginPromptProps {
-  onBack: () => void;
-}
 
-export default function LoginPrompt({ onBack }: LoginPromptProps) {
+export default function LoginPrompt() {
   const router = useRouter();
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Back
-            </Button>
-            <div className="w-20" />
-          </div>
-        </div>
-      </div>
+   
 
       {/* Login Prompt */}
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">

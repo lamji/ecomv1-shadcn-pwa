@@ -165,8 +165,12 @@ export default function PosPage() {
 
   
 
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const updateOrderStatus = async (orderId: string, newStatus: string, order: any) => {
+    alert("test");
     setIsUpdating(orderId);
+
+    console.log("test:order",order);
 
     try {
       // Update status via Next.js API
@@ -176,6 +180,7 @@ export default function PosPage() {
         body: JSON.stringify({
           orderId,
           status: newStatus,
+          data: order,
         }),
       });
 
@@ -197,7 +202,7 @@ export default function PosPage() {
           },
           body: JSON.stringify({
             contents: {
-              en: `Test order notification at ${new Date().toLocaleTimeString()}`,
+              en: `Order ${orderId} status updated to ${newStatus}`,
             },
             headings: {
               en: `${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)} Alert`,
@@ -208,8 +213,9 @@ export default function PosPage() {
               type: 'order',
               status: newStatus,
               orderId: orderId,
-              amount: Math.floor(Math.random() * 5000),
+              amount: order.total,
               timestamp: Date.now().toString(),
+              data: order,
             },
           }),
         });
@@ -338,7 +344,7 @@ export default function PosPage() {
                         <td className="px-2 py-4 text-right">
                           <Select
                             value={order.status}
-                            onValueChange={val => updateOrderStatus(order.id, val)}
+                            onValueChange={val => updateOrderStatus(order.id, val,order)}
                             disabled={isUpdating === order.id}
                           >
                             <SelectTrigger className="ml-auto h-8 w-[130px]">

@@ -58,13 +58,14 @@ export default function ProfileInfo({
       {/* Email */}
       <p className="mb-2 flex items-center justify-center gap-1 text-sm text-gray-600">
         {profile.email}
-        <Badge variant="default" className={currentBadge.className}>
-          {currentBadge.text}
-        </Badge>
+      
       </p>
 
       {/* Email Verification Helper */}
       <div className="mb-4 text-center">
+          <Badge variant="default" className={currentBadge.className}>
+          {currentBadge.text}
+        </Badge>
         {profile.emailVerified ? (
           <p className="mx-auto mb-2 max-w-xs text-xs text-green-600">
             Your email is verified and secure

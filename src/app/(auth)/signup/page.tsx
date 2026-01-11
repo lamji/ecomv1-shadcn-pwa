@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useState } from 'react';
@@ -19,17 +20,21 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import Image from 'next/image';
+import { useUnauthenticatedPostData } from "plugandplay-react-query-hooks";
+import { SignupValues } from '@/types/auth';
 
 export default function SignupPage() {
   const router = useRouter();
   const [formError, setFormError] = useState<string | null>(null);
 
-  type SignupValues = {
-    name: string;
-    email: string;
-    password: string;
-    confirm: string;
-  };
+  console.log("Socket URL",process.env.NEXT_PUBLIC_SOCKET_URL)
+  console.log("API Base URL",process.env.NEXT_PUBLIC_API_BASE_URL)
+
+  // Use unauthenticated mutation for signup endpoint
+  const { mutateAsync: signupMutateAsync, isPending } = useUnauthenticatedPostData({
+    baseUrl: process.env.NEXT_PUBLIC_SOCKET_URL || "",
+    endpoint: 'api/auth/register'
+  });
 
   const formik = useFormik<SignupValues>({
     initialValues: {
@@ -53,11 +58,29 @@ export default function SignupPage() {
     onSubmit: async (values: SignupValues, { setSubmitting }: FormikHelpers<SignupValues>) => {
       setFormError(null);
       try {
-        // TODO: call your signup API here with values
-        await new Promise(r => setTimeout(r, 900));
-        router.push('/login');
-      } catch {
-        setFormError('Signup failed. Please try again.');
+        // Call signup API with form values
+        const result = await signupMutateAsync({
+          name: values.name,
+          email: values.email,
+          password: values.password
+        }) as { success?: boolean; email?: string; tempToken?: string; message?: string };
+
+        if (result.success) {
+          // Redirect to OTP page with email and tempToken
+          const params = new URLSearchParams();
+          params.set('email', result.email || '');
+          if (result.tempToken) {
+            params.set('tempToken', result.tempToken);
+          }
+          
+          router.push(`/otp?${params.toString()}`);
+        } else {
+          setFormError(result.message || 'Signup failed. Please try again.');
+        }
+      } catch (error: unknown) {
+        console.error('Signup error:', error);
+        const errorMessage = (error as any)?.response?.data?.message || (error as any)?.message || 'Signup failed. Please try again.';
+        setFormError(errorMessage);
       } finally {
         setSubmitting(false);
       }
@@ -183,8 +206,8 @@ export default function SignupPage() {
               )}
             </div>
 
-            <Button type="submit" disabled={formik.isSubmitting} className="w-full">
-              {formik.isSubmitting ? 'Creating account…' : 'Create account'}
+            <Button type="submit" disabled={isPending || formik.isSubmitting} className="w-full">
+              {isPending || formik.isSubmitting ? 'Creating account…' : 'Create account'}
             </Button>
           </form>
         </CardContent>

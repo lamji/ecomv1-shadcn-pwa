@@ -103,7 +103,7 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
                   onChange={e => setSearchQuery(e.target.value)}
                   onFocus={() => setShowSuggestions(true)}
                   onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                  className="w-full border border-gray-300 bg-gray-100 pr-9 focus-visible:ring-0 focus-visible:ring-offset-0 dark:border-gray-600 dark:bg-gray-800"
+                  className="w-full border border-gray-300 pr-9 focus-visible:ring-0 focus-visible:ring-offset-0 dark:border-gray-600 dark:bg-white"
                   data-testid="mobile-search-input-header"
                 />
                 <Search
@@ -169,7 +169,7 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
                   onChange={e => setSearchQuery(e.target.value)}
                   onFocus={() => setShowSuggestions(true)}
                   onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                  className="w-60 border border-gray-300 bg-gray-100 pr-9 focus-visible:ring-0 focus-visible:ring-offset-0 dark:border-gray-600 dark:bg-gray-800"
+                  className="w-60 border border-gray-900 pr-9 focus-visible:ring-0 focus-visible:ring-offset-0 dark:border-gray-900 bg-white"
                   data-testid="search-input"
                 />
                 <Search

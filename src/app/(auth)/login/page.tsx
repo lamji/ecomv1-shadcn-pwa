@@ -1,13 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useFormik } from 'formik';
 import type { FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { cn } from '@/lib/utils';
-import { useLogin } from '@/lib/hooks/useLogin';
+import { useLogin } from '@/lib/hooks/integration/useLogin';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,8 +23,10 @@ import {
 } from '@/components/ui/card';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
   const [formError, setFormError] = useState<string | null>(null);
-  const { handleLogin, isLoading } = useLogin();
+  const { handleLogin, isLoading: loginLoading } = useLogin();
 
   type LoginValues = { email: string; password: string };
 
@@ -47,6 +51,24 @@ export default function LoginPage() {
     },
   });
 
+  // Redirect authenticated users away from login page
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      const redirectUrl = new URL('/login', window.location.href);
+      const redirectParam = redirectUrl.searchParams.get('redirect');
+      router.push(redirectParam || '/');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="bg-background flex min-h-[100dvh] items-center justify-center px-4 py-8">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+      </div>
+    );
+  }
+ 
   return (
     <div className="bg-background flex min-h-[100dvh] items-center justify-center px-4 py-8">
       <Card className="w-full max-w-sm border-0 shadow-none">
@@ -119,8 +141,8 @@ export default function LoginPage() {
               )}
             </div>
 
-            <Button type="submit" disabled={formik.isSubmitting || isLoading} className="w-full">
-              {formik.isSubmitting || isLoading ? 'Signing in…' : 'Sign in'}
+            <Button type="submit" disabled={formik.isSubmitting || loginLoading} className="w-full">
+              {formik.isSubmitting || loginLoading ? 'Signing in…' : 'Sign in'}
             </Button>
           </form>
         </CardContent>

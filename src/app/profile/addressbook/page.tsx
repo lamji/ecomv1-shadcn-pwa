@@ -1,25 +1,21 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { dummyProfile, type UserProfile } from '@/lib/data/profile';
+import { dummyProfile } from '@/lib/data/profile';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import LoginPrompt from '@/components/profile/LoginPrompt';
 import AddressList from '@/components/profile/ProfileNavigation';
 import { useAlert } from '@/lib/hooks/useAlert';
-import { Address } from '@/lib/data/profile';
+import { Address, UserProfile } from '@/types/profile';
+
 
 export default function AddressBookPage() {
-  const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
   const [profile] = useState<UserProfile>(dummyProfile);
   const { showSuccess } = useAlert();
 
-  const handleBack = () => {
-    router.back();
-    window.scrollTo(0, 0);
-  };
+ 
 
   const handleEditAddress = (address: Address) => {
     console.log('Edit address:', address);
@@ -48,7 +44,7 @@ export default function AddressBookPage() {
   }
 
   if (!isAuthenticated) {
-    return <LoginPrompt onBack={handleBack} />;
+    return <LoginPrompt />;
   }
 
   return (

@@ -72,7 +72,7 @@ export default function OverviewTab({ profile }: OverviewTabProps) {
         {/* Order Status Filter */}
         <OrderStatusFilter selectedStatus={selectedStatus} onStatusChange={setSelectedStatus} />
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto lg:min-w-[800px]">
           <table
             className={`${filteredOrders.length > 0 ? '' : 'h-[80vh]'} w-full`}
             data-testid="orders-table"

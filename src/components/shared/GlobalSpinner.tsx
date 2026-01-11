@@ -8,8 +8,7 @@ export default function GlobalSpinner() {
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50" />
+      {/* Backdrop removed as requested */}
 
       {/* Spinner Card */}
       <div

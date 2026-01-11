@@ -1,34 +1,42 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { useGetProfile } from '@/lib/hooks/integration/useGetProfile';
 import { dummyProfile } from '@/lib/data/profile';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import LoginPrompt from '@/components/profile/LoginPrompt';
 import OverviewTab from '@/components/profile/OverviewTab';
 import { type UserProfile } from '@/types/profile';
+import { useAppDispatch } from '@/lib/store';
+import { showLoading, hideLoading } from '@/lib/features/loadingSlice';
 
 export default function ProfilePage() {
-  const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { profile: serverProfile, isLoading: profileLoading } = useGetProfile();
   const [profile, setProfile] = useState<UserProfile>(dummyProfile);
+  const dispatch = useAppDispatch();
 
-  const handleBack = () => {
-    router.back();
-    window.scrollTo(0, 0);
-  };
+  useEffect(() => {
+    if (serverProfile) {
+      setProfile(serverProfile);
+    }
+  }, [serverProfile]);
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
-      </div>
-    );
+  useEffect(() => {
+    if (profileLoading) {
+      dispatch(showLoading({ message: 'Fetching profile...' }));
+    } else {
+      dispatch(hideLoading());
+    }
+  }, [profileLoading, dispatch]);
+
+  if (authLoading) {
+    return null;
   }
 
   if (!isAuthenticated) {
-    return <LoginPrompt onBack={handleBack} />;
+    return <LoginPrompt />;
   }
 
   return (
