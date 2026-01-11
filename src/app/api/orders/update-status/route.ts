@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
   try {
     const { orderId, status } = await req.json();
-      const socketServerUrl = process.env.SOCKET_SERVER_URL || 'http://localhost:4000';
+      const socketServerUrl = process.env.SOCKET_SERVER_URL || 'https://site--crud-handler--rrh2m28k5ljg.code.run';
 
     console.log(`🚀 Processing update for order ${orderId} to ${status}`);
 

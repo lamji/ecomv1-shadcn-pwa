@@ -48,7 +48,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https: blob:",
               "font-src 'self' data:",
-              "connect-src 'self' https: wss: ws://localhost:4000 http://localhost:4000 https://onesignal.com https://api.onesignal.com",
+              "connect-src 'self' https: wss: ws://localhost:5000 http://localhost:5000 https://onesignal.com https://api.onesignal.com https://site--crud-handler--rrh2m28k5ljg.code.run wss://site--crud-handler--rrh2m28k5ljg.code.run",
               "frame-ancestors 'none'",
             ].join('; '),
           },

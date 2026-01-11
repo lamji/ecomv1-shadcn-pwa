@@ -202,6 +202,7 @@ export default function PosPage() {
             headings: {
               en: `${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)} Alert`,
             },
+            url: `${window.location.origin}/notifications`, // Redirect on click
             included_segments: ['All'],
             data: {
               type: 'order',
