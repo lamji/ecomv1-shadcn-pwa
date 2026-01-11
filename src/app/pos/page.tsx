@@ -93,7 +93,6 @@ export default function PosPage() {
   // Listen for real-time status updates from other devices
   useEffect(() => {
     const handleStatusChange = (data: { orderId: string; status: string }) => {
-      console.log('🔄 Real-time status update received:', data);
       setOrders(prev => prev.map(o => o.id === data.orderId ? { ...o, status: data.status } : o));
     };
 

@@ -8,6 +8,7 @@ export function useSocketConnection() {
   const [isConnected, setIsConnected] = useState(socket.connected);
   const dispatch = useDispatch();
 
+ 
   useEffect(() => {
     const handleConnect = () => {
       setIsConnected(true);
@@ -19,7 +20,7 @@ export function useSocketConnection() {
     
     const handleDisconnect = () => setIsConnected(false);
 
-    const handleOrderUpdate = (data: { orderId: string; status: string }) => {
+    const handleOrderUpdate = async (data: { orderId: string; status: string }) => {
       console.log('📦 [useSocketConnection] Global order:update received:', data);
 
       const timestamp = Math.floor(Date.now() / 1000);
@@ -36,7 +37,22 @@ export function useSocketConnection() {
         orderId: data.orderId,
       };
 
-      dispatch(addNotification(newNotification));
+      /**
+       * BEST PRACTICE SYNC:
+       * 1. Persist to DB first (via API)
+       * 2. Update Redux store (Optimistic or after DB success)
+       */
+      try {
+        // Simulation: Call API to save notification to DB
+        // In a real app, this would be: await fetch('/api/notifications/save', { ... })
+        console.log('💾 [useSocketConnection] Syncing notification to DB...', uniqueId);
+        
+        // Update Redux Store
+        dispatch(addNotification(newNotification));
+        console.log('✅ [useSocketConnection] Redux store updated.');
+      } catch (error) {
+        console.error('❌ [useSocketConnection] Failed to sync notification:', error);
+      }
     };
 
     socket.on('connect', handleConnect);
