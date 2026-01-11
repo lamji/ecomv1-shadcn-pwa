@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search, ExternalLink, ShoppingBag } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import Image from 'next/image';
-import { NotificationItem } from '@/lib/data/notifications';
+import { useSocketConnection } from '@/lib/hooks/useSocketConnection';
+import OneSignalMessagesViewer from '@/components/test/OneSignalMessagesViewer';
+import NotificationTestButton from '@/components/test/NotificationTestButton';
 
 // Sample Order Data aligned with products.ts exactly
 const INITIAL_ORDERS = [
@@ -85,7 +87,21 @@ export default function PosPage() {
   const [orders, setOrders] = useState(INITIAL_ORDERS);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const { socket } = useSocketConnection();
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
+
+  // Listen for real-time status updates from other devices
+  useEffect(() => {
+    const handleStatusChange = (data: { orderId: string; status: string }) => {
+      console.log('🔄 Real-time status update received:', data);
+      setOrders(prev => prev.map(o => o.id === data.orderId ? { ...o, status: data.status } : o));
+    };
+
+    socket.on('order:update', handleStatusChange);
+    return () => {
+      socket.off('order:update', handleStatusChange);
+    };
+  }, [socket]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -148,106 +164,65 @@ export default function PosPage() {
     }));
   };
 
+  
+
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     setIsUpdating(orderId);
 
-    const order = orders.find(o => o.id === orderId);
-    if (!order) return;
-
     try {
-      // Create detailed notification payload
-      const notificationPayload: NotificationItem = {
-        id: `order-${orderId}-${Date.now()}`,
-        type: 'order',
-        status:
-          newStatus === 'delivered' ? 'success' : newStatus === 'shipped' ? 'info' : 'warning',
-        title: `Order ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`,
-        message: `Your order ${orderId} has been ${newStatus}!${newStatus === 'delivered' ? ' Thank you for your purchase.' : ` Current status: ${newStatus}.`}`,
-        orderId: orderId,
-        amount: order.total,
-        date: new Date().toISOString(),
-        read: false, // Add missing required property
-      };
+      // Update status via Next.js API
+      const response = await fetch('/api/orders/update-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId,
+          status: newStatus,
+        }),
+      });
 
-      // Try OneSignal API first (for local development)
-      try {
-        const oneSignalResponse = await fetch('/api/onesignal', {
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ API error:', response.status, errorText);
+        throw new Error(`Failed to update order: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Local state update (UI feedback)
+        setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: newStatus } : o)));
+        const response = await fetch('/api/onesignal', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({
             contents: {
-              en: notificationPayload.message,
+              en: `Test order notification at ${new Date().toLocaleTimeString()}`,
             },
             headings: {
-              en: notificationPayload.title,
+              en: `${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)} Alert`,
             },
             included_segments: ['All'],
             data: {
+              type: 'order',
+              status: newStatus,
               orderId: orderId,
-              type: notificationPayload.type,
-              status: notificationPayload.status,
-              amount: order.total,
-              customer: order.customer,
-              email: order.email,
-              items: order.items.map(item => ({
-                id: item.id,
-                name: item.name,
-                quantity: item.quantity,
-                price: item.price,
-              })),
-              address: order.address,
+              amount: Math.floor(Math.random() * 5000),
               timestamp: Date.now().toString(),
             },
           }),
         });
-
-        const oneSignalData = await oneSignalResponse.json();
-
-        if (oneSignalResponse.ok) {
-          // Update local state
-          setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: newStatus } : o)));
-          console.log(`✅ Order ${orderId} status updated to ${newStatus} via OneSignal`);
-
-          // Only dispatch directly in production for real-time updates
-          if (process.env.NODE_ENV === 'production') {
-            await dispatchNotificationDirectly(notificationPayload);
-          }
-        } else {
-          if (oneSignalResponse.status === 408) {
-            console.error('⏰ OneSignal API timeout - using fallback');
-            // Fallback: update status and dispatch notification directly
-            setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: newStatus } : o)));
-            await dispatchNotificationDirectly(notificationPayload);
-          } else {
-            console.error('❌ OneSignal failed:', oneSignalData.error);
-            // Don't update status if notification failed for reasons other than timeout
-          }
-        }
-      } catch (oneSignalError) {
-        console.error('❌ OneSignal API error, using fallback:', oneSignalError);
-        // Fallback for Vercel/network issues
-        setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: newStatus } : o)));
-        await dispatchNotificationDirectly(notificationPayload);
+        console.log(`Socket: Order ${orderId} updated successfully`, response);
+      } else {
+        console.error('❌ Server error:', result.error);
+        throw new Error(result.error || 'Unknown server error');
       }
     } catch (error) {
-      console.error('❌ Failed to update status:', error);
+      console.error('❌ Network error:', error);
+      // Optionally show error to user here
     } finally {
       setIsUpdating(null);
-    }
-  };
-
-  // Helper function to dispatch notification directly to Redux
-  const dispatchNotificationDirectly = async (notificationData: NotificationItem) => {
-    try {
-      // Import Redux store dynamically to avoid circular dependencies
-      const { store } = await import('@/lib/store');
-      const { addNotification } = await import('@/lib/features/notificationSlice');
-
-      // Dispatch directly to Redux store
-      store.dispatch(addNotification(notificationData));
-      console.log('📱 Notification dispatched directly to Redux:', notificationData);
-    } catch (error) {
-      console.error('Failed to dispatch notification directly:', error);
     }
   };
 
@@ -469,8 +444,14 @@ export default function PosPage() {
               </div>
             </CardContent>
           </Card>
+
+          <OneSignalMessagesViewer />
+          <NotificationTestButton />
         </div>
       </main>
+
+
+
     </div>
   );
 }

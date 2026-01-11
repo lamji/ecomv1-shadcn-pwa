@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useAppDispatch } from '../store';
 import { addNotification } from '../features/notificationSlice';
 import { NotificationItem } from '../data/notifications';
-import { io } from 'socket.io-client';
 
 // OneSignal will be loaded from CDN
 declare global {
@@ -83,113 +82,79 @@ export const useNotifications = () => {
       }
     };
 
-    const initOneSignal = async () => {
-      try {
-        // Initialize OneSignal as array if not defined or not an array
-        if (!window.OneSignal || !Array.isArray(window.OneSignal)) {
-          window.OneSignal = window.OneSignal || [];
-          console.log('OneSignal initialized as array');
-        }
+    // const initOneSignal = async () => {
+    //   try {
+    //     // Check if OneSignal is already initialized
+    //     if (window.OneSignal && !Array.isArray(window.OneSignal)) {
+    //       console.log('OneSignal already initialized, skipping...');
+    //       return;
+    //     }
 
-        // Load OneSignal SDK from CDN if not already loaded
-        if (!document.querySelector('script[src*="OneSignalSDK.js"]')) {
-          const script = document.createElement('script');
-          script.src = 'https://cdn.onesignal.com/sdks/OneSignalSDK.js';
-          script.async = true;
-          document.head.appendChild(script);
+    //     // Initialize OneSignal as array if not defined or not an array
+    //     if (!window.OneSignal || !Array.isArray(window.OneSignal)) {
+    //       window.OneSignal = window.OneSignal || [];
+    //       console.log('OneSignal initialized as array');
+    //     }
 
-          // Wait for script to load
-          await new Promise(resolve => {
-            script.onload = resolve;
-          });
-        }
+    //     // Load OneSignal SDK from CDN if not already loaded
+    //     if (!document.querySelector('script[src*="OneSignalSDK.js"]')) {
+    //       const script = document.createElement('script');
+    //       script.src = 'https://cdn.onesignal.com/sdks/OneSignalSDK.js';
+    //       script.async = true;
+    //       script.setAttribute('data-cfasync', 'false');
+    //       document.head.appendChild(script);
 
-        // Initialize OneSignal
-        window.OneSignal.push([
-          'init',
-          {
-            appId: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID || '',
-            notifyButton: {
-              enable: false, // Disable default notify button
-            },
-            allowLocalhostAsSecureOrigin: true, // For development
-          },
-        ]);
+    //       // Wait for script to load
+    //       await new Promise(resolve => {
+    //         script.onload = resolve;
+    //       });
+    //     }
 
-        // Set up event listeners
-        window.OneSignal.push([
-          'addListenerForNotificationOpened',
-          (event: OneSignalNotificationEvent) => {
-            console.log('Notification clicked:', event);
-          },
-        ]);
+    //     // Initialize OneSignal with minimal config to avoid CSP issues
+    //     window.OneSignal.push([
+    //       'init',
+    //       {
+    //         appId: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID || '',
+    //         notifyButton: {
+    //           enable: false, // Disable default notify button
+    //         },
+    //         allowLocalhostAsSecureOrigin: true, // For development
+    //         // Disable features that might cause CSP issues
+    //         webhooks: {
+    //           'notification.displayed': '',
+    //           'notification.clicked': '',
+    //         },
+    //       },
+    //     ]);
 
-        // Request notification permission
-        window.OneSignal.push([
-          'registerForPushNotifications',
-          {
-            modalPrompt: true,
-          },
-        ]);
-      } catch (error) {
-        console.error('OneSignal initialization error:', error);
-      }
-    };
+    //     // Set up event listeners
+    //     window.OneSignal.push([
+    //       'addListenerForNotificationOpened',
+    //       (event: OneSignalNotificationEvent) => {
+    //         console.log('Notification clicked:', event);
+    //       },
+    //     ]);
 
-    const setupSocket = () => {
-      const socketUrl = typeof window !== 'undefined' ? window.location.origin : '';
-      console.log('Setting up Socket.IO connection to:', socketUrl);
-      const socket = io(socketUrl, {
-        path: '/api/socket/io',
-        addTrailingSlash: false,
-      });
+    //     // Request notification permission only if not already granted
+    //     window.OneSignal.push([
+    //       'registerForPushNotifications',
+    //       {
+    //         modalPrompt: false, // Disable modal prompt to avoid CSP issues
+    //         autoPrompt: false,
+    //       },
+    //     ]);
 
-      socket.on('connect', () => {
-        console.log('useNotifications: Connected to Socket.IO with ID:', socket.id);
-        socket.emit('joinRoom', 'onesignal-messages');
-        console.log('useNotifications: Joined onesignal-messages room');
-      });
+    //     console.log('OneSignal initialized successfully');
+    //   } catch (error) {
+    //     console.error('OneSignal initialization error:', error);
+    //   }
+    // };
 
-      socket.on('disconnect', () => {
-        console.log('useNotifications: Disconnected from Socket.IO');
-      });
-
-      socket.on('connect_error', error => {
-        console.error('useNotifications: Socket.IO connection error:', error);
-      });
-
-      socket.on('newMessage', (msg: OneSignalMessage) => {
-        console.log('useNotifications: New real-time message received:', msg);
-        const newNotif: NotificationItem = {
-          id: msg.id,
-          type: (msg.data?.type as NotificationItem['type']) || 'promotion',
-          title: msg.headings?.en || 'New Notification',
-          message: msg.contents?.en || 'You have a new notification',
-          status: (msg.data?.status as NotificationItem['status']) || 'info',
-          read: false,
-          date: new Date(msg.completed_at * 1000).toISOString(),
-          orderId: msg.data?.orderId as string,
-          amount:
-            typeof msg.data?.amount === 'string'
-              ? parseFloat(msg.data.amount)
-              : (msg.data?.amount as number),
-        };
-        console.log('useNotifications: Dispatching new notification to Redux:', newNotif);
-        dispatch(addNotification(newNotif));
-      });
-
-      return () => {
-        console.log('useNotifications: Cleaning up Socket.IO connection');
-        socket.disconnect();
-      };
-    };
-
-    initOneSignal();
+    // initOneSignal();
     fetchRecentMessages();
-    const cleanupSocket = setupSocket();
 
     return () => {
-      cleanupSocket();
+      // No cleanup needed for OneSignal only
     };
   }, [dispatch]);
 

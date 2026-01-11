@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
+import { useSocketConnection } from '@/lib/hooks/useSocketConnection';
 
 // Type definition for OneSignal message
 interface OneSignalMessage {
@@ -20,7 +20,7 @@ export default function OneSignalMessagesViewer() {
   const [messages, setMessages] = useState<OneSignalMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
-  const [isConnected, setIsConnected] = useState(false);
+  const { isConnected, socket } = useSocketConnection();
 
   const fetchMessages = async () => {
     setLoading(true);
@@ -29,6 +29,8 @@ export default function OneSignalMessagesViewer() {
     try {
       const response = await fetch('/api/onesignal/messages?limit=20');
       const data = await response.json();
+
+      console.log('📦 Fetched messages:', data);
 
       if (response.ok) {
         setMessages(data.notifications || []);
@@ -43,47 +45,35 @@ export default function OneSignalMessagesViewer() {
   };
 
   useEffect(() => {
-    // Initialize Socket.IO connection
-    console.log('Initializing Socket.IO connection...');
-    const socketUrl = typeof window !== 'undefined' ? window.location.origin : '';
-    const newSocket = io(socketUrl, {
-      path: '/api/socket/io',
-      addTrailingSlash: false,
-    });
-
-    newSocket.on('connect', () => {
-      console.log('Connected to Socket.IO with ID:', newSocket.id);
-      setIsConnected(true);
-      // Join the onesignal-messages room
-      newSocket.emit('joinRoom', 'onesignal-messages');
-    });
-
-    newSocket.on('connect_error', error => {
-      console.error('Socket.IO connection error:', error);
-      setIsConnected(false);
-    });
-
-    newSocket.on('disconnect', () => {
-      console.log('Disconnected from Socket.IO');
-      setIsConnected(false);
-    });
-
-    // Listen for new messages
-    newSocket.on('newMessage', (message: OneSignalMessage) => {
-      console.log('New message received:', message);
-      // Add new message to the beginning of the list
-      setMessages(prev => [message, ...prev.slice(0, 19)]); // Keep only last 20 messages
-    });
-
-    // Fetch initial messages
+    // Initial fetch
     fetchMessages();
 
-    // Cleanup on unmount
-    return () => {
-      console.log('Cleaning up Socket.IO connection...');
-      newSocket.disconnect();
+    socket.on('order:update', (data: { orderId: string; status: string }) => {
+      console.log('📦 Status update received via socket:', data);
+      // Wait 2 seconds for OneSignal to process the notification before fetching
+      setTimeout(() => {
+        console.log('🔄 Fetching messages after delay...');
+        fetchMessages();
+      }, 2000);
+    });
+
+    const handleConnect = () => {
+      console.log('📡 Connected to socket, joining room and fetching...');
+      socket.emit('joinRoom', 'onesignal-messages');
+      fetchMessages();
     };
-  }, []);
+
+    if (socket.connected) {
+      handleConnect();
+    }
+
+    socket.on('connect', handleConnect);
+
+    return () => {
+      socket.off('order:update');
+      socket.off('connect', handleConnect);
+    };
+  }, [socket]);
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp * 1000).toLocaleString();

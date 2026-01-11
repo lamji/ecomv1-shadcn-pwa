@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/Providers';
+// import SocketInitializer from '@/components/SocketInitializer';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -68,6 +69,7 @@ export default function RootLayout({
         <meta name="twitter:image" content="https://i-solar.vercel.app/hero/preview.png" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/* <SocketInitializer /> */}
         <Providers>{children}</Providers>
       </body>
     </html>

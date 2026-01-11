@@ -10,7 +10,7 @@ import { type Address, type Phone } from '@/types/profile';
 import { type ProfileHeaderProps } from '@/lib/types/confirmation';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import EditAddressForm from '@/components/profile/EditAddressForm';
-import { useProfile } from '@/hooks/useProfile';
+import { useProfile } from '@/lib/hooks/useProfile';
 
 export default function ProfileHeader({ profile, onProfileUpdate }: ProfileHeaderProps) {
   const profileHook = useProfile(profile, onProfileUpdate);

@@ -28,6 +28,7 @@ const PUBLIC_API_ROUTES = [
   '/api/notifications',
   '/api/onesignal',
   '/api/onesignal/messages',
+  '/api/orders/update-status',
 ];
 
 /**
