@@ -14,6 +14,7 @@ const PUBLIC_ROUTES = [
   '/summer-collection',
   '/view-all',
   '/search',
+  '/pos'
 ];
 
 /**
