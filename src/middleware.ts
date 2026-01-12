@@ -28,6 +28,8 @@ const PUBLIC_API_ROUTES = [
   '/api/notifications',
   '/api/onesignal',
   '/api/onesignal/messages',
+  '/api/onesignal/check-subscription',
+  '/api/onesignal/send-test',
   '/api/orders/update-status',
 ];
 
@@ -55,7 +57,8 @@ function isPublicRoute(pathname: string): boolean {
     pathname.startsWith('/robots.txt') ||
     pathname.startsWith('/sitemap.xml') ||
     pathname.startsWith('/logo.') ||
-    pathname.startsWith('/icons/')
+    pathname.startsWith('/icons/') ||
+    pathname === '/OneSignalSDKWorker.js'
   ) {
     return true;
   }

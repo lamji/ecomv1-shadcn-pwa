@@ -10,7 +10,8 @@ import * as Yup from 'yup';
 import { cn } from '@/lib/utils';
 import { useLogin } from '@/lib/hooks/integration/useLogin';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { Button } from '@/components/ui/button';
+// import OneSignalSubscribeButton from '@/components/test/subsButtonTest';
+import SubscriptionChecker from '@/components/test/SubscriptionChecker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -22,6 +23,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Eye, EyeOff } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -172,6 +174,8 @@ export default function LoginPage() {
           </p>
         </CardFooter>
       </Card>
+      {/* <OneSignalSubscribeButton userId={formik.values.email} /> */}
+      <SubscriptionChecker />
     </div>
   );
 }
