@@ -33,6 +33,7 @@ export function usePostOtpIntegration() {
         }));
       }
       
+      // Return the full response including oneSignalUserId
       return response;
     } catch (error: any) {
       console.error('OTP verification failed:', error);

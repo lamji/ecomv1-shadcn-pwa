@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -6,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { useOneSignalNotification } from '@/lib/hooks/useOneSignalNotification';
 import {
   Select,
   SelectContent,
@@ -89,6 +91,7 @@ export default function PosPage() {
   const [search, setSearch] = useState('');
   const { socket } = useSocketConnection();
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
+  const { sendOrderStatusUpdate } = useOneSignalNotification();
 
   // Listen for real-time status updates from other devices
   useEffect(() => {
@@ -163,11 +166,8 @@ export default function PosPage() {
     }));
   };
 
-  
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const updateOrderStatus = async (orderId: string, newStatus: string, order: any) => {
-    alert("test");
     setIsUpdating(orderId);
 
     console.log("test:order",order);
@@ -195,38 +195,16 @@ export default function PosPage() {
       if (result.success) {
         // Local state update (UI feedback)
         setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: newStatus } : o)));
-        const response = await fetch('/api/onesignal', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: {
-              en: `Order ${orderId} status updated to ${newStatus}`,
-            },
-            headings: {
-              en: `${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)} Alert`,
-            },
-            url: `${window.location.origin}/notifications`, // Redirect on click
-            included_segments: ['All'],
-            data: {
-              type: 'order',
-              status: newStatus,
-              orderId: orderId,
-              amount: order.total,
-              timestamp: Date.now().toString(),
-              data: order,
-            },
-          }),
-        });
-        console.log(`Socket: Order ${orderId} updated successfully`, response);
+        // Send OneSignal notification using hook
+        await sendOrderStatusUpdate(orderId, newStatus, order);
+        console.log(`Order ${orderId} updated successfully`);
       } else {
         console.error('❌ Server error:', result.error);
         throw new Error(result.error || 'Unknown server error');
       }
     } catch (error) {
-      console.error('❌ Network error:', error);
-      // Optionally show error to user here
+      console.error('❌ Update failed:', error);
+      // Optional: Show error toast
     } finally {
       setIsUpdating(null);
     }
@@ -447,6 +425,23 @@ export default function PosPage() {
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-500">Avg. Processing Time</span>
                 <span className="font-bold text-slate-900">1.2 hrs</span>
+              </div>
+              <div className="border-t pt-4">
+                <div className="text-xs font-medium text-slate-500 mb-2">OneSignal Debug</div>
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400">User ID:</span>
+                    <code className="bg-slate-100 px-2 py-1 rounded text-xs font-mono">
+                      {typeof window !== 'undefined' && (window as any).OneSignal?.UserId || 'Not logged in'}
+                    </code>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400">Push ID:</span>
+                    <code className="bg-slate-100 px-2 py-1 rounded text-xs font-mono max-w-[120px] truncate">
+                      {typeof window !== 'undefined' && (window as any).OneSignal?.PushId || 'Not available'}
+                    </code>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

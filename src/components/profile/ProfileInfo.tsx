@@ -111,6 +111,9 @@ export default function ProfileInfo({
         <p className="mb-2 text-xs text-gray-500">
           Member since {formatDate(profile.stats.memberSince)}
         </p>
+        <p className="mb-2 text-xs text-gray-500">
+          Notif id: {profile.oneSignalUserId}
+        </p>
       </div>
     </div>
   );

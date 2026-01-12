@@ -1,0 +1,135 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+interface NotificationData {
+  type: string;
+  status?: string;
+  orderId?: string;
+  amount?: number;
+  timestamp?: string;
+  data?: any;
+}
+
+interface SendNotificationOptions {
+  contents: {
+    en: string;
+  };
+  headings: {
+    en: string;
+  };
+  url?: string;
+  included_segments?: string[];
+  include_aliases?: {
+    external_id: string[];
+  };
+  target_channel?: string;
+  data?: NotificationData;
+}
+
+/**
+ * Hook for sending OneSignal notifications
+ * @returns {Function} - Function to send notifications
+ */
+export function useOneSignalNotification() {
+  const checkSubscription = async (oneSignalUserId: string): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/onesignal/view-player', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ external_id: oneSignalUserId })
+      });
+      const data = await response.json();
+      console.log('Subscription check result:', data);
+      return data.subscribed === true;
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+      return false;
+    }
+  };
+
+  const sendNotification = async (options: SendNotificationOptions): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/onesignal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(options),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ OneSignal API error:', response.status, errorText);
+        return false;
+      }
+
+      const result = await response.json();
+      console.log('✅ OneSignal notification sent:', result);
+      return true;
+    } catch (error) {
+      console.error('❌ Error sending OneSignal notification:', error);
+      return false;
+    }
+  };
+
+  // Convenience functions for common notification types
+  const sendOrderStatusUpdate = async (
+    orderId: string,
+    newStatus: string,
+    order: any
+  ): Promise<boolean> => {
+    return sendNotification({
+      contents: {
+        en: `Order ${orderId} status updated to ${newStatus}`,
+      },
+      headings: {
+        en: `${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)} Alert`,
+      },
+      url: `${window.location.origin}/notifications`,
+      included_segments: ['All'],
+      target_channel: 'push',
+      data: {
+        type: 'order',
+        status: newStatus,
+        orderId,
+        amount: order.total,
+        timestamp: Date.now().toString(),
+        data: order,
+      },
+    });
+  };
+
+  const sendWelcomeNotification = async (
+    oneSignalUserId: string,
+    userName: string
+  ): Promise<boolean> => {
+    // Check if user is subscribed before sending
+    const isSubscribed = await checkSubscription(oneSignalUserId);
+    if (!isSubscribed) {
+      console.log('User not subscribed to OneSignal, skipping welcome notification');
+      return false;
+    }
+
+    return sendNotification({
+      contents: {
+        en: `Hi ${userName}, your registration is complete. Welcome aboard!`,
+      },
+      headings: {
+        en: 'Welcome to HotShop!',
+      },
+      include_aliases: {
+        external_id: [oneSignalUserId],
+      },
+      target_channel: 'push',
+      data: {
+        type: 'promotion',
+        status: 'success',
+        timestamp: Date.now().toString(),
+      },
+    });
+  };
+
+  return {
+    sendNotification,
+    sendOrderStatusUpdate,
+    sendWelcomeNotification,
+  };
+}

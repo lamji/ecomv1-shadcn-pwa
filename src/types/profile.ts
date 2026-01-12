@@ -105,6 +105,7 @@ export interface UserProfile {
   dateOfBirth?: string;
   gender?: 'male' | 'female' | 'other';
   bio?: string;
+  oneSignalUserId?: string;
   preferences: {
     newsletter: boolean;
     smsNotifications: boolean;

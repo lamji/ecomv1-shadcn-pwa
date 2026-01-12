@@ -5,13 +5,14 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { useGetProfile } from '@/lib/hooks/integration/useGetProfile';
 import { dummyProfile } from '@/lib/data/profile';
 import ProfileHeader from '@/components/profile/ProfileHeader';
-import LoginPrompt from '@/components/profile/LoginPrompt';
 import OverviewTab from '@/components/profile/OverviewTab';
 import { type UserProfile } from '@/types/profile';
 import { useAppDispatch } from '@/lib/store';
 import { showLoading, hideLoading } from '@/lib/features/loadingSlice';
+import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
+  const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { profile: serverProfile, isLoading: profileLoading } = useGetProfile();
   const [profile, setProfile] = useState<UserProfile>(dummyProfile);
@@ -36,7 +37,7 @@ export default function ProfilePage() {
   }
 
   if (!isAuthenticated) {
-    return <LoginPrompt />;
+    router.push('/login');
   }
 
   return (
@@ -49,7 +50,6 @@ export default function ProfilePage() {
             {/* Profile Header */}
             <ProfileHeader profile={profile} onProfileUpdate={setProfile} />
           </div>
-
           {/* Right Content Area */}
           <div className="flex-1" data-testid="profile-content-area">
             {/* Overview Tab */}

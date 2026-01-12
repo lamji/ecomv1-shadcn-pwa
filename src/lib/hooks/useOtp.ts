@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { usePostOtpIntegration } from './integration/usePostOtpIntegration';
+import { oneSignalLogin } from './useOneSignalLogin';
+import { useOneSignalNotification } from '@/lib/hooks/useOneSignalNotification';
 
 
 
@@ -26,10 +28,12 @@ export function useOtp(): UseOtpHookReturn {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { verifyOtp, resendOtp } = usePostOtpIntegration();
+  const { sendWelcomeNotification } = useOneSignalNotification();
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
+  
   
   // Get email from query params
   const email = searchParams.get('email') || 'your email';
@@ -163,6 +167,26 @@ export function useOtp(): UseOtpHookReturn {
         // Clear all OTP-related localStorage items
         localStorage.removeItem('otp_timer');
         localStorage.removeItem('otp_timestamp');
+        // OneSignal login - called after successful verification
+        if (result.oneSignalUserId) {
+          oneSignalLogin(result.oneSignalUserId);
+          
+          // Send welcome notification with retry logic
+          const userName = searchParams.get('name') || 'User';
+          const maxRetries = 3;
+          const retryDelay = 2000; // 2 seconds
+          
+          for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            await new Promise(resolve => setTimeout(resolve, retryDelay * attempt));
+            const success = await sendWelcomeNotification(result.oneSignalUserId, userName);
+            if (success) {
+              console.log(`Welcome notification sent on attempt ${attempt}`);
+              break;
+            } else if (attempt === maxRetries) {
+              console.log('Failed to send welcome notification after all retries');
+            }
+          }
+        }
         
         // Redirect to intended destination
         const redirectTo = searchParams.get('redirect') || '/login';
