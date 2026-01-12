@@ -27,10 +27,7 @@ export function usePostOtpIntegration() {
         // Store token in context (similar to useLogin)
         setToken(response.token);
         
-        dispatch(showAlert({
-          message: response.message || 'Verification successful',
-          variant: 'success'
-        }));
+      
       }
       
       // Return the full response including oneSignalUserId

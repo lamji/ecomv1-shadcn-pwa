@@ -12,16 +12,16 @@ export async function POST(request: NextRequest) {
     }
 
     const appId = "1ace30b6-3a42-4b09-a77d-b44ecc442175";
-    const apiKey = "os_v2_app_dlhdbnr2ijfqtj35wrhmyrbbowkbird5ni2us24bnywe5fix47oekbxn6tr3hrkn6xtew3vjtsroygazoq3mime6cu2k6d7nvgzwvpy";
+    const apiKey = process.env.ONESIGNAL_REST_API_KEY;
 
-    console.log("Checking if user exists with external_id:", external_id);
+    console.log("Checking if user exists with external_id:", external_id,appId,apiKey);
 
     const response = await fetch(
       `https://api.onesignal.com/apps/${appId}/users/by/external_id/${external_id}`,
       {
         method: 'GET',
         headers: {
-          'Authorization': `${apiKey}`,
+          'Authorization': `Basic ${apiKey}`,
           'Content-Type': 'application/json',
         },
       }

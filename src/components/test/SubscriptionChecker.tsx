@@ -10,30 +10,42 @@ export default function SubscriptionChecker() {
   const [message, setMessage] = useState('');
   const [externalId, setExternalId] = useState('');
 
-  // Generate unique external ID on component mount
+  // Get external ID from OTP response and save to localStorage
   useEffect(() => {
-    const generateUniqueId = () => {
-      const now = new Date();
-      const yy = now.getFullYear().toString().slice(-2);
-      const mm = String(now.getMonth() + 1).padStart(2, '0');
-      const dd = String(now.getDate()).padStart(2, '0');
-      const hh = String(now.getHours()).padStart(2, '0');
-      const min = String(now.getMinutes()).padStart(2, '0');
-      const ss = String(now.getSeconds()).padStart(2, '0');
-      const ms = String(now.getMilliseconds()).padStart(3, '0');
+    const getExternalIdFromOTP = () => {
+      // Try to get the external ID from OTP response in localStorage
+      const otpResponse = localStorage.getItem('otp_response');
+      const savedExternalId = localStorage.getItem('user_external_id');
       
-      return `${yy}${mm}${dd}${hh}${min}${ss}${ms}`;
+      if (otpResponse) {
+        try {
+          const parsed = JSON.parse(otpResponse);
+          const oneSignalUserId = parsed?.oneSignalUserId;
+          
+          if (oneSignalUserId) {
+            console.log('Using oneSignalUserId from OTP response:', oneSignalUserId);
+            setExternalId(oneSignalUserId);
+            localStorage.setItem('user_external_id', oneSignalUserId);
+            return;
+          }
+        } catch (error) {
+          console.error('Error parsing OTP response:', error);
+        }
+      }
+      
+      // Fallback to saved external ID if available
+      if (savedExternalId) {
+        console.log('Using saved external ID:', savedExternalId);
+        setExternalId(savedExternalId);
+        return;
+      }
+      
+      // If no external ID found, set to empty and wait for OTP
+      console.log('No external ID found, waiting for OTP...');
+      setExternalId('');
     };
 
-    // Check if we already have a saved ID
-    const savedId = localStorage.getItem('user_external_id');
-    if (savedId) {
-      setExternalId(savedId);
-    } else {
-      const newId = generateUniqueId();
-      setExternalId(newId);
-      localStorage.setItem('user_external_id', newId);
-    }
+    getExternalIdFromOTP();
   }, []);
 
   const checkUserExists = async (externalId: string) => {
@@ -261,13 +273,20 @@ export default function SubscriptionChecker() {
 
   return (
     <>
-      {/* Trigger Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 px-6 py-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors z-40"
-      >
-        🔔 Enable Notifications
-      </button>
+      {/* Trigger Button - Only show if external ID is available */}
+      {externalId ? (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-4 right-4 px-6 py-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors z-40"
+        >
+          🔔 Enable Notifications
+        </button>
+      ) : (
+        <div className="fixed bottom-4 right-4 px-4 py-2 bg-gray-600 text-white rounded-full shadow-lg z-40 flex items-center space-x-2">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+          <span className="text-sm">Waiting for login...</span>
+        </div>
+      )}
 
       {/* Modal */}
       {isOpen && (
