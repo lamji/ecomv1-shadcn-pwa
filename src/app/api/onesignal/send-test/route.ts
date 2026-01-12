@@ -1,11 +1,18 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    // 🔒 HARD-CODED VALUES (FOR TESTING ONLY)
-    const external_id = "test-user-123";
-    const title = "Order Placed ✅";
-    const message = "Your order #12345 has been successfully placed.";
+    // Parse request body
+    const body = await request.json();
+    const { external_id, title, message } = body;
+
+    // Validate required fields
+    if (!external_id || !title || !message) {
+      return NextResponse.json(
+        { success: false, error: "Missing required fields: external_id, title, message" },
+        { status: 400 }
+      );
+    }
 
     const appId = "1ace30b6-3a42-4b09-a77d-b44ecc442175";
     const apiKey = process.env.ONESIGNAL_REST_API_KEY;

@@ -19,6 +19,7 @@ import Image from 'next/image';
 import { useSocketConnection } from '@/lib/hooks/useSocketConnection';
 import OneSignalMessagesViewer from '@/components/test/OneSignalMessagesViewer';
 import NotificationTestButton from '@/components/test/NotificationTestButton';
+import SubscriptionChecker from '@/components/test/SubscriptionChecker';
 
 // Sample Order Data aligned with products.ts exactly
 const INITIAL_ORDERS = [
@@ -220,6 +221,7 @@ export default function PosPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
+           <SubscriptionChecker />
       {/* Top Header */}
       <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-6 py-4">
         <div className="flex items-center gap-2">

@@ -4,50 +4,37 @@
 export default function SubscriptionChecker() {
   const checkAndSubscribe = async (externalId: string) => {
     try {
-      // First check subscription status
-      const checkResponse = await fetch('/api/onesignal/check-subscription', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          external_id: externalId,
-        }),
-      });
-
-      if (checkResponse.ok) {
-        const checkResult = await checkResponse.json();
-        console.log('Subscription check result:', checkResult);
-        
-        if (checkResult.subscribed) {
-          alert('Device is already subscribed!');
-          return;
-        }
+      // First check if OneSignal is available
+      if (typeof window === 'undefined' || !(window as any).OneSignal) {
+        alert('OneSignal not available. Please refresh the page and try again.');
+        return;
       }
 
-      // If not subscribed, subscribe the device
-      console.log('Device not subscribed, subscribing now...');
-      
-      // Request notification permission first
+      // Check current notification permission
       const permission = await Notification.requestPermission();
       console.log('Permission result:', permission);
 
       if (permission !== 'granted') {
-        alert('Notification permission denied. Cannot subscribe without permission.');
+        alert('Notification permission denied. Cannot subscribe without permission.\n\nPlease allow notifications in your browser settings.');
         return;
       }
 
-      // Subscribe using OneSignal
-      if (typeof window !== 'undefined' && (window as any).OneSignal) {
-        (window as any).OneSignal.push([
-          'login',
-          externalId
-        ]);
-        console.log('Subscribed to OneSignal with external_id:', externalId);
-        alert('Successfully subscribed! You should now receive notifications.');
-      } else {
-        alert('OneSignal not available. Please refresh the page and try again.');
-      }
+      // Permission granted - now set external ID directly
+      (window as any).OneSignal.push(function() {
+        console.log('Setting external ID:', externalId);
+        
+        // Add a small delay to ensure OneSignal is fully initialized
+        setTimeout(() => {
+          try {
+            (window as any).OneSignal.login(externalId);
+            console.log('✅ External ID set successfully:', externalId);
+            alert('✅ Notifications allowed! External ID set to: ' + externalId);
+          } catch (loginError) {
+            console.error('Login failed:', loginError);
+            alert('⚠️ External ID set failed. This may work after a moment. Try again in a few seconds.');
+          }
+        }, 1000);
+      });
 
     } catch (err) {
       console.error('Error in check and subscribe:', err);
