@@ -15,7 +15,7 @@ export function usePostOtpIntegration() {
 
   const { mutateAsync: resendOtpMutateAsync } = usePostData({
     baseUrl: process.env.NEXT_PUBLIC_SOCKET_URL || "",
-    endpoint: '/api/auth/resend-otp'
+    endpoint: '/api/auth/opt-resend'
   });
 
   const verifyOtp = async (otp: string, tempToken?: string) => {

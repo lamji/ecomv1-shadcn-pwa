@@ -22,10 +22,13 @@ import {
 import Image from 'next/image';
 import { useUnauthenticatedPostData } from "plugandplay-react-query-hooks";
 import { SignupValues } from '@/types/auth';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
   const [formError, setFormError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   console.log("Socket URL",process.env.NEXT_PUBLIC_SOCKET_URL)
   console.log("API Base URL",process.env.NEXT_PUBLIC_API_BASE_URL)
@@ -160,23 +163,38 @@ export default function SignupPage() {
 
             <div className="space-y-1.5">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                name="password"
-                value={formik.values.password}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                required
-                placeholder="At least 8 chars, letters and numbers"
-                minLength={8}
-                className={cn(
-                  formik.touched.password &&
-                    formik.errors.password &&
-                    'border-destructive focus-visible:ring-destructive/30',
-                )}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  name="password"
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  required
+                  placeholder="At least 8 chars, letters and numbers"
+                  minLength={8}
+                  className={cn(
+                    'pr-10',
+                    formik.touched.password &&
+                      formik.errors.password &&
+                      'border-destructive focus-visible:ring-destructive/30',
+                  )}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
               {formik.touched.password && formik.errors.password && (
                 <p className="text-destructive text-xs">{formik.errors.password}</p>
               )}
@@ -184,23 +202,38 @@ export default function SignupPage() {
 
             <div className="space-y-1.5">
               <Label htmlFor="confirm">Confirm password</Label>
-              <Input
-                id="confirm"
-                type="password"
-                autoComplete="new-password"
-                name="confirm"
-                value={formik.values.confirm}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                required
-                placeholder="Repeat your password"
-                minLength={8}
-                className={cn(
-                  formik.touched.confirm &&
-                    formik.errors.confirm &&
-                    'border-destructive focus-visible:ring-destructive/30',
-                )}
-              />
+              <div className="relative">
+                <Input
+                  id="confirm"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  name="confirm"
+                  value={formik.values.confirm}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  required
+                  placeholder="Repeat your password"
+                  minLength={8}
+                  className={cn(
+                    'pr-10',
+                    formik.touched.confirm &&
+                      formik.errors.confirm &&
+                      'border-destructive focus-visible:ring-destructive/30',
+                  )}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                  aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
               {formik.touched.confirm && formik.errors.confirm && (
                 <p className="text-destructive text-xs">{formik.errors.confirm}</p>
               )}

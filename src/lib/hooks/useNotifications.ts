@@ -1,36 +1,21 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from 'react';
 import { useAppDispatch } from '../store';
 import { addNotification } from '../features/notificationSlice';
 import { NotificationItem } from '../data/notifications';
 
-// OneSignal will be loaded from CDN
-declare global {
-  interface Window {
-    OneSignal:
-      | unknown[]
-      | {
-          push: (
-            command: (
-              | string
-              | ((event: OneSignalNotificationEvent) => void)
-              | Record<string, unknown>
-            )[],
-          ) => void;
-        };
-  }
+// Type definitions for OneSignal events
+
+interface OneSignalInstance {
+  push: (command: any[]) => void;
+  login: (externalId: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
-// Type definitions for OneSignal events
-interface OneSignalNotificationEvent {
-  notification: {
-    id?: string;
-    title?: string;
-    body?: string;
-    data?: {
-      orderId?: string;
-      amount?: number;
-    };
-  };
+declare global {
+  interface Window {
+    OneSignal?: OneSignalInstance;
+  }
 }
 
 // Type definition for OneSignal message from API
@@ -150,7 +135,37 @@ export const useNotifications = () => {
     //   }
     // };
 
-    // initOneSignal();
+    const initOneSignal = async () => {
+      try {
+        if (!document.querySelector('script[src*="OneSignalSDK.js"]')) {
+          const script = document.createElement('script');
+          script.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
+          script.defer = true;
+          document.head.appendChild(script);
+
+          await new Promise((resolve) => {
+            script.onload = resolve;
+          });
+        }
+
+        const OneSignal = (window as any).OneSignal || [];
+        if (Array.isArray(OneSignal)) {
+          (window as any).OneSignal = {
+            push: (item: any) => OneSignal.push(item)
+          };
+        }
+
+        window.OneSignal?.push(['init', {
+          appId: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID || '',
+          allowLocalhostAsSecureOrigin: true,
+        }]);
+
+      } catch (error) {
+        console.error('OneSignal initialization error:', error);
+      }
+    };
+
+    initOneSignal();
     fetchRecentMessages();
 
     return () => {

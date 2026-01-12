@@ -21,11 +21,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
   const [formError, setFormError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const { handleLogin, isLoading: loginLoading } = useLogin();
 
   type LoginValues = { email: string; password: string };
@@ -119,23 +121,38 @@ export default function LoginPage() {
 
             <div className="space-y-1.5">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                name="password"
-                value={formik.values.password}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                required
-                minLength={8}
-                placeholder="••••••••"
-                className={cn(
-                  formik.touched.password &&
-                    formik.errors.password &&
-                    'border-destructive focus-visible:ring-destructive/30',
-                )}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  name="password"
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  required
+                  minLength={8}
+                  placeholder="••••••••"
+                  className={cn(
+                    'pr-10',
+                    formik.touched.password &&
+                      formik.errors.password &&
+                      'border-destructive focus-visible:ring-destructive/30',
+                  )}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
               {formik.touched.password && formik.errors.password && (
                 <p className="text-destructive text-xs">{formik.errors.password}</p>
               )}

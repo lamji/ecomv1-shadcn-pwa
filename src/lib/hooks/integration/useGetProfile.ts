@@ -1,9 +1,10 @@
 import { useGetData, useAppContext } from "plugandplay-react-query-hooks";
 import { UserProfile } from "@/types/profile";
+import { useEffect } from "react";
 
 interface ProfileApiResponse {
   success: boolean;
-  data: UserProfile;
+  data: UserProfile & { oneSignalUserId?: string };
   cached: boolean;
 }
 
@@ -18,6 +19,13 @@ export function useGetProfile() {
       enabled: !!token,
     },
   });
+
+  useEffect(() => {
+    if (data?.data?.oneSignalUserId && window.OneSignal) {
+      window.OneSignal.push(['login', data.data.oneSignalUserId]);
+      console.log('OneSignal logged in with External ID:', data.data.oneSignalUserId);
+    }
+  }, [data]);
 
   return {
     profile: data?.data,
