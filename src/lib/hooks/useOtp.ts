@@ -195,10 +195,29 @@ const dispatch = useDispatch()
               
               alert(`✅ OneSignal User ID Set!\n\nUser ID: ${result.oneSignalUserId}\nPlayer ID: ${currentPlayerId}\n\nThis ID has been registered for push notifications.`);
               
+              // Send welcome notification
+              try {
+                await fetch('/api/onesignal/send-test', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    message: 'Congratulations! Your account has been created and notifications are enabled.',
+                    title: 'Welcome! 🎉',
+                    external_id: result.oneSignalUserId,
+                  }),
+                });
+                console.log('Welcome notification sent');
+              } catch (notifError) {
+                console.error('Error sending welcome notification:', notifError);
+              }
+              
               dispatch(showAlert({
                 message: result.message || 'Verification successful',
                 variant: 'success'
               }));
+              
             }
           } catch (error) {
             console.error('Error with OneSignal external ID:', error);
