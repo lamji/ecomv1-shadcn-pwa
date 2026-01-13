@@ -24,4 +24,6 @@ export interface ApiResponse {
   user?: Record<string, unknown>;
   email?: string;
   tempToken?: string;
+  oneSignalUserId?: string;
+  userName?: string;
 }

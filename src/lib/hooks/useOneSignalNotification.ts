@@ -70,7 +70,6 @@ export function useOneSignalNotification() {
 
       const result = await response.json();
       console.log('✅ OneSignal notification sent:', result);
-      alert(`✅ OneSignal notification sent: ${result}`);
       return true;
     } catch (error) {
       console.error('❌ Error sending OneSignal notification:', error);
@@ -118,7 +117,7 @@ export function useOneSignalNotification() {
     oneSignalUserId: string,
     userName: string
   ): Promise<boolean> => {
-    alert('Sending welcome notification...');
+    
     
     return sendNotification({
       contents: {

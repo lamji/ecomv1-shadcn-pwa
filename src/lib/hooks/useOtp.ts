@@ -5,7 +5,6 @@ import { usePostOtpIntegration } from './integration/usePostOtpIntegration';
 import { setExternalUserId, getPlayerId } from 'webtonative/OneSignal';
 import { showAlert } from '../features/alertSlice';
 import { useDispatch } from 'react-redux';
-import { useOneSignalNotification } from './useOneSignalNotification';
 
 
 
@@ -27,7 +26,6 @@ interface UseOtpHookReturn {
 }
 
 export function useOtp(): UseOtpHookReturn {
-  const { sendWelcomeNotification } = useOneSignalNotification();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { verifyOtp, resendOtp } = usePostOtpIntegration();
@@ -194,7 +192,7 @@ const dispatch = useDispatch()
               // Set the new external ID
               setExternalUserId(result.oneSignalUserId);
               localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
-              await sendWelcomeNotification(result.oneSignalUserId, result.userName || "");
+            
               
               dispatch(showAlert({
                 message: result.message || 'Verification successful',

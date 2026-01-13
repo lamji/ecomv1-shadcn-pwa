@@ -13,7 +13,7 @@ export default function SubscriptionChecker() {
  
 
   const checkAndSubscribe = async () => {
-    await sendWelcomeNotification("260113064024032", "result.userName" );
+    await sendWelcomeNotification("260113070918769", "result.userName" );
   };
 
   const resetModal = () => {
