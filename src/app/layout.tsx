@@ -57,6 +57,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         {/* Open Graph Meta Tags for Social Sharing */}
         <meta property="og:title" content="ScaleWeb - Premier Web and Mobile Design Services" />
+        <script async src="https://unpkg.com/webtonative@1.0.83/webtonative.min.js"></script>
         <meta
           property="og:description"
           content="Transform your online presence with stunning, high-performance websites and mobile apps. Professional web design, development, and digital solutions for businesses of all sizes."

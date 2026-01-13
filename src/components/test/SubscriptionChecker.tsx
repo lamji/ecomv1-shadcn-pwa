@@ -74,13 +74,65 @@ export default function SubscriptionChecker() {
         User Agent: ${navigator.userAgent}
         Notifications supported: ${'Notification' in window}
         Service Worker supported: ${'serviceWorker' in navigator}
-        OneSignal available: ${!!(window as any).OneSignal}`;
+        WebToNative OneSignal available: ${!!(window as any).WTN?.OneSignal}`;
         alert(debugInfo);
-        console.log('🔍 WebView detected - debugging subscription issues');
+        console.log('🔍 WebView detected - using WebToNative OneSignal');
         console.log('User Agent:', navigator.userAgent);
         console.log('Notifications supported:', 'Notification' in window);
         console.log('Service Worker supported:', 'serviceWorker' in navigator);
-        console.log('OneSignal available:', !!(window as any).OneSignal);
+        console.log('WebToNative OneSignal available:', !!(window as any).WTN?.OneSignal);
+      }
+
+      // Check if we should use WebToNative OneSignal (WebView) or regular OneSignal (Web)
+      if (isWebView) {
+        // Use WebToNative OneSignal for WebView
+        if (!(window as any).WTN?.OneSignal) {
+          setStatus('error');
+          setMessage('📱 WebToNative OneSignal not available.\n\nPlease ensure the WebToNative script is loaded in your app.');
+          setIsLoading(false);
+          return;
+        }
+
+        setStatus('subscribing');
+        setMessage('Getting current OneSignal user...');
+        
+        try {
+          const { getPlayerId } = (window as any).WTN.OneSignal;
+          
+          // Just get the current player ID
+          getPlayerId().then(function(playerId: string) {
+            console.log('Current Player ID:', playerId);
+            
+            // Show alert with current user info
+            if (playerId) {
+              alert(`📱 Current OneSignal User:\n\nPlayer ID: ${playerId}\n\nThis is the current device/user ID in OneSignal.`);
+              
+              setStatus('success');
+              setMessage('✅ Current user retrieved successfully.');
+              setIsLoading(false);
+            } else {
+              alert(`❌ No OneSignal user found\n\nDevice may not be registered with OneSignal yet.`);
+              
+              setStatus('error');
+              setMessage('❌ No OneSignal user found.');
+              setIsLoading(false);
+            }
+          }).catch(function(error: any) {
+            console.error('Get player ID error:', error);
+            alert(`❌ Error getting user: ${error}`);
+            
+            setStatus('error');
+            setMessage(`❌ Error: ${error}`);
+            setIsLoading(false);
+          });
+          
+        } catch (webToNativeError) {
+          console.error('WebToNative OneSignal error:', webToNativeError);
+          setStatus('error');
+          setMessage(`WebToNative OneSignal error: ${webToNativeError instanceof Error ? webToNativeError.message : String(webToNativeError)}`);
+          setIsLoading(false);
+        }
+        return;
       }
 
       // First check if OneSignal is available
