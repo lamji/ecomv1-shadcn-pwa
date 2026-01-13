@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from 'react';
-import { getPlayerId } from 'webtonative/OneSignal';
+import { getPlayerId, setExternalUserId } from 'webtonative/OneSignal';
 
 export default function SubscriptionChecker() {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,18 +18,25 @@ export default function SubscriptionChecker() {
 
     try {
       // Use WebToNative OneSignal getPlayerId
-      if (!getPlayerId) {
-        alert('❌ WebToNative getPlayerId not available\n\nPlease ensure:\n1. WebToNative package is installed\n2. OneSignal is configured in your app');
+      if (!getPlayerId || !setExternalUserId) {
+        alert('❌ WebToNative OneSignal functions not available\n\nPlease ensure:\n1. WebToNative package is installed\n2. OneSignal is configured in your app');
         setIsLoading(false);
         return;
       }
       
+      // Generate a random external ID for this user
+      const randomExternalId = Math.random().toString(36).substring(2, 15);
+      setExternalId(randomExternalId);
+      
       // Get current player ID
       getPlayerId().then(function(playerId: string) {
         if (playerId) {
-          alert(`📱 Current OneSignal User:\n\nPlayer ID: ${playerId}`);
+          // Set the external user ID
+          setExternalUserId("randomExternalId");
+          
+          alert(`📱 OneSignal User Info:\n\nPlayer ID: ${playerId}\nExternal ID: ${randomExternalId}\n\nExternal ID has been set for this user.`);
           setStatus('success');
-          setMessage('✅ User retrieved successfully');
+          setMessage('✅ User retrieved and external ID set successfully');
         } else {
           alert('❌ No OneSignal user found');
           setStatus('error');
