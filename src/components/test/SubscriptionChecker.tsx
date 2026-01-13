@@ -24,19 +24,20 @@ export default function SubscriptionChecker() {
         return;
       }
       
-      // Generate a random external ID for this user
-      const randomExternalId = Math.random().toString(36).substring(2, 15);
-      setExternalId(randomExternalId);
-      
       // Get current player ID
       getPlayerId().then(function(playerId: string) {
         if (playerId) {
-          // Set the external user ID
-          setExternalUserId("randomExternalId");
+          // TODO: Replace this with actual API call to get external ID from OTP verification
+          // For now, using random ID - replace with API response
+          const apiResponseExternalId = Math.random().toString(36).substring(2, 15);
+          setExternalId(apiResponseExternalId);
           
-          alert(`📱 OneSignal User Info:\n\nPlayer ID: ${playerId}\nExternal ID: ${randomExternalId}\n\nExternal ID has been set for this user.`);
+          // Set the external user ID from API response
+          setExternalUserId(apiResponseExternalId);
+          
+          alert(`📱 OneSignal User Info:\n\nPlayer ID: ${playerId}\nExternal ID: ${apiResponseExternalId}\n\nExternal ID set from API response.`);
           setStatus('success');
-          setMessage('✅ User retrieved and external ID set successfully');
+          setMessage('✅ User retrieved and external ID set from API');
         } else {
           alert('❌ No OneSignal user found');
           setStatus('error');

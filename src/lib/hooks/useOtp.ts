@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { usePostOtpIntegration } from './integration/usePostOtpIntegration';
-import { oneSignalLogin } from './useOneSignalLogin';
+import { setExternalUserId } from 'webtonative/OneSignal';
 import { showAlert } from '../features/alertSlice';
 import { useDispatch } from 'react-redux';
 
@@ -171,9 +171,9 @@ const dispatch = useDispatch()
         // Clear all OTP-related localStorage items
         localStorage.removeItem('otp_timer');
         localStorage.removeItem('otp_timestamp');
-        // OneSignal login - called after successful verification
+        // Set OneSignal external ID using WebToNative
         if (result.oneSignalUserId) {
-          oneSignalLogin(result.oneSignalUserId);
+          setExternalUserId(result.oneSignalUserId);
         }
         dispatch(showAlert({
           message: result.message || 'Verification successful',
