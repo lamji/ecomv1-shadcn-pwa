@@ -71,10 +71,10 @@ export default function SubscriptionChecker() {
       
       if (isWebView) {
         const debugInfo = `🔍 WebView Debugging:
-User Agent: ${navigator.userAgent}
-Notifications supported: ${'Notification' in window}
-Service Worker supported: ${'serviceWorker' in navigator}
-OneSignal available: ${!!(window as any).OneSignal}`;
+        User Agent: ${navigator.userAgent}
+        Notifications supported: ${'Notification' in window}
+        Service Worker supported: ${'serviceWorker' in navigator}
+        OneSignal available: ${!!(window as any).OneSignal}`;
         alert(debugInfo);
         console.log('🔍 WebView detected - debugging subscription issues');
         console.log('User Agent:', navigator.userAgent);
@@ -92,6 +92,15 @@ OneSignal available: ${!!(window as any).OneSignal}`;
 
       // Check current notification permission
       console.log('🔍 Checking notification permission...');
+      
+      // Check if Notification API is available
+      if (typeof Notification === 'undefined') {
+        setStatus('error');
+        setMessage('📱 Notification API not available!\n\nThis mobile app does not support web notifications.\n\nSolutions:\n• Use native push notifications\n• Test in regular web browser\n• Check app configuration for notification support');
+        setIsLoading(false);
+        return;
+      }
+      
       const permission = await Notification.requestPermission();
       console.log('Permission result:', permission);
 
