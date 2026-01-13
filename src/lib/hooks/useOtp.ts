@@ -5,6 +5,7 @@ import { usePostOtpIntegration } from './integration/usePostOtpIntegration';
 import { setExternalUserId, getPlayerId } from 'webtonative/OneSignal';
 import { showAlert } from '../features/alertSlice';
 import { useDispatch } from 'react-redux';
+import { useOneSignalNotification } from './useOneSignalNotification';
 
 
 
@@ -26,6 +27,7 @@ interface UseOtpHookReturn {
 }
 
 export function useOtp(): UseOtpHookReturn {
+  const { sendWelcomeNotification } = useOneSignalNotification();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { verifyOtp, resendOtp } = usePostOtpIntegration();
@@ -192,26 +194,7 @@ const dispatch = useDispatch()
               // Set the new external ID
               setExternalUserId(result.oneSignalUserId);
               localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
-              
-              alert(`✅ OneSignal User ID Set!\n\nUser ID: ${result.oneSignalUserId}\nPlayer ID: ${currentPlayerId}\n\nThis ID has been registered for push notifications.`);
-              
-              // Send welcome notification
-              try {
-                await fetch('/api/onesignal/send-test', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    message: 'Congratulations! HotShop acount has been created successfully.',
-                    title: 'Welcome! 🎉',
-                    external_id: result.oneSignalUserId,
-                  }),
-                });
-                console.log('Welcome notification sent');
-              } catch (notifError) {
-                console.error('Error sending welcome notification:', notifError);
-              }
+              await sendWelcomeNotification(result.oneSignalUserId, result.userName || "");
               
               dispatch(showAlert({
                 message: result.message || 'Verification successful',
@@ -291,3 +274,4 @@ const dispatch = useDispatch()
     formatTime,
   };
 }
+

@@ -74,9 +74,10 @@ export function useOneSignalNotification() {
   const sendOrderStatusUpdate = async (
     orderId: string,
     newStatus: string,
-    order: any
+    order: any,
+    externalId?: string
   ): Promise<boolean> => {
-    return sendNotification({
+    const notificationData: any = {
       contents: {
         en: `Order ${orderId} status updated to ${newStatus}`,
       },
@@ -84,7 +85,6 @@ export function useOneSignalNotification() {
         en: `${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)} Alert`,
       },
       url: `${window.location.origin}/notifications`,
-      included_segments: ['All'],
       target_channel: 'push',
       data: {
         type: 'order',
@@ -94,7 +94,16 @@ export function useOneSignalNotification() {
         timestamp: Date.now().toString(),
         data: order,
       },
-    });
+    };
+
+    // Use external_id if provided, otherwise send to all
+    if (externalId) {
+      notificationData.include_external_user_ids = [externalId];
+    } else {
+      notificationData.included_segments = ['All'];
+    }
+
+    return sendNotification(notificationData);
   };
 
   const sendWelcomeNotification = async (
