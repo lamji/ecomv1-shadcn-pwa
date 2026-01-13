@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from 'react';
+import { getPlayerId } from 'webtonative/OneSignal';
 
 export default function SubscriptionChecker() {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,14 +17,12 @@ export default function SubscriptionChecker() {
     setMessage('Getting current user...');
 
     try {
-      // Use WebToNative OneSignal
-      if (!(window as any).WTN?.OneSignal) {
-        alert('❌ WebToNative OneSignal not available');
+      // Use WebToNative OneSignal getPlayerId
+      if (!getPlayerId) {
+        alert('❌ WebToNative getPlayerId not available\n\nPlease ensure:\n1. WebToNative package is installed\n2. OneSignal is configured in your app');
         setIsLoading(false);
         return;
       }
-
-      const { getPlayerId } = (window as any).WTN.OneSignal;
       
       // Get current player ID
       getPlayerId().then(function(playerId: string) {
