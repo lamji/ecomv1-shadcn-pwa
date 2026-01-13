@@ -1,62 +1,19 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 "use client";
 
 import { useState } from 'react';
-import { getPlayerId, setExternalUserId } from 'webtonative/OneSignal';
+import { useOneSignalNotification } from '@/lib/hooks/useOneSignalNotification';
 
 export default function SubscriptionChecker() {
+  const { sendWelcomeNotification } = useOneSignalNotification();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'checking' | 'subscribing' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
-  const [externalId, setExternalId] = useState('');
+ 
 
   const checkAndSubscribe = async () => {
-    setIsLoading(true);
-    setStatus('checking');
-    setMessage('Getting current user...');
-
-    try {
-      // Use WebToNative OneSignal getPlayerId
-      if (!getPlayerId || !setExternalUserId) {
-        alert('❌ WebToNative OneSignal functions not available\n\nPlease ensure:\n1. WebToNative package is installed\n2. OneSignal is configured in your app');
-        setIsLoading(false);
-        return;
-      }
-      
-      // Get current player ID
-      getPlayerId().then(function(playerId: string) {
-        if (playerId) {
-          // TODO: Replace this with actual API call to get external ID from OTP verification
-          // For now, using random ID - replace with API response
-          const apiResponseExternalId = Math.random().toString(36).substring(2, 15);
-          setExternalId(apiResponseExternalId);
-          
-          // Set the external user ID from API response
-          setExternalUserId(apiResponseExternalId);
-          
-          alert(`📱 OneSignal User Info:\n\nPlayer ID: ${playerId}\nExternal ID: ${apiResponseExternalId}\n\nExternal ID set from API response.`);
-          setStatus('success');
-          setMessage('✅ User retrieved and external ID set from API');
-        } else {
-          alert('❌ No OneSignal user found');
-          setStatus('error');
-          setMessage('❌ No user found');
-        }
-        setIsLoading(false);
-      }).catch(function(error: any) {
-        alert(`❌ Error: ${error}`);
-        setStatus('error');
-        setMessage(`❌ Error: ${error}`);
-        setIsLoading(false);
-      });
-
-    } catch (err) {
-      alert(`❌ Error: ${err instanceof Error ? err.message : String(err)}`);
-      setStatus('error');
-      setMessage(`❌ Error: ${err instanceof Error ? err.message : String(err)}`);
-      setIsLoading(false);
-    }
+    await sendWelcomeNotification("260113064024032", "result.userName" );
   };
 
   const resetModal = () => {
@@ -75,11 +32,9 @@ export default function SubscriptionChecker() {
       
         <button
           onClick={() => {
-            // Generate random external ID when modal opens
-            const randomExternalId = Math.random().toString(36).substring(2, 15);
-            setExternalId(randomExternalId);
-            console.log('Generated random external ID:', randomExternalId);
-            setIsOpen(true);
+            // checkAndSubscribeGenerate random external ID when modal opens
+            checkAndSubscribe();
+            
           }}
           className="fixed bottom-4 right-4 px-6 py-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors z-40"
         >
@@ -118,21 +73,7 @@ export default function SubscriptionChecker() {
               <p className="text-sm text-gray-600 mb-2">
                 <strong>Your Device ID:</strong>
               </p>
-              <div className="flex items-center space-x-2">
-                <code className="flex-1 px-3 py-2 bg-white border border-gray-300 rounded text-sm font-mono text-gray-800 break-all">
-                  {externalId}
-                </code>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(externalId);
-                    setMessage('📋 Device ID copied to clipboard!');
-                    setTimeout(() => setMessage(''), 2000);
-                  }}
-                  className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm"
-                >
-                  📋 Copy
-                </button>
-              </div>
+             
               <p className="text-xs text-gray-500 mt-2">
                 This ID identifies your device for notifications
               </p>
@@ -164,16 +105,6 @@ export default function SubscriptionChecker() {
                 <li>Get important account notifications</li>
                 <li>Stay informed about new features</li>
               </ul>
-            </div>
-
-            {/* Footer */}
-            <div className="mt-6 flex justify-end">
-              <button
-                onClick={closeModal}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-              >
-                Maybe Later
-              </button>
             </div>
           </div>
         </div>

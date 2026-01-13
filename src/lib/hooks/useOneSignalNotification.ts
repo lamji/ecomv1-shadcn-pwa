@@ -24,26 +24,33 @@ interface SendNotificationOptions {
   data?: NotificationData;
 }
 
+
+
 /**
  * Hook for sending OneSignal notifications
  * @returns {Function} - Function to send notifications
  */
 export function useOneSignalNotification() {
-  const checkSubscription = async (oneSignalUserId: string): Promise<boolean> => {
-    try {
-      const response = await fetch('/api/onesignal/view-player', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ external_id: oneSignalUserId })
-      });
-      const data = await response.json();
-      console.log('Subscription check result:', data);
-      return data.subscribed === true;
-    } catch (error) {
-      console.error('Error checking subscription:', error);
-      return false;
-    }
-  };
+  // const checkSubscription = async () => {
+  //   try {
+  //     const playerId = await new Promise<string>((resolve, reject) => {
+  //       getPlayerId().then(function(playerId: string) {
+  //         if (playerId) {
+  //           resolve(playerId);
+  //         } else {
+  //           reject(new Error('No player ID found'));
+  //         }
+  //       }).catch(reject);
+  //     });
+      
+  //     console.log('Player ID found:', playerId);
+  //     // If we have a player ID, the user is subscribed
+  //     return !!playerId;
+  //   } catch (error) {
+  //     console.error('Error checking subscription:', error);
+  //     return false;
+  //   }
+  // };
 
   const sendNotification = async (options: SendNotificationOptions): Promise<boolean> => {
     try {
@@ -111,11 +118,11 @@ export function useOneSignalNotification() {
     userName: string
   ): Promise<boolean> => {
     // Check if user is subscribed before sending
-    const isSubscribed = await checkSubscription(oneSignalUserId);
-    if (!isSubscribed) {
-      console.log('User not subscribed to OneSignal, skipping welcome notification');
-      return false;
-    }
+    // const isSubscribed = await checkSubscription();
+    // if (!isSubscribed) {
+    //   console.log('User not subscribed to OneSignal, skipping welcome notification');
+    //   return false;
+    // }
 
     return sendNotification({
       contents: {
