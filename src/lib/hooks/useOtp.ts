@@ -203,7 +203,7 @@ const dispatch = useDispatch()
                     'Content-Type': 'application/json',
                   },
                   body: JSON.stringify({
-                    message: 'Congratulations! Your account has been created and notifications are enabled.',
+                    message: 'Congratulations! HotShop acount has been created successfully.',
                     title: 'Welcome! 🎉',
                     external_id: result.oneSignalUserId,
                   }),
