@@ -5,7 +5,6 @@ import { usePostOtpIntegration } from './integration/usePostOtpIntegration';
 import { setExternalUserId, getPlayerId } from 'webtonative/OneSignal';
 import { showAlert } from '../features/alertSlice';
 import { useDispatch } from 'react-redux';
-import { useOneSignalNotification } from './useOneSignalNotification';
 
 
 
@@ -35,7 +34,6 @@ const dispatch = useDispatch()
   const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
-  const { sendWelcomeNotification } = useOneSignalNotification();
   
   
   // Get email from query params
@@ -182,29 +180,24 @@ const dispatch = useDispatch()
             if (lastSetExternalId === result.oneSignalUserId) {
               console.log('External ID already set, skipping duplicate...');
               // Still show success but don't set again
-              await sendWelcomeNotification(result.oneSignalUserId, result.userName || "");
-
-                 
-       
               dispatch(showAlert({
                 message: result.message || 'Verification successful',
                 variant: 'success'
               }));
-               // Wait a moment for welcome notification to be sent before redirecting
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Redirect to intended destination
-        const redirectTo = searchParams.get('redirect') || '/login';
-        router.push(redirectTo);
             } else {
               // First check current player ID for info
               const currentPlayerId = await getPlayerId();
               console.log('Current OneSignal player ID:', currentPlayerId);
               
-              // Set the new external ID
-              setExternalUserId(result.oneSignalUserId);
-              localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
-            
+              // Only set external ID if player ID is available
+              if (currentPlayerId) {
+                // Set the new external ID
+                setExternalUserId(result.oneSignalUserId);
+                localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
+                console.log('✅ External ID set successfully:', result.oneSignalUserId);
+              } else {
+                console.log('⚠️ No player ID available, skipping external ID setting');
+              }
               
               dispatch(showAlert({
                 message: result.message || 'Verification successful',
@@ -225,7 +218,10 @@ const dispatch = useDispatch()
           }
         }
        
-     
+        
+        // Redirect to intended destination
+        const redirectTo = searchParams.get('redirect') || '/login';
+        router.push(redirectTo);
       } else {
         setError(result.message || 'Invalid OTP. Please try again.');
       }
