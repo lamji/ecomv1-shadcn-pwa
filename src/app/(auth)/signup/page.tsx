@@ -23,10 +23,12 @@ import Image from 'next/image';
 import { useUnauthenticatedPostData } from "plugandplay-react-query-hooks";
 import { SignupValues } from '@/types/auth';
 import { Eye, EyeOff } from 'lucide-react';
+import { useAppDispatch } from '@/lib/store';
+import { showAlert } from '@/lib/features/alertSlice';
 
 export default function SignupPage() {
   const router = useRouter();
-  const [formError, setFormError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -59,14 +61,25 @@ export default function SignupPage() {
         .required('Confirm your password'),
     }),
     onSubmit: async (values: SignupValues, { setSubmitting }: FormikHelpers<SignupValues>) => {
-      setFormError(null);
       try {
         // Call signup API with form values
         const result = await signupMutateAsync({
           name: values.name,
           email: values.email,
           password: values.password
-        }) as { success?: boolean; email?: string; tempToken?: string; message?: string };
+        }) as { 
+          success?: boolean; 
+          email?: string; 
+          tempToken?: string; 
+          message?: string;
+          errors?: Array<{
+            type: string;
+            value: string;
+            msg: string;
+            path: string;
+            location: string;
+          }>;
+        };
 
         if (result.success) {
           // Redirect to OTP page with email and tempToken
@@ -78,12 +91,44 @@ export default function SignupPage() {
           
           router.push(`/otp?${params.toString()}`);
         } else {
-          setFormError(result.message || 'Signup failed. Please try again.');
+          // Handle field validation errors from API
+          if (result.errors && Array.isArray(result.errors)) {
+            // API returns array of field validation errors
+            const fieldErrors = result.errors as Array<{
+              type: string;
+              value: string;
+              msg: string;
+              path: string;
+              location: string;
+            }>;
+            
+            // Set field errors in formik
+            fieldErrors.forEach(error => {
+              formik.setFieldError(error.path, error.msg);
+            });
+            
+            // Show general alert for first error
+            dispatch(showAlert({
+              message: fieldErrors[0]?.msg || 'Please check your input and try again.',
+              variant: 'error'
+            }));
+          } else {
+            // Handle general error message
+            dispatch(showAlert({
+              message: result.message || 'Signup failed. Please try again.',
+              variant: 'error'
+            }));
+          }
         }
       } catch (error: unknown) {
         console.error('Signup error:', error);
-        const errorMessage = (error as any)?.response?.data?.message || (error as any)?.message || 'Signup failed. Please try again.';
-        setFormError(errorMessage);
+        const errorMessage = (error as any)?.response?.data?.errors?.[0]?.msg || (error as any)?.message || 'Signup failed. Please try again.';
+        
+        // Show centralized alert for API errors
+        dispatch(showAlert({
+          message: errorMessage,
+          variant: 'error'
+        }));
       } finally {
         setSubmitting(false);
       }
@@ -107,12 +152,6 @@ export default function SignupPage() {
           <CardDescription>Start managing your loans</CardDescription>
         </CardHeader>
         <CardContent>
-          {formError ? (
-            <div className="border-destructive/40 bg-destructive/5 text-destructive mb-4 rounded-md border px-3 py-2 text-sm">
-              {formError}
-            </div>
-          ) : null}
-
           <form onSubmit={formik.handleSubmit} noValidate className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="name">Full name</Label>

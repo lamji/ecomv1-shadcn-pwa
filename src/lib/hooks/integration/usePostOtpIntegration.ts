@@ -8,7 +8,6 @@ export function usePostOtpIntegration() {
   const { setToken } = useAppContext();
   const dispatch = useAppDispatch();
 
-
   const { mutateAsync: verifyOtpMutateAsync } = usePostData({
     baseUrl: process.env.NEXT_PUBLIC_SOCKET_URL || "",
     endpoint: '/api/auth/verify-email' // Use auth endpoint for registration verification
@@ -29,27 +28,35 @@ export function usePostOtpIntegration() {
         setToken(response.token);
         
         // Send welcome notification if oneSignalUserId is available
-        
+        if (response.oneSignalUserId) {
+          dispatch(showAlert({
+            message: response.message || 'Verification successful',
+            variant: 'success'
+          }));
+        }
       }
       
       // Return the full response including oneSignalUserId
       return response;
     } catch (error: any) {
       console.error('OTP verification failed:', error);
-      const errorMessage = error?.response?.data?.message || error?.message || 'Verification failed';
       
-      dispatch(showAlert({
-        message: errorMessage,
-        variant: 'error'
-      }));
-      
+      // Don't show alert here - let useOtp handle it with proper message
       throw error;
     }
   };
 
   const resendOtp = async (email: string) => {
     try {
-      const response = await resendOtpMutateAsync({ email });
+      const response = await resendOtpMutateAsync({ email }) as ApiResponse;
+      
+      if (response.success) {
+        dispatch(showAlert({
+          message: response.message || 'OTP sent successfully',
+          variant: 'success'
+        }));
+      }
+      
       return response;
     } catch (error) {
       console.error('Resend OTP failed:', error);

@@ -9,7 +9,7 @@ import GlobalSpinner from '@/components/shared/GlobalSpinner';
 import { SocketGlobalListener } from './SocketGlobalListener';
 import { useEffect } from 'react';
 import OneSignal from 'react-onesignal';
-import SubscriptionChecker from './test/SubscriptionChecker';
+// import SubscriptionChecker from './test/SubscriptionChecker';
 
 export function Providers({ children }: { children: React.ReactNode }) {
     useEffect(() => {
@@ -32,7 +32,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <PersistGate loading={null} persistor={persistor}>
         <SocketGlobalListener />
         <ReactProvider>
-          <SubscriptionChecker />
+          {/* <SubscriptionChecker /> */}
           {children}
           <GlobalAlert />
           <GlobalSpinner />

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { User, Pencil } from 'lucide-react';
+import { User, Pencil, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/data/profile';
@@ -16,6 +16,7 @@ interface ProfileInfoProps {
   };
   onEditProfile: () => void;
   onUpdateEmail: () => void;
+  onLogout: () => void;
 }
 
 export default function ProfileInfo({
@@ -23,6 +24,7 @@ export default function ProfileInfo({
   currentBadge,
   onEditProfile,
   onUpdateEmail,
+  onLogout,
 }: ProfileInfoProps) {
   return (
     <div className={`mb-2 p-2`}>
@@ -93,6 +95,15 @@ export default function ProfileInfo({
             onClick={onUpdateEmail}
           >
             Update Email
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-6 px-2 py-0.5 text-xs text-red-600 hover:bg-red-50"
+            onClick={onLogout}
+          >
+            <LogOut className="h-3 w-3 mr-1" />
+            Logout
           </Button>
         </div>
       </div>

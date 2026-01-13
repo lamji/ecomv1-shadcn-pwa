@@ -13,7 +13,6 @@ export default function OtpVerificationPage() {
   const {
     isLoading,
     isResending,
-    error,
     otpValues,
     timeLeft,
     isExpired,
@@ -46,12 +45,6 @@ export default function OtpVerificationPage() {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {error && (
-            <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-              {error}
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="otp" className="text-center block">

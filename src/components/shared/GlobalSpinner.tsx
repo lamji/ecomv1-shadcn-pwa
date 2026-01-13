@@ -7,8 +7,8 @@ export default function GlobalSpinner() {
   if (!isLoading) return null;
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center">
-      {/* Backdrop removed as requested */}
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
+      {/* Backdrop with highest z-index */}
 
       {/* Spinner Card */}
       <div

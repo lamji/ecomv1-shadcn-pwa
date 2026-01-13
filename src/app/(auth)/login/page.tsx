@@ -22,9 +22,12 @@ import {
 } from '@/components/ui/card';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import useAppConfig from '@/lib/hooks/useAppConfig';
+
 
 export default function LoginPage() {
   const router = useRouter();
+  const { appName, appLogo } = useAppConfig();
   const { isAuthenticated, isLoading } = useAuth();
   const [formError, setFormError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -77,14 +80,14 @@ export default function LoginPage() {
         <CardHeader className="text-center">
           <div className="mb-2 flex flex-col items-center gap-2">
             <Image
-              src="/icons/apple-touch-icon.png"
-              alt="Loan Management logo"
+              src={appLogo}
+              alt={appName}
               width={100}
               height={100}
               priority
             />
           </div>
-          <CardTitle className="text-2xl">Loan Management</CardTitle>
+          <CardTitle className="text-2xl">{appName}</CardTitle>
           <CardDescription>Sign in to continue</CardDescription>
         </CardHeader>
         <CardContent>
@@ -119,8 +122,10 @@ export default function LoginPage() {
               )}
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-foreground">
+                Password
+              </label>
               <div className="relative">
                 <Input
                   id="password"
@@ -156,6 +161,16 @@ export default function LoginPage() {
               {formik.touched.password && formik.errors.password && (
                 <p className="text-destructive text-xs">{formik.errors.password}</p>
               )}
+            </div>
+
+            <div className="flex justify-end">
+              <button 
+                type="button"
+                onClick={() => router.push('/forgot-password')}
+                className="text-sm text-primary hover:underline"
+              >
+                Forgot password?
+              </button>
             </div>
 
             <Button type="submit" disabled={formik.isSubmitting || loginLoading} className="w-full">

@@ -11,13 +11,11 @@ import Image from 'next/image';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useSearchHooks } from '@/lib/hooks/useSearchHooks';
 import { useAppSelector } from '@/lib/store';
+import useAppConfig from '@/lib/hooks/useAppConfig';
 
-interface AppHeaderProps {
-  title?: string;
-}
-
-export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
+export const AppHeader = () => {
   const router = useRouter();
+  const { appName, appLogo } = useAppConfig();
   const [showSuggestions, setShowSuggestions] = useState(false);
   const headerRef = useRef<HTMLDivElement | null>(null);
   const { isAuthenticated, isLoading } = useAuth();
@@ -69,8 +67,8 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
             >
               <div className="relative h-8 w-8 overflow-hidden">
                 <Image
-                  src="/logo.png"
-                  alt="E-HotShop Logo"
+                  src={appLogo}
+                  alt={appName}
                   width={32}
                   height={32}
                   className="object-contain"
@@ -83,7 +81,7 @@ export const AppHeader = ({ title = 'E-HotShop' }: AppHeaderProps) => {
                   }}
                 />
               </div>
-              <h1 className="text-foreground hidden text-2xl font-bold lg:block">{title}</h1>
+              <h1 className="text-foreground hidden text-2xl font-bold lg:block">{appName}</h1>
             </Button>
           </div>
 

@@ -32,12 +32,14 @@ export default function ProfilePage() {
     }
   }, [profileLoading, dispatch]);
 
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [authLoading, isAuthenticated, router]);
+
   if (authLoading) {
     return null;
-  }
-
-  if (!isAuthenticated) {
-    router.push('/login');
   }
 
   return (

@@ -3,9 +3,11 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Facebook, Twitter, Instagram, Mail, Phone, MapPin } from 'lucide-react';
+import useAppConfig from '@/lib/hooks/useAppConfig';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const { appName, appDescription ,customerServiceAddress,customerServiceEmail,customerServicePhone} = useAppConfig();
 
   return (
     <footer className="mt-20 bg-gray-900 text-white">
@@ -15,10 +17,9 @@ export default function Footer() {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {/* Company Info */}
             <div>
-              <h3 className="mb-4 text-lg font-bold">ShopHub</h3>
+              <h3 className="mb-4 text-lg font-bold">{appName}</h3>
               <p className="mb-4 text-sm leading-relaxed text-gray-300">
-                Your one-stop destination for the latest fashion trends and exclusive deals.
-                Discover quality products at unbeatable prices.
+                {appDescription}
               </p>
               <div className="flex space-x-4">
                 <a href="#" className="text-gray-400 transition-colors hover:text-white">
@@ -71,15 +72,15 @@ export default function Footer() {
               <ul className="space-y-2 text-sm">
                 <li className="flex items-center text-gray-300">
                   <Phone className="mr-2 h-4 w-4" />
-                  <span>1-800-SHOP-HUB</span>
+                  <span>{customerServicePhone}</span>
                 </li>
                 <li className="flex items-center text-gray-300">
                   <Mail className="mr-2 h-4 w-4" />
-                  <span>support@shophub.com</span>
+                  <span>{customerServiceEmail}</span>
                 </li>
                 <li className="flex items-center text-gray-300">
                   <MapPin className="mr-2 h-4 w-4" />
-                  <span>123 Fashion Street, NY 10001</span>
+                  <span>{customerServiceAddress}</span>
                 </li>
               </ul>
               <div className="mt-4">
@@ -94,7 +95,7 @@ export default function Footer() {
         {/* Bottom Footer */}
         <div className="border-t border-gray-800 py-6">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className="text-sm text-gray-400">© {currentYear} ShopHub. All rights reserved.</p>
+            <p className="text-sm text-gray-400">© {currentYear} {appName}. All rights reserved.</p>
             <div className="flex gap-6 text-sm text-gray-400">
               <a href="#" className="transition-colors hover:text-white">
                 Privacy Policy

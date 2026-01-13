@@ -79,6 +79,37 @@ function getAuthToken(request: NextRequest): string | null {
 }
 
 /**
+ * Extract and validate reset temp token for password reset access
+ */
+function getResetTempToken(request: NextRequest): { valid: boolean; token: string | null } {
+  const cookieValue = request.cookies.get('resetTempToken')?.value ?? null;
+  
+  if (!cookieValue) {
+    return { valid: false, token: null };
+  }
+  
+  // Parse token and timestamp from cookie
+  // Format: token:timestamp
+  const parts = cookieValue.split(':');
+  if (parts.length !== 2) {
+    return { valid: false, token: null };
+  }
+  
+  const [token, timestampStr] = parts;
+  const timestamp = parseInt(timestampStr);
+  
+  // Check if timestamp is valid and not expired (5 minutes = 300 seconds)
+  const now = Date.now();
+  const tokenAge = (now - timestamp) / 1000; // Convert to seconds
+  
+  if (isNaN(timestamp) || tokenAge > 300 || tokenAge < 0) {
+    return { valid: false, token: null };
+  }
+  
+  return { valid: true, token };
+}
+
+/**
  * Redirect to login preserving intended destination
  */
 function redirectToLogin(request: NextRequest): NextResponse {
@@ -101,6 +132,19 @@ export function middleware(request: NextRequest) {
    */
   if (isPublicRoute(pathname)) {
     return NextResponse.next();
+  }
+
+  /**
+   * Special handling for password reset routes
+   * Allow access with valid resetTempToken, otherwise redirect to login
+   */
+  if (pathname === '/reset-password' || pathname === '/new-password') {
+    const { valid } = getResetTempToken(request);
+    if (valid) {
+      return NextResponse.next();
+    }
+    // If no valid resetTempToken, redirect to login
+    return redirectToLogin(request);
   }
 
   /**

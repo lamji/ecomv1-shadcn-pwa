@@ -2,10 +2,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { usePostOtpIntegration } from './integration/usePostOtpIntegration';
-import { setExternalUserId, getPlayerId } from 'webtonative/OneSignal';
+import { useResetPassword } from './integration/useResetPassword';
 import { showAlert } from '../features/alertSlice';
 import { useDispatch } from 'react-redux';
-
+import useNativeFunc from '../native/useNativeFunc';
 
 
 
@@ -26,10 +26,12 @@ interface UseOtpHookReturn {
 }
 
 export function useOtp(): UseOtpHookReturn {
+  const {setExternalUserId, getPlayerId} = useNativeFunc()
   const router = useRouter();
   const searchParams = useSearchParams();
   const { verifyOtp, resendOtp } = usePostOtpIntegration();
-const dispatch = useDispatch()
+  const { resetPasswordVerify } = useResetPassword();
+  const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +43,10 @@ const dispatch = useDispatch()
 
   // Get temporary token from query params (for registration verification)
   const tempToken = searchParams.get('tempToken') || '';
+
+  // Get redirect path to determine OTP purpose
+  const redirectPath = searchParams.get('redirect') || '';
+  const isPasswordReset = redirectPath === '/reset-password';
 
   // Initialize timer from localStorage immediately
   const getInitialTimer = () => {
@@ -149,12 +155,18 @@ const dispatch = useDispatch()
     const otp = otpValues.join('');
 
     if (otp.length !== 6) {
-      setError('Please enter all 6 digits');
+      dispatch(showAlert({
+        message: 'Please enter all 6 digits',
+        variant: 'error'
+      }));
       return;
     }
 
     if (isExpired) {
-      setError('OTP has expired. Please request a new one.');
+      dispatch(showAlert({
+        message: 'OTP has expired. Please request a new one.',
+        variant: 'error'
+      }));
       return;
     }
 
@@ -162,7 +174,15 @@ const dispatch = useDispatch()
     setError(null);
 
     try {
-      const result:any = await verifyOtp(otp, tempToken);
+      let result: any;
+      
+      if (isPasswordReset) {
+        // Use password reset verification API
+        result = await resetPasswordVerify(otp, email);
+      } else {
+        // Use regular OTP verification API
+        result = await verifyOtp(otp, tempToken);
+      }
 
       if (result.success) {
         // Save OTP response to localStorage for SubscriptionChecker
@@ -171,63 +191,81 @@ const dispatch = useDispatch()
         // Clear all OTP-related localStorage items
         localStorage.removeItem('otp_timer');
         localStorage.removeItem('otp_timestamp');
-        // Set OneSignal external ID using WebToNative - prevent duplication
-        if (result.oneSignalUserId) {
-          try {
-            // Check if we already set this external ID for this device
-            const lastSetExternalId = localStorage.getItem('last_onesignal_external_id');
-            
-            if (lastSetExternalId === result.oneSignalUserId) {
-              console.log('External ID already set, skipping duplicate...');
-              // Still show success but don't set again
-              dispatch(showAlert({
-                message: result.message || 'Verification successful',
-                variant: 'success'
-              }));
-            } else {
-              // First check current player ID for info
-              const currentPlayerId = await getPlayerId();
-              console.log('Current OneSignal player ID:', currentPlayerId);
+        
+        // For password reset, don't set OneSignal - just redirect
+        if (!isPasswordReset) {
+          // Set OneSignal external ID using WebToNative - prevent duplication
+          if (result.oneSignalUserId) {
+            try {
+              // Check if we already set this external ID for this device
+              const lastSetExternalId = localStorage.getItem('last_onesignal_external_id');
               
-              // Only set external ID if player ID is available
-              if (currentPlayerId) {
-                // Set the new external ID
-                setExternalUserId(result.oneSignalUserId);
-                localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
-                console.log('✅ External ID set successfully:', result.oneSignalUserId);
+              if (lastSetExternalId === result.oneSignalUserId) {
+                console.log('External ID already set, skipping duplicate...');
               } else {
-                console.log('⚠️ No player ID available, skipping external ID setting');
+                // First check current player ID for info
+                const currentPlayerId = await getPlayerId();
+                console.log('Current OneSignal player ID:', currentPlayerId);
+                
+                // Only set external ID if player ID is available
+                if (currentPlayerId) {
+                  // Set the new external ID
+                  setExternalUserId(result.oneSignalUserId);
+                  localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
+                  console.log('✅ External ID set successfully:', result.oneSignalUserId);
+                } else {
+                  console.log('⚠️ No player ID available, skipping external ID setting');
+                }
               }
-              
-              dispatch(showAlert({
-                message: result.message || 'Verification successful',
-                variant: 'success'
-              }));
-              
+            } catch (error) {
+              console.error('Error with OneSignal external ID:', error);
+              // Still try to set on error
+              setExternalUserId(result.oneSignalUserId);
+              localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
             }
-          } catch (error) {
-            console.error('Error with OneSignal external ID:', error);
-            // Still try to set on error
-            setExternalUserId(result.oneSignalUserId);
-            localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
-            
-            dispatch(showAlert({
-              message: result.message || 'Verification successful',
-              variant: 'success'
-            }));
           }
         }
-       
+        
+        // Show success alert
+        dispatch(showAlert({
+          message: result.message || 'Verification successful',
+          variant: 'success'
+        }));
         
         // Redirect to intended destination
-        const redirectTo = searchParams.get('redirect') || '/login';
-        router.push(redirectTo);
+        if (isPasswordReset && result.resetToken && result.resetTempToken) {
+          // Store resetTempToken with timestamp in cookie for middleware validation
+          // Format: token:timestamp
+          const timestamp = Date.now();
+          document.cookie = `resetTempToken=${result.resetTempToken}:${timestamp}; path=/; max-age=300; SameSite=Lax`; // 5 minutes
+          
+          // Redirect to new password page with resetToken in URL for API use
+          const params = new URLSearchParams();
+          params.set('email', email);
+          params.set('resetToken', result.resetToken);
+          params.set('expiry', result.resetTokenExpiry || '');
+          router.push(`/new-password?${params.toString()}`);
+        } else {
+          // Regular flow - redirect to login or other destination
+          const redirectTo = searchParams.get('redirect') || '/login';
+          router.push(redirectTo);
+        }
       } else {
-        setError(result.message || 'Invalid OTP. Please try again.');
+        dispatch(showAlert({
+          message: result.message || 'Invalid OTP. Please try again.',
+          variant: 'error'
+        }));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('OTP verification failed:', error);
-      setError('Something went wrong. Please try again.');
+      
+      // Extract the actual API response message
+      const errorMessage = error?.response?.data?.message || error?.message || 'Something went wrong. Please try again.';
+      
+      dispatch(showAlert({
+        message: errorMessage,
+        variant: 'error'
+      }));
     } finally {
       setIsLoading(false);
     }

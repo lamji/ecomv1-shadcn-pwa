@@ -12,8 +12,6 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import EditAddressForm from '@/components/profile/EditAddressForm';
 import { useProfile } from '@/lib/hooks/useProfile';
 
-import { LogOut } from 'lucide-react';
-
 export default function ProfileHeader({ profile, onProfileUpdate }: ProfileHeaderProps) {
   const profileHook = useProfile(profile, onProfileUpdate);
 
@@ -26,19 +24,9 @@ export default function ProfileHeader({ profile, onProfileUpdate }: ProfileHeade
           currentBadge={profileHook.currentBadge}
           onEditProfile={profileHook.handleEditProfile}
           onUpdateEmail={profileHook.handleUpdateEmail}
+          onLogout={profileHook.handleLogout}
         />
         
-        {/* Logout Button */}
-        <div className="mt-4 w-full border-t border-gray-100 pt-4 sm:border-gray-300">
-          <button
-            onClick={profileHook.handleLogout}
-            className="flex w-full items-center justify-center gap-2 rounded-md py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
-          >
-            <LogOut className="h-4 w-4" />
-            Logout
-          </button>
-        </div>
-
         <PhoneBook
           profile={profile}
           onAddPhone={profileHook.handleAddPhone}
