@@ -70,6 +70,7 @@ export function useOneSignalNotification() {
 
       const result = await response.json();
       console.log('✅ OneSignal notification sent:', result);
+      alert(`✅ OneSignal notification sent: ${result}`);
       return true;
     } catch (error) {
       console.error('❌ Error sending OneSignal notification:', error);
@@ -117,13 +118,8 @@ export function useOneSignalNotification() {
     oneSignalUserId: string,
     userName: string
   ): Promise<boolean> => {
-    // Check if user is subscribed before sending
-    // const isSubscribed = await checkSubscription();
-    // if (!isSubscribed) {
-    //   console.log('User not subscribed to OneSignal, skipping welcome notification');
-    //   return false;
-    // }
-
+    alert('Sending welcome notification...');
+    
     return sendNotification({
       contents: {
         en: `Hi ${userName}, your registration is complete. Welcome aboard!`,
