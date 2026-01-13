@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import OneSignal from 'react-onesignal';
 
 export default function SubscriptionChecker() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,44 +10,6 @@ export default function SubscriptionChecker() {
   const [status, setStatus] = useState<'idle' | 'checking' | 'subscribing' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
   const [externalId, setExternalId] = useState('');
-
-  // Get external ID from OTP response and save to localStorage
-  useEffect(() => {
-    const getExternalIdFromOTP = () => {
-      // Try to get the external ID from OTP response in localStorage
-      const otpResponse = localStorage.getItem('otp_response');
-      const savedExternalId = localStorage.getItem('user_external_id');
-      
-      if (otpResponse) {
-        try {
-          const parsed = JSON.parse(otpResponse);
-          const oneSignalUserId = parsed?.oneSignalUserId;
-          
-          if (oneSignalUserId) {
-            console.log('Using oneSignalUserId from OTP response:', oneSignalUserId);
-            setExternalId(oneSignalUserId);
-            localStorage.setItem('user_external_id', oneSignalUserId);
-            return;
-          }
-        } catch (error) {
-          console.error('Error parsing OTP response:', error);
-        }
-      }
-      
-      // Fallback to saved external ID if available
-      if (savedExternalId) {
-        console.log('Using saved external ID:', savedExternalId);
-        setExternalId(savedExternalId);
-        return;
-      }
-      
-      // If no external ID found, set to empty and wait for OTP
-      console.log('No external ID found, waiting for OTP...');
-      setExternalId('');
-    };
-
-    getExternalIdFromOTP();
-  }, []);
 
   const checkUserExists = async (externalId: string) => {
     try {
@@ -94,9 +57,14 @@ export default function SubscriptionChecker() {
     setStatus('checking');
     setMessage('Checking notification permission...');
 
+    // Generate random external ID for testing
+    const randomExternalId = Math.random().toString(36).substring(2, 15);
+    setExternalId(randomExternalId);
+    console.log('Generated random external ID:', randomExternalId);
+
     try {
       // First check if OneSignal is available
-      if (typeof window === 'undefined' || !(window as any).OneSignal) {
+      if (typeof window === 'undefined' || !OneSignal) {
         setStatus('error');
         setMessage('OneSignal not available. Please refresh the page and try again.');
         return;
@@ -193,27 +161,23 @@ export default function SubscriptionChecker() {
         setMessage('Setting up fresh subscription...');
       }
 
-      // Force clear any existing OneSignal data and logout current user
-      try {
-        // Logout current OneSignal user to force fresh subscription
-        if ((window as any).OneSignal) {
-          console.log('Logging out current OneSignal user...');
-          await (window as any).OneSignal.logout();
-          
-          // Wait a moment for logout
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+      // Set external ID first, then wait for subscription
+      console.log('Setting external ID:', externalId);
 
-        console.log('Setting external ID:', externalId);
-
-        // Set external ID first, then wait for subscription
-        (window as any).OneSignal.push(function() {
+      // Use the standard push method to set external ID
+      (window as any).OneSignal.push(function() {
+        try {
           console.log('Setting external ID in OneSignal...');
           (window as any).OneSignal.login(externalId);
-        });
+        } catch (error) {
+          console.error('Login error:', error);
+          // If login fails due to domain restrictions, we'll handle it gracefully
+          console.log('OneSignal may be restricted to production domain');
+        }
+      });
 
-        // Wait for external ID to be set
-        await new Promise(resolve => setTimeout(resolve, 2000));
+      // Wait for external ID to be set
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
         // Verify external ID was set by checking user again
         const verifyCheck = await checkUserExists(externalId);
@@ -251,13 +215,6 @@ export default function SubscriptionChecker() {
         setMessage('Error preparing subscription. Please refresh the page and try again.');
         setIsLoading(false);
       }
-
-    } catch (err) {
-      console.error('Error in check and subscribe:', err);
-      setStatus('error');
-      setMessage('Something went wrong. Please try again.');
-      setIsLoading(false);
-    }
   };
 
   const resetModal = () => {
@@ -273,20 +230,20 @@ export default function SubscriptionChecker() {
 
   return (
     <>
-      {/* Trigger Button - Only show if external ID is available */}
-      {externalId ? (
+      
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            // Generate random external ID when modal opens
+            const randomExternalId = Math.random().toString(36).substring(2, 15);
+            setExternalId(randomExternalId);
+            console.log('Generated random external ID:', randomExternalId);
+            setIsOpen(true);
+          }}
           className="fixed bottom-4 right-4 px-6 py-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors z-40"
         >
           🔔 Enable Notifications
         </button>
-      ) : (
-        <div className="fixed bottom-4 right-4 px-4 py-2 bg-gray-600 text-white rounded-full shadow-lg z-40 flex items-center space-x-2">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-          <span className="text-sm">Waiting for login...</span>
-        </div>
-      )}
+    
 
       {/* Modal */}
       {isOpen && (

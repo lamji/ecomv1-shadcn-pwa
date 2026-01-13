@@ -20,6 +20,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         // You can add other initialization options here
         allowLocalhostAsSecureOrigin: true,
         autoPrompt: false, // Disable auto-prompting to prevent permission blocked errors
+        externalId: '12345', // Add your user ID here
         // notifyButton: {
         //   enable: false, // Disable default notify button to use our custom modal
         // }
@@ -31,7 +32,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <PersistGate loading={null} persistor={persistor}>
         <SocketGlobalListener />
         <ReactProvider>
-               <SubscriptionChecker />
+          <SubscriptionChecker />
           {children}
           <GlobalAlert />
           <GlobalSpinner />
