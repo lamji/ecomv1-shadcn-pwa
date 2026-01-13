@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { usePostOtpIntegration } from './integration/usePostOtpIntegration';
-import { setExternalUserId } from 'webtonative/OneSignal';
+import { setExternalUserId, getPlayerId } from 'webtonative/OneSignal';
 import { showAlert } from '../features/alertSlice';
 import { useDispatch } from 'react-redux';
 
@@ -171,14 +171,48 @@ const dispatch = useDispatch()
         // Clear all OTP-related localStorage items
         localStorage.removeItem('otp_timer');
         localStorage.removeItem('otp_timestamp');
-        // Set OneSignal external ID using WebToNative
+        // Set OneSignal external ID using WebToNative - prevent duplication
         if (result.oneSignalUserId) {
-          setExternalUserId(result.oneSignalUserId);
+          try {
+            // Check if we already set this external ID for this device
+            const lastSetExternalId = localStorage.getItem('last_onesignal_external_id');
+            
+            if (lastSetExternalId === result.oneSignalUserId) {
+              console.log('External ID already set, skipping duplicate...');
+              // Still show success but don't set again
+              dispatch(showAlert({
+                message: result.message || 'Verification successful',
+                variant: 'success'
+              }));
+            } else {
+              // First check current player ID for info
+              const currentPlayerId = await getPlayerId();
+              console.log('Current OneSignal player ID:', currentPlayerId);
+              
+              // Set the new external ID
+              setExternalUserId(result.oneSignalUserId);
+              localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
+              
+              alert(`✅ OneSignal User ID Set!\n\nUser ID: ${result.oneSignalUserId}\nPlayer ID: ${currentPlayerId}\n\nThis ID has been registered for push notifications.`);
+              
+              dispatch(showAlert({
+                message: result.message || 'Verification successful',
+                variant: 'success'
+              }));
+            }
+          } catch (error) {
+            console.error('Error with OneSignal external ID:', error);
+            // Still try to set on error
+            setExternalUserId(result.oneSignalUserId);
+            localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
+            
+            dispatch(showAlert({
+              message: result.message || 'Verification successful',
+              variant: 'success'
+            }));
+          }
         }
-        dispatch(showAlert({
-          message: result.message || 'Verification successful',
-          variant: 'success'
-        }));
+       
         
         // Redirect to intended destination
         const redirectTo = searchParams.get('redirect') || '/login';
