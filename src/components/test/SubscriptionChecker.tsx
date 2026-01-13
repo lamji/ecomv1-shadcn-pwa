@@ -63,6 +63,26 @@ export default function SubscriptionChecker() {
     console.log('Generated random external ID:', randomExternalId);
 
     try {
+      // Check if running in mobile app/WebView for debugging
+      const isWebView = /wv|WebView/i.test(navigator.userAgent) || 
+                       window.hasOwnProperty('webkit') || 
+                       window.hasOwnProperty('cordova') ||
+                       window.hasOwnProperty('capacitor');
+      
+      if (isWebView) {
+        const debugInfo = `🔍 WebView Debugging:
+User Agent: ${navigator.userAgent}
+Notifications supported: ${'Notification' in window}
+Service Worker supported: ${'serviceWorker' in navigator}
+OneSignal available: ${!!(window as any).OneSignal}`;
+        alert(debugInfo);
+        console.log('🔍 WebView detected - debugging subscription issues');
+        console.log('User Agent:', navigator.userAgent);
+        console.log('Notifications supported:', 'Notification' in window);
+        console.log('Service Worker supported:', 'serviceWorker' in navigator);
+        console.log('OneSignal available:', !!(window as any).OneSignal);
+      }
+
       // First check if OneSignal is available
       if (typeof window === 'undefined' || !OneSignal) {
         setStatus('error');
@@ -71,8 +91,15 @@ export default function SubscriptionChecker() {
       }
 
       // Check current notification permission
+      console.log('🔍 Checking notification permission...');
       const permission = await Notification.requestPermission();
       console.log('Permission result:', permission);
+
+      if (isWebView) {
+        console.log('🔍 WebView permission debugging:');
+        console.log('Current permission:', permission);
+        console.log('Notification.permission:', Notification.permission);
+      }
 
       if (permission === 'denied') {
         // User manually turned off notifications, try to re-trigger the permission prompt
@@ -133,7 +160,7 @@ export default function SubscriptionChecker() {
     } catch (err) {
       console.error('Error in check and subscribe:', err);
       setStatus('error');
-      setMessage('Something went wrong. Please try again.');
+      setMessage(`Something went wrong. Please try again.\n\nError: ${err instanceof Error ? err.message : String(err)}`);
       setIsLoading(false);
     }
   };
