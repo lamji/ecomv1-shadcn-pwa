@@ -3,13 +3,11 @@ import { usePostData, useAppContext } from "plugandplay-react-query-hooks";
 import { useAppDispatch } from '@/lib/store';
 import { showAlert } from '@/lib/features/alertSlice';
 import { ApiResponse } from '@/types/auth';
-import { useOneSignalNotification } from '../useOneSignalNotification';
 
 export function usePostOtpIntegration() {
   const { setToken } = useAppContext();
   const dispatch = useAppDispatch();
 
-  const { sendWelcomeNotification } = useOneSignalNotification();
 
   const { mutateAsync: verifyOtpMutateAsync } = usePostData({
     baseUrl: process.env.NEXT_PUBLIC_SOCKET_URL || "",
@@ -31,9 +29,7 @@ export function usePostOtpIntegration() {
         setToken(response.token);
         
         // Send welcome notification if oneSignalUserId is available
-        if (response.oneSignalUserId) {
-          await sendWelcomeNotification(response.oneSignalUserId, response.userName || "");
-        }
+        
       }
       
       // Return the full response including oneSignalUserId
