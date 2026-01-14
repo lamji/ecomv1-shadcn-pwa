@@ -47,6 +47,24 @@ export function useOtp(): UseOtpHookReturn {
   // Get redirect path to determine OTP purpose
   const redirectPath = searchParams.get('redirect') || '';
   const isPasswordReset = redirectPath === '/reset-password';
+  
+  // Fallback: Check if tempToken is missing (indicates password reset vs registration)
+  const isPasswordResetFallback = !tempToken && email;
+  const finalIsPasswordReset = isPasswordReset || isPasswordResetFallback;
+  
+  // Debug logging for WebView issues
+  useEffect(() => {
+    console.log('🔍 OTP Debug - WebView Detection:', {
+      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'N/A',
+      redirectPath,
+      isPasswordReset,
+      isPasswordResetFallback,
+      finalIsPasswordReset,
+      email,
+      tempToken,
+      searchParams: Object.fromEntries(searchParams.entries())
+    });
+  }, [redirectPath, isPasswordReset, isPasswordResetFallback, finalIsPasswordReset, email, tempToken, searchParams]);
 
   // Initialize timer from localStorage immediately
   const getInitialTimer = () => {
@@ -176,10 +194,12 @@ export function useOtp(): UseOtpHookReturn {
     try {
       let result: any;
       
-      if (isPasswordReset) {
+      if (finalIsPasswordReset) {
+        console.log('🔍 OTP Debug - Using password reset verification API');
         // Use password reset verification API
         result = await resetPasswordVerify(otp, email);
       } else {
+        console.log('🔍 OTP Debug - Using regular OTP verification API');
         // Use regular OTP verification API
         result = await verifyOtp(otp, tempToken);
       }
@@ -245,7 +265,8 @@ export function useOtp(): UseOtpHookReturn {
         }));
         
         // Redirect to intended destination
-        if (isPasswordReset && result.resetToken && result.resetTempToken) {
+        if (finalIsPasswordReset && result.resetToken && result.resetTempToken) {
+          console.log('🔍 OTP Debug - Redirecting to new-password (password reset flow)');
           // Store resetTempToken with timestamp in cookie for middleware validation
           // Format: token:timestamp
           const timestamp = Date.now();
@@ -258,6 +279,7 @@ export function useOtp(): UseOtpHookReturn {
           params.set('expiry', result.resetTokenExpiry || '');
           router.push(`/new-password?${params.toString()}`);
         } else {
+          console.log('🔍 OTP Debug - Redirecting to login (regular flow)', { finalIsPasswordReset, hasResetToken: !!result.resetToken, hasResetTempToken: !!result.resetTempToken });
           // Regular flow - redirect to login or other destination
           const redirectTo = searchParams.get('redirect') || '/login';
           router.push(redirectTo);
