@@ -197,6 +197,19 @@ export function useOtp(): UseOtpHookReturn {
           // Set OneSignal external ID using WebToNative - prevent duplication
           if (result.oneSignalUserId) {
             try {
+              // Detect platform - only set OneSignal for mobile and webview, not web
+              const userAgent = typeof window !== 'undefined' ? window.navigator.userAgent : '';
+              const isMobile = userAgent.includes('Mobile') || userAgent.includes('Android') || 
+                              userAgent.includes('iPhone') || userAgent.includes('iPad');
+              const isWebView = userAgent.includes('wv') || userAgent.includes('WebView') || 
+                               (userAgent.includes('Mobile') && userAgent.includes('wv'));
+              const shouldSetOneSignal = isMobile || isWebView; // Skip for web browsers
+              
+              if (!shouldSetOneSignal) {
+                console.log('🌐 Web browser detected - skipping OneSignal external ID setup');
+                return;
+              }
+              
               // Check if we already set this external ID for this device
               const lastSetExternalId = localStorage.getItem('last_onesignal_external_id');
               
@@ -219,7 +232,7 @@ export function useOtp(): UseOtpHookReturn {
               }
             } catch (error) {
               console.error('Error with OneSignal external ID:', error);
-              // Still try to set on error
+              // Still try to set on error (only for mobile/webview)
               setExternalUserId(result.oneSignalUserId);
               localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
             }

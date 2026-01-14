@@ -5,12 +5,14 @@ import { useAppDispatch } from '@/lib/store';
 import { showAlert } from '@/lib/features/alertSlice';
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
+import useNativeFunc from '@/lib/native/useNativeFunc';
 
 export function useLogin() {
   const { setToken } = useAppContext();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { setExternalUserId, getPlayerId } = useNativeFunc();
   
   const baseUrl =
     process.env.NEXT_PUBLIC_SOCKET_URL || ""
@@ -40,6 +42,8 @@ export function useLogin() {
         if (apiResult.success && apiResult.token) {
           const token = apiResult.token;
           const user = apiResult.user || {};
+          const signupPlatform = user.signupPlatform as string || 'web';
+          const oneSignalUserId = user.oneSignalUserId as string;
           
           // Persist token and user data
           localStorage.setItem('auth_token', token);
@@ -52,6 +56,41 @@ export function useLogin() {
            */
           const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
           document.cookie = `auth_token=${encodeURIComponent(token)}; Path=/; Expires=${expires.toUTCString()}; SameSite=Lax` + (location.protocol === 'https:' ? '; Secure' : '');
+          
+          // Set OneSignal external ID for non-web platforms
+          if (oneSignalUserId && signupPlatform !== 'web') {
+            try {
+              // Check if we already set this external ID for this device
+              const lastSetExternalId = localStorage.getItem('last_onesignal_external_id');
+              
+              if (lastSetExternalId === oneSignalUserId) {
+                console.log('External ID already set, skipping duplicate...');
+              } else {
+                // First check current player ID for info
+                const currentPlayerId = await getPlayerId();
+                console.log('Current OneSignal player ID:', currentPlayerId);
+                
+                // Only set external ID if player ID is available
+                if (currentPlayerId) {
+                  // Set the new external ID
+                  await setExternalUserId(oneSignalUserId);
+                  localStorage.setItem('last_onesignal_external_id', oneSignalUserId);
+                  console.log('✅ External ID set successfully on login:', oneSignalUserId);
+                } else {
+                  console.log('⚠️ No player ID available, skipping external ID setting');
+                }
+              }
+            } catch (error) {
+              console.error('Error with OneSignal external ID on login:', error);
+              // Still try to set on error (only for mobile/webview)
+              try {
+                await setExternalUserId(oneSignalUserId);
+                localStorage.setItem('last_onesignal_external_id', oneSignalUserId);
+              } catch (fallbackError) {
+                console.log('OneSignal fallback failed:', fallbackError);
+              }
+            }
+          }
           
           // Redirect
           const redirectTo = searchParams.get('redirect') || '/';

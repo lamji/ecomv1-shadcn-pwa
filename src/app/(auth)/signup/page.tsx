@@ -149,7 +149,7 @@ export default function SignupPage() {
             />
           </div>
           <CardTitle className="text-2xl">Create account</CardTitle>
-          <CardDescription>Start managing your loans</CardDescription>
+          <CardDescription>Start shopping amazing products</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={formik.handleSubmit} noValidate className="space-y-4">
