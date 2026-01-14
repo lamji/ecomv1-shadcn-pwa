@@ -108,6 +108,11 @@ export default function ProfileInfo({
         </div>
       </div>
 
+      {/* Push Notification Toggle - WebView Only */}
+      {/* <div className="mb-4">
+        <ToggleSubscription />
+      </div> */}
+
       {/* Additional Info */}
       <div className="mb-4 space-y-1">
         {profile.dateOfBirth && (

@@ -43,34 +43,21 @@ export function useOtp(): UseOtpHookReturn {
   
   
   // Get email from query params
-  const email = searchParams.get('email') || 'your email';
+  const email = searchParams?.get('email') || 'your email';
 
   // Get temporary token from query params (for registration verification)
-  const tempToken = searchParams.get('tempToken') || '';
+  const tempToken = searchParams?.get('tempToken') || '';
 
   // Get redirect path to determine OTP purpose
-  const redirectPath = searchParams.get('redirect') || '';
+  const redirectPath = searchParams?.get('redirect') || '';
   const isPasswordReset = redirectPath === '/reset-password';
   
   // Fallback: Check if tempToken is missing (indicates password reset vs registration)
   const isPasswordResetFallback = !tempToken && email;
   const finalIsPasswordReset = isPasswordReset || isPasswordResetFallback;
-
   
   // Debug logging for WebView issues
-  useEffect(() => {
-    console.log('🔍 OTP Debug - WebView Detection:', {
-      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'N/A',
-      redirectPath,
-      isPasswordReset,
-      isPasswordResetFallback,
-      finalIsPasswordReset,
-      email,
-      tempToken,
-      searchParams: Object.fromEntries(searchParams.entries())
-    });
-  }, [redirectPath, isPasswordReset, isPasswordResetFallback, finalIsPasswordReset, email, tempToken, searchParams]);
-
+ 
   // Test function to bypass middleware and go to new-password directly
   const handleTestNewPassword = useCallback(() => {
     console.log('🧪 Testing direct navigation to new-password page');
@@ -252,10 +239,10 @@ export function useOtp(): UseOtpHookReturn {
       if (finalIsPasswordReset) {
         console.log('🔍 OTP Debug - Using password reset verification API');
         // Use password reset verification API
-
         result = await resetPasswordVerify(otp, email);
       } else {
         console.log('🔍 OTP Debug - Using regular OTP verification API');
+        // Use regular OTP verification API
         result = await verifyOtp(otp, tempToken);
       }
 
@@ -270,7 +257,7 @@ export function useOtp(): UseOtpHookReturn {
         // For password reset, don't set OneSignal - just redirect
         if (!isPasswordReset) {
           // Set OneSignal external ID using WebToNative - prevent duplication
-          if (result.createdAtKey) {
+          if (result.oneSignalUserId) {
             try {
               // Detect platform - only set OneSignal for mobile and webview, not web
               const userAgent = typeof window !== 'undefined' ? window.navigator.userAgent : '';
@@ -284,7 +271,7 @@ export function useOtp(): UseOtpHookReturn {
                 // Check if we already set this external ID for this device
                 const lastSetExternalId = localStorage.getItem('last_onesignal_external_id');
                 
-                if (lastSetExternalId === result.createdAtKey) {
+                if (lastSetExternalId === result.oneSignalUserId) {
                   console.log('External ID already set, skipping duplicate...');
                 } else {
                   // First check current player ID for info
@@ -294,9 +281,9 @@ export function useOtp(): UseOtpHookReturn {
                   // Only set external ID if player ID is available
                   if (currentPlayerId) {
                     // Set the new external ID
-                    setExternalUserId(result.createdAtKey);
-                    localStorage.setItem('last_onesignal_external_id', result.createdAtKey);
-                  
+                    setExternalUserId(result.oneSignalUserId);
+                    localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
+                    console.log('✅ External ID set successfully:', result.oneSignalUserId);
                   } else {
                     console.log('⚠️ No player ID available, skipping external ID setting');
                   }
@@ -307,8 +294,8 @@ export function useOtp(): UseOtpHookReturn {
             } catch (error) {
               console.error('Error with OneSignal external ID:', error);
               // Still try to set on error (only for mobile/webview)
-              setExternalUserId(result.createdAtKey);
-              localStorage.setItem('last_onesignal_external_id', result.createdAtKey);
+              setExternalUserId(result.oneSignalUserId);
+              localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
             }
           }
         }
@@ -321,7 +308,7 @@ export function useOtp(): UseOtpHookReturn {
         
         // Redirect to intended destination
         if (finalIsPasswordReset && result.resetToken && result.resetTempToken) {
-         
+          console.log('🔍 OTP Debug - Redirecting to new-password (password reset flow)');
           // Store resetTempToken with timestamp in both cookie and localStorage for middleware validation
           // Format: token:timestamp
           const timestamp = Date.now();
@@ -340,9 +327,9 @@ export function useOtp(): UseOtpHookReturn {
           params.set('expiry', result.resetTokenExpiry || '');
           router.push(`/new-password?${params.toString()}`);
         } else {
-        
+          console.log('🔍 OTP Debug - Redirecting to login (regular flow)', { finalIsPasswordReset, hasResetToken: !!result.resetToken, hasResetTempToken: !!result.resetTempToken });
           // Regular flow - redirect to login or other destination
-          const redirectTo = searchParams.get('redirect') || '/login';
+          const redirectTo = searchParams?.get('redirect') || '/login';
           router.push(redirectTo);
         }
       } else {
