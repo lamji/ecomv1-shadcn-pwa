@@ -80,9 +80,15 @@ export function useOtp(): UseOtpHookReturn {
     const testExpiry = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 minutes from now
     const testResetTempToken = 'test-temp-token-' + Date.now();
     
-    // Set the resetTempToken cookie manually (bypassing middleware)
+    // Store the resetTempToken in both cookie and localStorage manually (bypassing middleware)
     const timestamp = Date.now();
-    document.cookie = `resetTempToken=${testResetTempToken}:${timestamp}; path=/; max-age=300; SameSite=Lax`;
+    const tokenData = `${testResetTempToken}:${timestamp}`;
+    
+    // Store in cookie
+    document.cookie = `resetTempToken=${tokenData}; path=/; max-age=300; SameSite=Lax`;
+    
+    // Store in localStorage as backup for WebView
+    localStorage.setItem('resetTempToken', tokenData);
     
     // Navigate to new-password page with test data
     const params = new URLSearchParams();
@@ -91,6 +97,7 @@ export function useOtp(): UseOtpHookReturn {
     params.set('expiry', testExpiry);
     
     console.log('🧪 Navigating to:', `/new-password?${params.toString()}`);
+    console.log('🧪 Token data stored:', tokenData);
     router.push(`/new-password?${params.toString()}`);
   }, [email, router]);
 
@@ -314,10 +321,16 @@ export function useOtp(): UseOtpHookReturn {
         // Redirect to intended destination
         if (finalIsPasswordReset && result.resetToken && result.resetTempToken) {
           console.log('🔍 OTP Debug - Redirecting to new-password (password reset flow)');
-          // Store resetTempToken with timestamp in cookie for middleware validation
+          // Store resetTempToken with timestamp in both cookie and localStorage for middleware validation
           // Format: token:timestamp
           const timestamp = Date.now();
-          document.cookie = `resetTempToken=${result.resetTempToken}:${timestamp}; path=/; max-age=300; SameSite=Lax`; // 5 minutes
+          const tokenData = `${result.resetTempToken}:${timestamp}`;
+          
+          // Store in cookie
+          document.cookie = `resetTempToken=${tokenData}; path=/; max-age=300; SameSite=Lax`; // 5 minutes
+          
+          // Store in localStorage as backup for WebView
+          localStorage.setItem('resetTempToken', tokenData);
           
           // Redirect to new password page with resetToken in URL for API use
           const params = new URLSearchParams();

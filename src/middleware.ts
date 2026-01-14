@@ -36,8 +36,16 @@ const PUBLIC_API_ROUTES = [
 /**
  * Check if the request is for a public route
  */
-function isPublicRoute(pathname: string): boolean {
+function isPublicRoute(pathname: string, request: NextRequest): boolean {
   if (PUBLIC_ROUTES.includes(pathname)) return true;
+
+  // Dynamic check for /new-password with valid resetTempToken
+  if (pathname === '/new-password') {
+    const { valid } = getResetTempToken(request);
+    if (valid) {
+      return true;
+    }
+  }
 
   // Handle dynamic product routes
   if (pathname.startsWith('/product/')) return true;
@@ -82,7 +90,18 @@ function getAuthToken(request: NextRequest): string | null {
  * Extract and validate reset temp token for password reset access
  */
 function getResetTempToken(request: NextRequest): { valid: boolean; token: string | null } {
-  const cookieValue = request.cookies.get('resetTempToken')?.value ?? null;
+  // First try to get from cookie
+  let cookieValue = request.cookies.get('resetTempToken')?.value ?? null;
+  
+  // If not found in cookie, try to get from localStorage via headers
+  if (!cookieValue) {
+    // Note: localStorage is not directly accessible in middleware
+    // We'll need to pass it via headers from the client side
+    const localStorageToken = request.headers.get('x-reset-temp-token');
+    if (localStorageToken) {
+      cookieValue = localStorageToken;
+    }
+  }
   
   if (!cookieValue) {
     return { valid: false, token: null };
@@ -130,15 +149,15 @@ export function middleware(request: NextRequest) {
    * - public routes
    * - Next.js internals
    */
-  if (isPublicRoute(pathname)) {
+  if (isPublicRoute(pathname, request)) {
     return NextResponse.next();
   }
 
   /**
-   * Special handling for password reset routes
+   * Special handling for /reset-password route
    * Allow access with valid resetTempToken, otherwise redirect to login
    */
-  if (pathname === '/reset-password' || pathname === '/new-password') {
+  if (pathname === '/reset-password') {
     const { valid } = getResetTempToken(request);
     if (valid) {
       return NextResponse.next();
