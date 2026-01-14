@@ -34,7 +34,7 @@ export default function ReactProvider({
 
   const pathname = usePathname();
   const isAuthRoute =
-    pathname.startsWith('/product/') ||
+    pathname?.startsWith('/product/') ||
     pathname === '/search' ||
     pathname === '/notifications' ||
     pathname === '/otp';

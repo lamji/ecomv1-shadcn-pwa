@@ -107,7 +107,7 @@ export function useLogin() {
           dispatch(fetchProfile());
           
           // Redirect
-          const redirectTo = searchParams.get('redirect') || '/';
+          const redirectTo = searchParams?.get('redirect') || '/';
           router.replace(redirectTo);
         }
       }
