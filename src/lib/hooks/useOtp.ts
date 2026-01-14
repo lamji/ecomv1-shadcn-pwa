@@ -55,7 +55,7 @@ export function useOtp(): UseOtpHookReturn {
   // Fallback: Check if tempToken is missing (indicates password reset vs registration)
   const isPasswordResetFallback = !tempToken && email;
   const finalIsPasswordReset = isPasswordReset || isPasswordResetFallback;
-  alert("finalIsPasswordReset: " + finalIsPasswordReset);
+
   
   // Debug logging for WebView issues
   useEffect(() => {
