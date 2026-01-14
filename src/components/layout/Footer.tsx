@@ -1,13 +1,64 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Facebook, Twitter, Instagram, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Mail, Phone, MapPin, Package, MessageCircle } from 'lucide-react';
 import useAppConfig from '@/lib/hooks/useAppConfig';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const { appName, appDescription ,customerServiceAddress,customerServiceEmail,customerServicePhone} = useAppConfig();
+  const [isWeb, setIsWeb] = useState(false);
+
+  useEffect(() => {
+    // Check if running on web platform
+    const userAgent = typeof window !== 'undefined' ? window.navigator.userAgent : '';
+    const isWebPlatform = !/Mobile|Android|iPhone|iPad|Tablet|wv|WebView/i.test(userAgent);
+    setIsWeb(isWebPlatform);
+  }, []);
+
+  // Render minimal footer on mobile/tablet/WebView platforms
+  if (!isWeb) {
+    return (
+      <footer className="mt-20 bg-gray-900 text-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
+          <div className="py-8">
+            <div className="flex flex-col items-center justify-center gap-4">
+              <div className="flex gap-4">
+                <Button variant="outline" className="bg-primary hover:bg-primary/90 text-white">
+                  <Package className="w-4 h-4 mr-2" />
+                  Track Order
+                </Button>
+                <Button variant="outline" className="bg-primary hover:bg-primary/90 text-white">
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Chat Us
+                </Button>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center text-gray-300 mb-2">
+                  <Phone className="mr-2 h-4 w-4" />
+                  <span>{customerServicePhone}</span>
+                </div>
+                <div className="flex items-center justify-center text-gray-300 mb-2">
+                  <Mail className="mr-2 h-4 w-4" />
+                  <span>{customerServiceEmail}</span>
+                </div>
+                <div className="flex items-center justify-center text-gray-300">
+                  <MapPin className="mr-2 h-4 w-4" />
+                  <span>{customerServiceAddress}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 py-4">
+            <p className="text-center text-sm text-gray-400">
+              © {currentYear} {appName}. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+    );
+  }
 
   return (
     <footer className="mt-20 bg-gray-900 text-white">
