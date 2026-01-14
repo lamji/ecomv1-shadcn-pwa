@@ -14,7 +14,8 @@ const PUBLIC_ROUTES = [
   '/summer-collection',
   '/view-all',
   '/search',
-  '/pos'
+  '/pos',
+  '/new-password'
 ];
 
 /**
@@ -31,6 +32,7 @@ const PUBLIC_API_ROUTES = [
   '/api/onesignal/check-subscription',
   '/api/onesignal/send-test',
   '/api/orders/update-status',
+  ''
 ];
 
 /**
