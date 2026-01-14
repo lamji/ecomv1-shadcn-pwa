@@ -32,8 +32,6 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  console.log("Socket URL",process.env.NEXT_PUBLIC_SOCKET_URL)
-  console.log("API Base URL",process.env.NEXT_PUBLIC_API_BASE_URL)
 
   // Use unauthenticated mutation for signup endpoint
   const { mutateAsync: signupMutateAsync, isPending } = useUnauthenticatedPostData({

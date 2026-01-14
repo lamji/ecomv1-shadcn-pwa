@@ -6,6 +6,7 @@ import alertReducer from './features/alertSlice';
 import loadingReducer from './features/loadingSlice';
 import searchReducer from './features/searchSlice';
 import notificationReducer from './features/notificationSlice';
+import profileReducer from './features/profileSlice';
 import storage from 'redux-persist/lib/storage';
 
 const persistConfig = {
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
   loading: loadingReducer,
   search: searchReducer,
   notifications: notificationReducer,
+  profile: profileReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

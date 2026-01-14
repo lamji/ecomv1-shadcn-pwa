@@ -6,6 +6,7 @@ import { showAlert } from '@/lib/features/alertSlice';
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import useNativeFunc from '@/lib/native/useNativeFunc';
+import { fetchProfile } from '@/lib/features/profileSlice';
 
 export function useLogin() {
   const { setToken } = useAppContext();
@@ -103,6 +104,9 @@ export function useLogin() {
               }
             }
           }
+          
+          // Fetch profile data after successful login
+          dispatch(fetchProfile());
           
           // Redirect
           const redirectTo = searchParams.get('redirect') || '/';

@@ -205,30 +205,29 @@ export function useOtp(): UseOtpHookReturn {
                                (userAgent.includes('Mobile') && userAgent.includes('wv'));
               const shouldSetOneSignal = isMobile || isWebView; // Skip for web browsers
               
-              if (!shouldSetOneSignal) {
-                console.log('🌐 Web browser detected - skipping OneSignal external ID setup');
-                return;
-              }
-              
-              // Check if we already set this external ID for this device
-              const lastSetExternalId = localStorage.getItem('last_onesignal_external_id');
-              
-              if (lastSetExternalId === result.oneSignalUserId) {
-                console.log('External ID already set, skipping duplicate...');
-              } else {
-                // First check current player ID for info
-                const currentPlayerId = await getPlayerId();
-                console.log('Current OneSignal player ID:', currentPlayerId);
+              if (shouldSetOneSignal) {
+                // Check if we already set this external ID for this device
+                const lastSetExternalId = localStorage.getItem('last_onesignal_external_id');
                 
-                // Only set external ID if player ID is available
-                if (currentPlayerId) {
-                  // Set the new external ID
-                  setExternalUserId(result.oneSignalUserId);
-                  localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
-                  console.log('✅ External ID set successfully:', result.oneSignalUserId);
+                if (lastSetExternalId === result.oneSignalUserId) {
+                  console.log('External ID already set, skipping duplicate...');
                 } else {
-                  console.log('⚠️ No player ID available, skipping external ID setting');
+                  // First check current player ID for info
+                  const currentPlayerId = await getPlayerId();
+                  console.log('Current OneSignal player ID:', currentPlayerId);
+                  
+                  // Only set external ID if player ID is available
+                  if (currentPlayerId) {
+                    // Set the new external ID
+                    setExternalUserId(result.oneSignalUserId);
+                    localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
+                    console.log('✅ External ID set successfully:', result.oneSignalUserId);
+                  } else {
+                    console.log('⚠️ No player ID available, skipping external ID setting');
+                  }
                 }
+              } else {
+                console.log('🌐 Web browser detected - skipping OneSignal external ID setup');
               }
             } catch (error) {
               console.error('Error with OneSignal external ID:', error);

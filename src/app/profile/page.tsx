@@ -2,27 +2,26 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { useGetProfile } from '@/lib/hooks/integration/useGetProfile';
+import { useAppSelector, useAppDispatch } from '@/lib/store';
 import { dummyProfile } from '@/lib/data/profile';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import OverviewTab from '@/components/profile/OverviewTab';
 import { type UserProfile } from '@/types/profile';
-import { useAppDispatch } from '@/lib/store';
 import { showLoading, hideLoading } from '@/lib/features/loadingSlice';
 import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { profile: serverProfile, isLoading: profileLoading } = useGetProfile();
-  const [profile, setProfile] = useState<UserProfile>(dummyProfile);
+  const { profile: reduxProfile, isLoading: profileLoading } = useAppSelector(state => state.profile);
   const dispatch = useAppDispatch();
+  const [profile, setProfile] = useState<UserProfile>(dummyProfile);
 
   useEffect(() => {
-    if (serverProfile) {
-      setProfile(serverProfile);
+    if (reduxProfile) {
+      setProfile(reduxProfile);
     }
-  }, [serverProfile]);
+  }, [reduxProfile]);
 
   useEffect(() => {
     if (profileLoading) {
