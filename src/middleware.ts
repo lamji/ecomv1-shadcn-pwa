@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+console.log('🔥 MIDDLEWARE FILE LOADED - This should appear on server start');
+
 /**
  * Public routes that do NOT require authentication
  */
@@ -14,8 +16,7 @@ const PUBLIC_ROUTES = [
   '/summer-collection',
   '/view-all',
   '/search',
-  '/pos',
-  '/new-password'
+  '/pos'
 ];
 
 /**
@@ -39,14 +40,42 @@ const PUBLIC_API_ROUTES = [
  * Check if the request is for a public route
  */
 function isPublicRoute(pathname: string, request: NextRequest): boolean {
+ console.log(` Middleware: new pass1`);
   if (PUBLIC_ROUTES.includes(pathname)) return true;
-
-  // Dynamic check for /new-password with valid resetTempToken
+ console.log(` Middleware: new pass2 ${pathname}`);
+  
+  // Dynamic check for /new-password with valid resetTempToken - mobile/tablet only
   if (pathname === '/new-password') {
-    const { valid } = getResetTempToken(request);
-    if (valid) {
+      console.log(` Middleware: new pass`);
+    // Check device type first - includes mobile, tablet, and WebView
+    const userAgent = request.headers.get('user-agent') || '';
+    const isMobileOrTablet = /Mobile|Android|iPhone|iPad|Tablet/i.test(userAgent);
+    const isWebView = /wv|WebView/i.test(userAgent);
+
+    console.log(` Middleware: /new-password access - Mobile/Tablet: ${isMobileOrTablet}, WebView: ${isWebView}`);
+    
+    // Allow mobile, tablet, and WebView devices
+    if (!isMobileOrTablet && !isWebView) {
+      console.log(` Middleware: /new-password denied - not mobile/tablet device`);
+      return false; // Deny access for desktop browsers only
+    }
+    
+    // WebView apps get automatic access (no token required)
+    if (isWebView) {
+      console.log(`✅ Middleware: /new-password allowed - WebView detected (no token required)`);
       return true;
     }
+    
+    // For mobile/tablet browsers, check for valid token
+    const { valid } = getResetTempToken(request);
+    console.log(` Middleware: /new-password resetTempToken valid: ${valid}`);
+    
+    if (valid) {
+      console.log(` Middleware: /new-password allowed - mobile/tablet + valid token`);
+      return true;
+    }
+    
+    console.log(` Middleware: /new-password denied - invalid or missing token`);
   }
 
   // Handle dynamic product routes
@@ -197,5 +226,7 @@ export function middleware(request: NextRequest) {
  * Middleware matcher
  */
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)'],
+  matcher: [
+    '/((?!_next/static|_next/image|_next/data).*)'
+  ],
 };
