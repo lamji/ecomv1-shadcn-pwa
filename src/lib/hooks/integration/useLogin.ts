@@ -45,7 +45,6 @@ export function useLogin() {
           const user = apiResult.user || {};
           const signupPlatform = user.signupPlatform as string || 'web';
           const oneSignalUserId = user.createdAtKey as string;
-          alert("recived oneSignalUserId: " + oneSignalUserId);
           
           // Persist token and user data
           localStorage.setItem('auth_token', token);
@@ -84,7 +83,6 @@ export function useLogin() {
                 const currentPlayerId = await getPlayerId();
                 // Only set external ID if player ID is available
                 if (currentPlayerId) {
-                   alert("to save oneSignalUserId: " + oneSignalUserId);
                   // Set the new external ID
                   await setExternalUserId(oneSignalUserId);
                   localStorage.setItem('last_onesignal_external_id', oneSignalUserId);
