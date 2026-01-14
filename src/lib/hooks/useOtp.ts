@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { usePostOtpIntegration } from './integration/usePostOtpIntegration';
 import { useResetPassword } from './integration/useResetPassword';
@@ -22,6 +22,9 @@ interface UseOtpHookReturn {
   handlePaste: (e: React.ClipboardEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent) => void;
   handleResend: () => void;
+  handleTestNewPassword: () => void;
+  showNewPasswordModal: boolean;
+  setShowNewPasswordModal: (show: boolean) => void;
   formatTime: (seconds: number) => string;
 }
 
@@ -36,6 +39,7 @@ export function useOtp(): UseOtpHookReturn {
   const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
+  const [showNewPasswordModal, setShowNewPasswordModal] = useState(false);
   
   
   // Get email from query params
@@ -65,6 +69,49 @@ export function useOtp(): UseOtpHookReturn {
       searchParams: Object.fromEntries(searchParams.entries())
     });
   }, [redirectPath, isPasswordReset, isPasswordResetFallback, finalIsPasswordReset, email, tempToken, searchParams]);
+
+  // Test function to bypass middleware and go to new-password directly
+  const handleTestNewPassword = useCallback(() => {
+    console.log('🧪 Testing direct navigation to new-password page');
+    
+    // Create sample data for testing
+    const testEmail = email || 'test@example.com';
+    const testResetToken = 'test-reset-token-' + Date.now();
+    const testExpiry = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 minutes from now
+    const testResetTempToken = 'test-temp-token-' + Date.now();
+    
+    // Set the resetTempToken cookie manually (bypassing middleware)
+    const timestamp = Date.now();
+    document.cookie = `resetTempToken=${testResetTempToken}:${timestamp}; path=/; max-age=300; SameSite=Lax`;
+    
+    // Navigate to new-password page with test data
+    const params = new URLSearchParams();
+    params.set('email', testEmail);
+    params.set('resetToken', testResetToken);
+    params.set('expiry', testExpiry);
+    
+    console.log('🧪 Navigating to:', `/new-password?${params.toString()}`);
+    router.push(`/new-password?${params.toString()}`);
+  }, [email, router]);
+
+  // Auto-bypass for WebView if it's a password reset
+  useEffect(() => {
+    if (finalIsPasswordReset && email && process.env.NODE_ENV === 'development') {
+      const userAgent = typeof window !== 'undefined' ? window.navigator.userAgent : '';
+      const isWebView = userAgent.includes('wv') || userAgent.includes('WebView') || 
+                       (userAgent.includes('Mobile') && userAgent.includes('wv'));
+      
+      if (isWebView) {
+        console.log('🔍 WebView detected for password reset - showing modal instead of redirect');
+        // Show modal after 1 second delay instead of redirecting
+        const timer = setTimeout(() => {
+          setShowNewPasswordModal(true);
+        }, 1000);
+        
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [finalIsPasswordReset, email]);
 
   // Initialize timer from localStorage immediately
   const getInitialTimer = () => {
@@ -346,6 +393,9 @@ export function useOtp(): UseOtpHookReturn {
     handlePaste,
     handleSubmit,
     handleResend,
+    handleTestNewPassword,
+    showNewPasswordModal,
+    setShowNewPasswordModal,
     formatTime,
   };
 }

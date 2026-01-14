@@ -8,6 +8,7 @@ import { Loader2, ArrowLeft, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useOtp } from '@/lib/hooks/useOtp';
+import NewPasswordModal from '@/components/modals/NewPasswordModal';
 
 export default function OtpVerificationPage() {
   const {
@@ -22,6 +23,9 @@ export default function OtpVerificationPage() {
     handlePaste,
     handleSubmit,
     handleResend,
+    handleTestNewPassword,
+    showNewPasswordModal,
+    setShowNewPasswordModal,
     formatTime,
   } = useOtp();
 
@@ -129,9 +133,31 @@ export default function OtpVerificationPage() {
             <div className="flex items-center justify-center gap-2 mb-2">
               <span>Check your spam folder if you don&apos;t see the email</span>
             </div>
+            
+            {/* Test button for WebView middleware bypass */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="mt-4 pt-4 border-t border-border">
+                <p className="text-xs text-muted-foreground mb-2">WebView Testing:</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleTestNewPassword}
+                  className="text-xs"
+                >
+                  🧪 Test New Password (Bypass Middleware)
+                </Button>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
+      
+      {/* New Password Modal for WebView */}
+      <NewPasswordModal
+        isOpen={showNewPasswordModal}
+        onClose={() => setShowNewPasswordModal(false)}
+        email={email}
+      />
     </div>
   );
 }
