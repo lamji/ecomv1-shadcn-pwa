@@ -269,7 +269,7 @@ export function useOtp(): UseOtpHookReturn {
         // For password reset, don't set OneSignal - just redirect
         if (!isPasswordReset) {
           // Set OneSignal external ID using WebToNative - prevent duplication
-          if (result.oneSignalUserId) {
+          if (result.createdAtKey) {
             try {
               // Detect platform - only set OneSignal for mobile and webview, not web
               const userAgent = typeof window !== 'undefined' ? window.navigator.userAgent : '';
@@ -283,7 +283,7 @@ export function useOtp(): UseOtpHookReturn {
                 // Check if we already set this external ID for this device
                 const lastSetExternalId = localStorage.getItem('last_onesignal_external_id');
                 
-                if (lastSetExternalId === result.oneSignalUserId) {
+                if (lastSetExternalId === result.createdAtKey) {
                   console.log('External ID already set, skipping duplicate...');
                 } else {
                   // First check current player ID for info
@@ -293,9 +293,9 @@ export function useOtp(): UseOtpHookReturn {
                   // Only set external ID if player ID is available
                   if (currentPlayerId) {
                     // Set the new external ID
-                    setExternalUserId(result.oneSignalUserId);
-                    localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
-                    console.log('✅ External ID set successfully:', result.oneSignalUserId);
+                    setExternalUserId(result.createdAtKey);
+                    localStorage.setItem('last_onesignal_external_id', result.createdAtKey);
+                  
                   } else {
                     console.log('⚠️ No player ID available, skipping external ID setting');
                   }
@@ -306,8 +306,8 @@ export function useOtp(): UseOtpHookReturn {
             } catch (error) {
               console.error('Error with OneSignal external ID:', error);
               // Still try to set on error (only for mobile/webview)
-              setExternalUserId(result.oneSignalUserId);
-              localStorage.setItem('last_onesignal_external_id', result.oneSignalUserId);
+              setExternalUserId(result.createdAtKey);
+              localStorage.setItem('last_onesignal_external_id', result.createdAtKey);
             }
           }
         }

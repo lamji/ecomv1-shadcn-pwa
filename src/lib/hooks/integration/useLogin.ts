@@ -44,7 +44,7 @@ export function useLogin() {
           const token = apiResult.token;
           const user = apiResult.user || {};
           const signupPlatform = user.signupPlatform as string || 'web';
-          const oneSignalUserId = user.oneSignalUserId as string;
+          const oneSignalUserId = user.createdAtKey as string;
           
           // Persist token and user data
           localStorage.setItem('auth_token', token);
