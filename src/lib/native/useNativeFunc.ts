@@ -1,8 +1,9 @@
-import { setExternalUserId, getPlayerId } from 'webtonative/OneSignal';
+import { setExternalUserId, getPlayerId, removeExternalUserId } from 'webtonative/OneSignal';
 
 export default function useNativeFunc() {
   return{
     setExternalUserId,
-    getPlayerId
+    getPlayerId,
+    removeExternalUserId
   }
 }

@@ -12,7 +12,7 @@ export function useLogin() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setExternalUserId, getPlayerId } = useNativeFunc();
+  const { setExternalUserId, getPlayerId, removeExternalUserId } = useNativeFunc();
   
   const baseUrl =
     process.env.NEXT_PUBLIC_SOCKET_URL || ""
@@ -60,6 +60,18 @@ export function useLogin() {
           // Set OneSignal external ID for non-web platforms
           if (oneSignalUserId && signupPlatform !== 'web') {
             try {
+              // Get the previously logged in user's email from localStorage
+              const previousUserData = localStorage.getItem('user_data');
+              const previousEmail = previousUserData ? JSON.parse(previousUserData).email : null;
+              const currentEmail = user.email as string;
+              
+              // If different user is logging in, remove old external ID first
+              if (previousEmail && previousEmail !== currentEmail) {
+                console.log(`Switching users: removing external ID for ${previousEmail}, setting for ${currentEmail}`);
+                await removeExternalUserId();
+                localStorage.removeItem('last_onesignal_external_id');
+              }
+              
               // Check if we already set this external ID for this device
               const lastSetExternalId = localStorage.getItem('last_onesignal_external_id');
               
