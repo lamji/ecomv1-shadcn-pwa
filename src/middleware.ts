@@ -174,6 +174,7 @@ function redirectToLogin(request: NextRequest): NextResponse {
  */
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  console.log('Middleware: pathname', pathname);
 
   /**
    * Skip middleware for:
