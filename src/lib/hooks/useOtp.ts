@@ -252,12 +252,10 @@ export function useOtp(): UseOtpHookReturn {
       if (finalIsPasswordReset) {
         console.log('🔍 OTP Debug - Using password reset verification API');
         // Use password reset verification API
-        alert("Using password reset verification API" + finalIsPasswordReset);
+
         result = await resetPasswordVerify(otp, email);
       } else {
         console.log('🔍 OTP Debug - Using regular OTP verification API');
-        // Use regular OTP verification API
-        alert("Using regular OTP verification API" + finalIsPasswordReset);
         result = await verifyOtp(otp, tempToken);
       }
 
@@ -323,8 +321,7 @@ export function useOtp(): UseOtpHookReturn {
         
         // Redirect to intended destination
         if (finalIsPasswordReset && result.resetToken && result.resetTempToken) {
-          alert("Redirecting to new-password (password reset flow)" + finalIsPasswordReset + " " + result.resetToken + " " + result.resetTempToken);
-          console.log('🔍 OTP Debug - Redirecting to new-password (password reset flow)');
+         
           // Store resetTempToken with timestamp in both cookie and localStorage for middleware validation
           // Format: token:timestamp
           const timestamp = Date.now();
@@ -343,8 +340,7 @@ export function useOtp(): UseOtpHookReturn {
           params.set('expiry', result.resetTokenExpiry || '');
           router.push(`/new-password?${params.toString()}`);
         } else {
-          alert("Redirecting to login (regular flow)" + finalIsPasswordReset + " " + result.resetToken + " " + result.resetTempToken);
-          console.log('🔍 OTP Debug - Redirecting to login (regular flow)', { finalIsPasswordReset, hasResetToken: !!result.resetToken, hasResetTempToken: !!result.resetTempToken });
+        
           // Regular flow - redirect to login or other destination
           const redirectTo = searchParams.get('redirect') || '/login';
           router.push(redirectTo);
