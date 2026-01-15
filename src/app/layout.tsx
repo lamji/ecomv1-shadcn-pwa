@@ -7,11 +7,15 @@ import { Providers } from '@/components/Providers';
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
+  display: 'swap', // Prevents render-blocking
+  preload: true,
 });
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
+  display: 'swap', // Prevents render-blocking
+  preload: false, // Don't preload secondary font
 });
 
 export const metadata: Metadata = {
@@ -51,10 +55,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Preconnect hints for external resources */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        
+        {/* Critical resources */}
         <link rel="icon" href="/icons/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" sizes="180x180" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        
         {/* Open Graph Meta Tags for Social Sharing */}
         <meta property="og:title" content="ScaleWeb - Premier Web and Mobile Design Services" />
         <meta
@@ -64,6 +74,7 @@ export default function RootLayout({
         <meta property="og:image" content="https://i-solar.vercel.app/hero/preview.png" />
         <meta property="og:url" content="https://i-solar.vercel.app/" />
         <meta property="og:type" content="website" />
+        
         {/* Twitter Card Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:image" content="https://i-solar.vercel.app/hero/preview.png" />

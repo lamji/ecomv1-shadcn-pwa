@@ -4,16 +4,23 @@ import withPWA from 'next-pwa';
 const isProd = process.env.NODE_ENV === 'production';
 
 const nextConfig: NextConfig = {
-  devIndicators: {
-    buildActivity: false,
-  },
-
   typescript: {
     ignoreBuildErrors: true,
   },
 
   eslint: {
     ignoreDuringBuilds: true,
+  },
+
+  // Performance optimizations
+  compiler: {
+    removeConsole: isProd ? {
+      exclude: ['error', 'warn']
+    } : false,
+  },
+
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
 
   images: {
@@ -44,11 +51,11 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.onesignal.com https://onesignal.com https://api.onesignal.com",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https: blob:",
               "font-src 'self' data:",
-              "connect-src 'self' https: wss: ws://localhost:5000 http://localhost:5000 https://onesignal.com https://api.onesignal.com https://site--crud-handler--rrh2m28k5ljg.code.run wss://site--crud-handler--rrh2m28k5ljg.code.run",
+              "connect-src 'self' https: wss: ws://localhost:5000 http://localhost:5000 wss://site--crud-handler--rrh2m28k5ljg.code.run",
               "frame-ancestors 'none'",
             ].join('; '),
           },
