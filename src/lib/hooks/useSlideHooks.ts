@@ -21,30 +21,23 @@ export function useSlideHooks({ total, autoPlay = true, interval = 5000 }: UseSl
 
   const goToPrevious = () => {
     // Debugging logs retained as in component
-    // eslint-disable-next-line no-console
+     
     console.log('Previous button clicked, current index:', currentIndex);
     setCurrentIndex(prevIndex => {
       const newIndex = (prevIndex - 1 + total) % total;
-      // eslint-disable-next-line no-console
-      console.log('New index:', newIndex);
       return newIndex;
     });
   };
 
   const goToNext = () => {
-    // eslint-disable-next-line no-console
-    console.log('Next button clicked, current index:', currentIndex);
     setCurrentIndex(prevIndex => {
       const newIndex = (prevIndex + 1) % total;
-      // eslint-disable-next-line no-console
-      console.log('New index:', newIndex);
       return newIndex;
     });
   };
 
   const goToSlide = (index: number) => {
-    // eslint-disable-next-line no-console
-    console.log('Dot clicked, going to index:', index);
+     
     setCurrentIndex(index);
   };
 

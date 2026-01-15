@@ -60,8 +60,6 @@ export function useOtp(): UseOtpHookReturn {
  
   // Test function to bypass middleware and go to new-password directly
   const handleTestNewPassword = useCallback(() => {
-    console.log('🧪 Testing direct navigation to new-password page');
-    
     // Create sample data for testing
     const testEmail = email || 'test@example.com';
     const testResetToken = 'test-reset-token-' + Date.now();
@@ -84,8 +82,6 @@ export function useOtp(): UseOtpHookReturn {
     params.set('resetToken', testResetToken);
     params.set('expiry', testExpiry);
     
-    console.log('🧪 Navigating to:', `/new-password?${params.toString()}`);
-    console.log('🧪 Token data stored:', tokenData);
     router.push(`/new-password?${params.toString()}`);
   }, [email, router]);
 
@@ -97,7 +93,6 @@ export function useOtp(): UseOtpHookReturn {
                        (userAgent.includes('Mobile') && userAgent.includes('wv'));
       
       if (isWebView) {
-        console.log('🔍 WebView detected for password reset - showing modal instead of redirect');
         // Show modal after 1 second delay instead of redirecting
         const timer = setTimeout(() => {
           setShowNewPasswordModal(true);
@@ -237,11 +232,11 @@ export function useOtp(): UseOtpHookReturn {
       let result: any;
       
       if (finalIsPasswordReset) {
-        console.log('🔍 OTP Debug - Using password reset verification API');
+       
         // Use password reset verification API
         result = await resetPasswordVerify(otp, email);
       } else {
-        console.log('🔍 OTP Debug - Using regular OTP verification API');
+      
         // Use regular OTP verification API
         result = await verifyOtp(otp, tempToken);
       }
@@ -308,7 +303,7 @@ export function useOtp(): UseOtpHookReturn {
         
         // Redirect to intended destination
         if (finalIsPasswordReset && result.resetToken && result.resetTempToken) {
-          console.log('🔍 OTP Debug - Redirecting to new-password (password reset flow)');
+      
           // Store resetTempToken with timestamp in both cookie and localStorage for middleware validation
           // Format: token:timestamp
           const timestamp = Date.now();
@@ -327,7 +322,7 @@ export function useOtp(): UseOtpHookReturn {
           params.set('expiry', result.resetTokenExpiry || '');
           router.push(`/new-password?${params.toString()}`);
         } else {
-          console.log('🔍 OTP Debug - Redirecting to login (regular flow)', { finalIsPasswordReset, hasResetToken: !!result.resetToken, hasResetTempToken: !!result.resetTempToken });
+        
           // Regular flow - redirect to login or other destination
           const redirectTo = searchParams?.get('redirect') || '/login';
           router.push(redirectTo);
@@ -339,8 +334,6 @@ export function useOtp(): UseOtpHookReturn {
         }));
       }
     } catch (error: any) {
-      console.error('OTP verification failed:', error);
-      
       // Extract the actual API response message
       const errorMessage = error?.response?.data?.message || error?.message || 'Something went wrong. Please try again.';
       

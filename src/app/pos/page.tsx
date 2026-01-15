@@ -170,7 +170,7 @@ export default function PosPage() {
   const updateOrderStatus = async (orderId: string, newStatus: string, order: any) => {
     setIsUpdating(orderId);
 
-    console.log("test:order",order);
+  
 
     try {
       // Update status via Next.js API

@@ -2,26 +2,27 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { useAppSelector, useAppDispatch } from '@/lib/store';
+import { useAppDispatch } from '@/lib/store';
 import { dummyProfile } from '@/lib/data/profile';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import OverviewTab from '@/components/profile/OverviewTab';
 import { type UserProfile } from '@/types/profile';
 import { showLoading, hideLoading } from '@/lib/features/loadingSlice';
 import { useRouter } from 'next/navigation';
+import { useGetProfile } from '@/lib/hooks/integration/useGetProfile';
 
 export default function ProfilePage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { profile: reduxProfile, isLoading: profileLoading } = useAppSelector(state => state.profile);
+  const { profile: queryProfile, isLoading: profileLoading } = useGetProfile();
   const dispatch = useAppDispatch();
   const [profile, setProfile] = useState<UserProfile>(dummyProfile);
 
   useEffect(() => {
-    if (reduxProfile) {
-      setProfile(reduxProfile);
+    if (queryProfile) {
+      setProfile(queryProfile);
     }
-  }, [reduxProfile]);
+  }, [queryProfile]);
 
   useEffect(() => {
     if (profileLoading) {
@@ -44,10 +45,10 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50 sm:bg-white" data-testid="profile-page">
       {/* Profile Content */}
-      <div className="mx-auto max-w-7xl px-0 py-8 sm:px-6 lg:px-8" data-testid="profile-content">
-        <div className="flex flex-col gap-8 lg:flex-row" data-testid="profile-layout">
+      <div className="mt-6" data-testid="profile-content">
+        <div className="flex flex-col gap-6 lg:flex-row" data-testid="profile-layout">
           {/* Left Sidebar - Profile Header */}
-          <div className="lg:w-80" data-testid="profile-sidebar">
+          <div className="w-full lg:w-1/2" data-testid="profile-sidebar">
             {/* Profile Header */}
             <ProfileHeader profile={profile} onProfileUpdate={setProfile} />
           </div>

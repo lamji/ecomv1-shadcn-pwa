@@ -21,6 +21,31 @@ export type CartProduct = {
   sizes: string[];
 };
 
+// Cart item with quantity and timestamp
+export interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  timestamp: Date;
+}
+
+// Cart state structure
+export interface CartState {
+  cart: CartItem[];
+  temporaryCart: CartItem[];
+}
+
+// Parameters for adding to cart
+export interface AddToCartPayload {
+  product: {
+    id: string;
+    name: string;
+    price: number;
+  };
+  quantity: number;
+}
+
 // Parameters for creating cart product
 export type CreateCartProductParams = {
   id: string;

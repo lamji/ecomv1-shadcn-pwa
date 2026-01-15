@@ -32,8 +32,7 @@ const notificationSlice = createSlice({
     },
     addNotification: (state, action: PayloadAction<NotificationItem>) => {
       // Check if notification already exists to avoid duplicates
-      console.log('Redux addNotification called with:', action.payload);
-      console.log('Current notifications count:', state.items.length);
+     
 
       if (!state.items.find(n => n.id === action.payload.id)) {
         state.items = [action.payload, ...state.items];

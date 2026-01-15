@@ -6,7 +6,7 @@ import { showAlert } from '@/lib/features/alertSlice';
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import useNativeFunc from '@/lib/native/useNativeFunc';
-import { fetchProfile } from '@/lib/features/profileSlice';
+
 
 export function useLogin() {
   const { setToken } = useAppContext();
@@ -91,24 +91,22 @@ export function useLogin() {
                   console.log('⚠️ No player ID available, skipping external ID setting');
                 }
               }
-            } catch (error) {
-              console.error('Error with OneSignal external ID on login:', error);
+            } catch {
+             
               // Still try to set on error (only for mobile/webview)
               try {
                 await setExternalUserId(oneSignalUserId);
                 localStorage.setItem('last_onesignal_external_id', oneSignalUserId);
-              } catch (fallbackError) {
-                console.log('OneSignal fallback failed:', fallbackError);
-              }
+                } catch {
+                
+                }
             }
           }
-          
-          // Fetch profile data after successful login
-          dispatch(fetchProfile());
           
           // Redirect
           const redirectTo = searchParams?.get('redirect') || '/';
           router.replace(redirectTo);
+          
         }
       }
     } catch (error) {

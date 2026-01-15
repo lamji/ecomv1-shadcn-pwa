@@ -9,7 +9,8 @@ import GlobalSpinner from '@/components/shared/GlobalSpinner';
 import { SocketGlobalListener } from './SocketGlobalListener';
 import { useEffect } from 'react';
 import OneSignal from 'react-onesignal';
-import { fetchProfile } from '@/lib/features/profileSlice';
+import ProfileProvider from './ProfileProvider';
+
 // import SubscriptionChecker from './test/SubscriptionChecker';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -29,41 +30,19 @@ export function Providers({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Fetch profile data when auth token changes
-  useEffect(() => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      store.dispatch(fetchProfile());
-    }
-  }, []);
-
-  // Listen for auth token changes (login/logout)
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'auth_token') {
-        if (e.newValue) {
-          // Token added (login)
-          store.dispatch(fetchProfile());
-        } else {
-          // Token removed (logout)
-          store.dispatch({ type: 'profile/clearProfile' });
-        }
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <SocketGlobalListener />
-        <ReactProvider>
-          {/* <SubscriptionChecker /> */}
-          {children}
-          <GlobalAlert />
-          <GlobalSpinner />
-        </ReactProvider>
+          <SocketGlobalListener />
+          <ReactProvider>
+            {/* <SubscriptionChecker /> */}
+            <ProfileProvider>
+              {children}
+              <GlobalAlert />
+              <GlobalSpinner />
+            </ProfileProvider>
+          </ReactProvider>
+     
       </PersistGate>
     </Provider>
   );

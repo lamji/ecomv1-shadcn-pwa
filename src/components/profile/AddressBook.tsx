@@ -49,11 +49,11 @@ export default function AddressBook({
 
       {addresses.length > 0 ? (
         <div className="space-y-2">
-          {(showAllAddresses ? addresses : addresses.slice(0, 2)).map(address => (
+          {(showAllAddresses ? addresses : addresses.slice(0, 2)).map((address,id) => (
             <div
-              key={address.id}
+              key={id}
               className="flex items-start gap-2 rounded-lg bg-gray-50 p-2 text-left"
-              data-testid={`address-item-${address.id}`}
+              data-testid={`address-item-${id}`}
             >
               <div className="mt-0.5 text-gray-400">{getAddressIcon()}</div>
               <div className="min-w-0 flex-1">

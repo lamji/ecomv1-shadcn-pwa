@@ -94,7 +94,6 @@ export const useProductCardLogic = (
     (params: CreateCartProductParams) => {
       if (!isOutOfStock && addToCart) {
         const product = createCartProduct(params);
-        console.log('handleAddToCart', { product, id: params.id });
         addToCart(product, 1);
       }
     },

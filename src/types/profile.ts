@@ -1,26 +1,102 @@
 import { Product } from '../lib/data/products';
 
-export interface Order {
+// Enums for type values
+export enum ContactType {
+  MOBILE = 'mobile',
+  HOME = 'home',
+  WORK = 'work'
+}
+
+export enum AddressType {
+  HOME = 'home',
+  WORK = 'work',
+  OTHER = 'other'
+}
+
+export enum PaymentType {
+  CREDIT_CARD = 'credit_card',
+  DEBIT_CARD = 'debit_card',
+  PAYPAL = 'paypal',
+  APPLE_PAY = 'apple_pay',
+  GOOGLE_PAY = 'google_pay',
+  GCASH = 'gcash'
+}
+
+export enum OrderStatus {
+  PENDING = 'pending',
+  PROCESSING = 'processing',
+  SHIPPED = 'shipped',
+  DELIVERED = 'delivered',
+  CANCELLED = 'cancelled'
+}
+
+// Base interfaces for reusability
+export interface BaseItem {
   id: string;
+}
+
+export interface BaseContact {
+  type: ContactType;
+}
+
+export interface BaseAddress {
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+}
+
+// Specific interfaces extending base interfaces
+export interface Phone extends BaseContact, BaseItem {
+  number: string;
+  isPrimary: boolean;
+}
+
+export interface Address extends BaseItem {
+  type: AddressType;
+  isDefault: boolean;
+  street: string;
+  barangay: string;
+  city: string;
+  province: string;
+  region: string;
+  zipCode: string;
+  country: string;
+  phone: string;
+  nearestLandmark?: string;
+}
+
+export interface PaymentMethod extends BaseItem {
+  type: PaymentType;
+  isDefault: boolean;
+  last4?: string;
+  brand?: string;
+  expiryMonth?: number;
+  expiryYear?: number;
+  email?: string;
+  number?: string;
+}
+
+export interface UpdateProfileData {
+  phones: Omit<Phone, keyof BaseItem>[]; // Remove id from Phone for update
+  addresses: Omit<Address, keyof BaseItem>[]; // Remove id from Address for update
+}
+
+export interface Order extends BaseItem {
   orderNumber: string;
   date: string;
   orderDate: string;
   shippedDate?: string;
   deliveredDate?: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: OrderStatus;
   totalAmount: number;
   items: {
     product: Product;
     quantity: number;
     price: number;
   }[];
-  shippingAddress: {
-    street: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-  };
+  shippingAddress: BaseAddress;
   paymentMethod: {
     type: 'credit_card' | 'paypal' | 'apple_pay' | 'google_pay';
     lastFour?: string;
@@ -34,48 +110,12 @@ export interface Order {
   estimatedDelivery?: string;
 }
 
-export interface Address {
-  id: string;
-  type: 'home' | 'work' | 'other';
-  isDefault: boolean;
-  street: string;
-  barangay: string;
-  city: string;
-  province: string;
-  region: string;
-  zipCode: string;
-  country: string;
-  phone: string;
-  nearestLandmark?: string;
-}
-
-export interface Phone {
-  id: string;
-  type: 'mobile' | 'home' | 'work';
-  number: string;
-  isPrimary: boolean;
-}
-
-export interface PaymentMethod {
-  id: string;
-  type: 'credit_card' | 'debit_card' | 'paypal' | 'apple_pay' | 'google_pay' | 'gcash';
-  isDefault: boolean;
-  last4?: string;
-  brand?: string;
-  expiryMonth?: number;
-  expiryYear?: number;
-  email?: string;
-  number?: string;
-}
-
-export interface WishlistItem {
-  id: string;
+export interface WishlistItem extends BaseItem {
   product: Product;
   addedDate: string;
 }
 
-export interface Review {
-  id: string;
+export interface Review extends BaseItem {
   product: Product;
   rating: number;
   title: string;
@@ -94,8 +134,7 @@ export interface ProfileStats {
   memberSince: string;
 }
 
-export interface UserProfile {
-  id: string;
+export interface UserProfile extends BaseItem {
   firstName: string;
   lastName: string;
   email: string;

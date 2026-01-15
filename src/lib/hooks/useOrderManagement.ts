@@ -50,9 +50,6 @@ export function useOrderManagement() {
       `Order ${orderNumber} cancellation requested. This action cannot be undone.`,
       'Cancel Order',
     );
-
-    console.log('Cancel order:', orderNumber);
-
     setTimeout(() => {
       showSuccess(`Order ${orderNumber} has been successfully cancelled.`, 'Order Cancelled');
     }, 1000);

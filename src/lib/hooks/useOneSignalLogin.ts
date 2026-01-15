@@ -22,7 +22,7 @@ export function useOneSignalLogin(userId?: string | null) {
     window.OneSignalDeferred.push(async (OneSignal) => {
       try {
         await OneSignal.login(userId);
-        console.log("[OneSignal] logged in:", userId);
+    
         
         // Request push permission and subscribe
         if (OneSignal.Notifications.permission !== 'granted') {
@@ -45,11 +45,9 @@ export function oneSignalLogin(userId: string) {
   window.OneSignalDeferred.push(async (OneSignal) => {
     try {
       await OneSignal.login(userId);
-      console.log("[OneSignal] logged in:", userId);
 
       // Request push permission and subscribe
       if (OneSignal.Notifications.permission !== 'granted') {
-        console.log("[OneSignal] Requesting notification permission...");
         await OneSignal.Notifications.requestPermission();
       }
     } catch (err) {

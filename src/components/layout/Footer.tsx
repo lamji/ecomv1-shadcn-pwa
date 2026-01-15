@@ -18,150 +18,153 @@ export default function Footer() {
   }, []);
 
   // Render minimal footer on mobile/tablet/WebView platforms
-  if (!isWeb) {
+
+  if (isWeb) {
+    // Show full footer for web platform
     return (
       <footer className="mt-20 bg-gray-900 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
-          <div className="py-8">
-            <div className="flex flex-col items-center justify-center gap-4">
-              <div className="flex gap-4">
-                <Button variant="outline" className="bg-primary hover:bg-primary/90 text-white">
-                  <Package className="w-4 h-4 mr-2" />
-                  Track Order
-                </Button>
-                <Button variant="outline" className="bg-primary hover:bg-primary/90 text-white">
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Chat Us
-                </Button>
+          {/* Main Footer Content */}
+          <div className="py-12">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {/* Company Info */}
+              <div>
+                <h3 className="mb-4 text-lg font-bold">{appName}</h3>
+                <p className="mb-4 text-sm leading-relaxed text-gray-300">
+                  {appDescription}
+                </p>
+                <div className="flex space-x-4">
+                  <a href="#" className="text-gray-400 transition-colors hover:text-white">
+                    <Facebook className="h-5 w-5" />
+                  </a>
+                  <a href="#" className="text-gray-400 transition-colors hover:text-white">
+                    <Twitter className="h-5 w-5" />
+                  </a>
+                  <a href="#" className="text-gray-400 transition-colors hover:text-white">
+                    <Instagram className="h-5 w-5" />
+                  </a>
+                </div>
               </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center text-gray-300 mb-2">
-                  <Phone className="mr-2 h-4 w-4" />
-                  <span>{customerServicePhone}</span>
-                </div>
-                <div className="flex items-center justify-center text-gray-300 mb-2">
-                  <Mail className="mr-2 h-4 w-4" />
-                  <span>{customerServiceEmail}</span>
-                </div>
-                <div className="flex items-center justify-center text-gray-300">
-                  <MapPin className="mr-2 h-4 w-4" />
-                  <span>{customerServiceAddress}</span>
+              {/* Quick Links */}
+              <div>
+                <h4 className="mb-4 text-base font-semibold tracking-wider uppercase">Quick Links</h4>
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <a href="#" className="text-gray-300 transition-colors hover:text-white">
+                      New Arrivals
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-gray-300 transition-colors hover:text-white">
+                      Flash Sale
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-gray-300 transition-colors hover:text-white">
+                      Categories
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-gray-300 transition-colors hover:text-white">
+                      About Us
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-gray-300 transition-colors hover:text-white">
+                      Contact
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              {/* Customer Service */}
+              <div>
+                <h4 className="mb-4 text-base font-semibold tracking-wider uppercase">
+                  Customer Service
+                </h4>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center text-gray-300">
+                    <Phone className="mr-2 h-4 w-4" />
+                    <span>{customerServicePhone}</span>
+                  </li>
+                  <li className="flex items-center text-gray-300">
+                    <Mail className="mr-2 h-4 w-4" />
+                    <span>{customerServiceEmail}</span>
+                  </li>
+                  <li className="flex items-center text-gray-300">
+                    <MapPin className="mr-2 h-4 w-4" />
+                    <span>{customerServiceAddress}</span>
+                  </li>
+                </ul>
+                <div className="mt-4">
+                  <Button variant="outline" className="bg-primary hover:bg-primary/90 text-white">
+                    Track Order
+                  </Button>
                 </div>
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-800 py-4">
-            <p className="text-center text-sm text-gray-400">
-              © {currentYear} {appName}. All rights reserved.
-            </p>
+
+          {/* Bottom Footer */}
+          <div className="border-t border-gray-800 py-6">
+            <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+              <p className="text-sm text-gray-400">© {currentYear} {appName}. All rights reserved.</p>
+              <div className="flex gap-6 text-sm text-gray-400">
+                <a href="#" className="transition-colors hover:text-white">
+                  Privacy Policy
+                </a>
+                <a href="#" className="transition-colors hover:text-white">
+                  Terms of Service
+                </a>
+                <a href="#" className="transition-colors hover:text-white">
+                  Shipping Policy
+                </a>
+                <a href="#" className="transition-colors hover:text-white">
+                  Returns
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
     );
   }
 
+  // Show minimal footer for mobile/tablet/WebView platforms
   return (
     <footer className="mt-20 bg-gray-900 text-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
-        {/* Main Footer Content */}
-        <div className="py-12">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {/* Company Info */}
-            <div>
-              <h3 className="mb-4 text-lg font-bold">{appName}</h3>
-              <p className="mb-4 text-sm leading-relaxed text-gray-300">
-                {appDescription}
-              </p>
-              <div className="flex space-x-4">
-                <a href="#" className="text-gray-400 transition-colors hover:text-white">
-                  <Facebook className="h-5 w-5" />
-                </a>
-                <a href="#" className="text-gray-400 transition-colors hover:text-white">
-                  <Twitter className="h-5 w-5" />
-                </a>
-                <a href="#" className="text-gray-400 transition-colors hover:text-white">
-                  <Instagram className="h-5 w-5" />
-                </a>
+        <div className="py-8">
+          <div className="flex flex-col items-center justify-center gap-4">
+            <div className="flex gap-4">
+              <Button variant="outline" className="bg-primary hover:bg-primary/90 text-white">
+                <Package className="w-4 h-4 mr-2" />
+                Track Order
+              </Button>
+              <Button variant="outline" className="bg-primary hover:bg-primary/90 text-white">
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Chat Us
+              </Button>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center text-gray-300 mb-2">
+                <Phone className="mr-2 h-4 w-4" />
+                <span>{customerServicePhone}</span>
               </div>
-            </div>
-            {/* Quick Links */}
-            <div>
-              <h4 className="mb-4 text-base font-semibold tracking-wider uppercase">Quick Links</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <a href="#" className="text-gray-300 transition-colors hover:text-white">
-                    New Arrivals
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-300 transition-colors hover:text-white">
-                    Flash Sale
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-300 transition-colors hover:text-white">
-                    Categories
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-300 transition-colors hover:text-white">
-                    About Us
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-300 transition-colors hover:text-white">
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-            {/* Customer Service */}
-            <div>
-              <h4 className="mb-4 text-base font-semibold tracking-wider uppercase">
-                Customer Service
-              </h4>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-center text-gray-300">
-                  <Phone className="mr-2 h-4 w-4" />
-                  <span>{customerServicePhone}</span>
-                </li>
-                <li className="flex items-center text-gray-300">
-                  <Mail className="mr-2 h-4 w-4" />
-                  <span>{customerServiceEmail}</span>
-                </li>
-                <li className="flex items-center text-gray-300">
-                  <MapPin className="mr-2 h-4 w-4" />
-                  <span>{customerServiceAddress}</span>
-                </li>
-              </ul>
-              <div className="mt-4">
-                <Button variant="outline" className="bg-primary hover:bg-primary/90 text-white">
-                  Track Order
-                </Button>
+              <div className="flex items-center justify-center text-gray-300 mb-2">
+                <Mail className="mr-2 h-4 w-4" />
+                <span>{customerServiceEmail}</span>
+              </div>
+              <div className="flex items-center justify-center text-gray-300">
+                <MapPin className="mr-2 h-4 w-4" />
+                <span>{customerServiceAddress}</span>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Bottom Footer */}
-        <div className="border-t border-gray-800 py-6">
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className="text-sm text-gray-400">© {currentYear} {appName}. All rights reserved.</p>
-            <div className="flex gap-6 text-sm text-gray-400">
-              <a href="#" className="transition-colors hover:text-white">
-                Privacy Policy
-              </a>
-              <a href="#" className="transition-colors hover:text-white">
-                Terms of Service
-              </a>
-              <a href="#" className="transition-colors hover:text-white">
-                Shipping Policy
-              </a>
-              <a href="#" className="transition-colors hover:text-white">
-                Returns
-              </a>
-            </div>
-          </div>
+        <div className="border-t border-gray-800 py-4">
+          <p className="text-center text-sm text-gray-400">
+            © {currentYear} {appName}. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

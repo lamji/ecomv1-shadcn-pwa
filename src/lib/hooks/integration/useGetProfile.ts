@@ -3,6 +3,7 @@ import { UserProfile } from "@/types/profile";
 import { useEffect } from "react";
 import { useAppDispatch } from '@/lib/store';
 import { showAlert } from '@/lib/features/alertSlice';
+import { updateProfile } from "@/lib/features/profileSlice";
 
 interface ProfileApiResponse {
   success: boolean;
@@ -19,10 +20,11 @@ export function useGetProfile() {
     endpoint: "api/profile",
     options: {
       queryKey: ["profile"],
-      staleTime: 1000 * 60 * 60, // 1 hour - consider data fresh for 1 hour
+      staleTime: 0, // Always consider data stale for immediate updates
       gcTime: 1000 * 60 * 60 * 24, // 24 hours - keep in cache for 1 day (React Query v5)
       refetchOnWindowFocus: false, // Don't refetch when window regains focus
       refetchOnReconnect: false, // Don't refetch when reconnecting
+      refetchOnMount: 'always', // Always refetch when component mounts
       retry: 1, // Only retry once on failure
       enabled: !!token,
     },
@@ -41,8 +43,6 @@ export function useGetProfile() {
         errorObj.message?.toLowerCase().includes('authentication');
 
       if (isAuthError) {
-        console.log('Authentication error detected, logging out user...');
-        
         // Clear auth data
         localStorage.removeItem('auth_token');
         localStorage.removeItem('user_data');
@@ -65,11 +65,10 @@ export function useGetProfile() {
   }, [error, setToken, dispatch]);
 
   useEffect(() => {
-    if (data?.data?.oneSignalUserId && window.OneSignal) {
-      window.OneSignal.push(['login', data.data.oneSignalUserId]);
-      console.log('OneSignal logged in with External ID:', data.data.oneSignalUserId);
+    if (data?.data) {
+      dispatch(updateProfile(data.data));
     }
-  }, [data]);
+  }, [data, dispatch]);
 
   return {
     profile: data?.data,

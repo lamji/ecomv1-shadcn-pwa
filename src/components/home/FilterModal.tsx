@@ -42,8 +42,6 @@ const FilterModal: React.FC<FilterModalProps> = ({
 
   const handleApplyFilters = () => {
     onApplyFilters(filters);
-
-    console.log('Applied filters:', filters);
     onClose();
   };
 

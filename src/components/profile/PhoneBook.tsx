@@ -51,9 +51,9 @@ export default function PhoneBook({
 
       {profile.phones.length > 0 ? (
         <div className="space-y-2">
-          {displayPhones.map(phone => (
+          {displayPhones.map((phone, id) => (
             <div
-              key={phone.id}
+              key={id}
               className="flex items-start gap-2 rounded-lg bg-gray-50 p-2 text-left"
             >
               <div className="mt-0.5 text-gray-400">

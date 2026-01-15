@@ -37,7 +37,7 @@ export default function ReactProvider({
     pathname?.startsWith('/product/') ||
     pathname === '/search' ||
     pathname === '/notifications' ||
-    pathname === '/otp';
+    pathname === '/otp' || pathname === "/update-profile";
 
   return (
     <Providers bearer={false} queryClient={queryClient}>
