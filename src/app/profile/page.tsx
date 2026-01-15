@@ -2,35 +2,37 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { useAppDispatch } from '@/lib/store';
+// import { useAppDispatch } from '@/lib/store';
 import { dummyProfile } from '@/lib/data/profile';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import OverviewTab from '@/components/profile/OverviewTab';
 import { type UserProfile } from '@/types/profile';
-import { showLoading, hideLoading } from '@/lib/features/loadingSlice';
+import { getProfileDataRedux } from '@/lib/features/profileSlice';
+// import { showLoading, hideLoading } from '@/lib/features/loadingSlice';
 import { useRouter } from 'next/navigation';
-import { useGetProfile } from '@/lib/hooks/integration/useGetProfile';
+import { useAppSelector } from '@/lib/store';
 
 export default function ProfilePage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { profile: queryProfile, isLoading: profileLoading } = useGetProfile();
-  const dispatch = useAppDispatch();
+  // const { profile: queryProfile, isLoading: profileLoading } = useGetProfile();
+  // const dispatch = useAppDispatch();
   const [profile, setProfile] = useState<UserProfile>(dummyProfile);
+  const profileData = useAppSelector(getProfileDataRedux);
 
   useEffect(() => {
-    if (queryProfile) {
-      setProfile(queryProfile);
+    if (profileData) {
+      setProfile(profileData);
     }
-  }, [queryProfile]);
+  }, [profileData]);
 
-  useEffect(() => {
-    if (profileLoading) {
-      dispatch(showLoading({ message: 'Fetching profile...' }));
-    } else {
-      dispatch(hideLoading());
-    }
-  }, [profileLoading, dispatch]);
+  // useEffect(() => {
+  //   if (profileLoading) {
+  //     dispatch(showLoading({ message: 'Fetching profile...' }));
+  //   } else {
+  //     dispatch(hideLoading());
+  //   }
+  // }, [profileLoading, dispatch]);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {

@@ -6,30 +6,29 @@ import { useRouter } from 'next/navigation';
 import { UpdateProfileData } from '@/types/profile';
 import { useGetProfile } from './useGetProfile';
 
+
 export const useUpdateProfile = () => {
-  const { refetch } = useGetProfile();
+  const {refetch:refetchProfileData} =useGetProfile()
   const dispatch = useAppDispatch();
   const router = useRouter();
 
   const { mutateAsync, isPending, error } = usePutData<UpdateProfileData>({
     baseUrl: process.env.NEXT_PUBLIC_SOCKET_URL || "",
     endpoint: "api/profile/update-profile",
+    invalidateQueryKey:["profile"],
     options: {
       retry: 1,
-      onSuccess: () => {
-        // Refetch profile data using React Query
-        refetch();
-        
+      onSuccess: () => {        
         dispatch(showAlert({
           title: 'Success!',
           message: 'Your profile has been updated successfully.',
           variant: 'success',
         }));
 
+        refetchProfileData();
         router.push('/');
       },
       onError: (error: Error) => {
-        console.error('Update profile error:', error);
         
         // Type cast to access response properties
         const axiosError = error as any;

@@ -25,7 +25,7 @@ export function usePostOtpIntegration() {
       
       if (response.success && response.token) {
         // Store token in context (similar to useLogin)
-        setToken(response.token);
+        setToken(`Bearer ${response.token}`);
         
         // Send welcome notification if oneSignalUserId is available
         if (response.oneSignalUserId) {

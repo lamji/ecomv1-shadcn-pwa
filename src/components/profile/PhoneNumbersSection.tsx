@@ -40,7 +40,7 @@ export default function PhoneNumbersSection({
         {({ push, remove }) => (
           <>
             {values.phones.map((phone, index) => (
-              <div key={phone.id} className="rounded-lg border p-4">
+              <div key={phone.id} className="rounded-lg border-0 p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <Label className="text-sm font-medium">Phone {index + 1}</Label>
                   <div className="flex items-center gap-2">

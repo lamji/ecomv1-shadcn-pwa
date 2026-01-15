@@ -45,15 +45,16 @@ export function useAuth() {
     } catch (error) {
       console.error('Logout API call failed:', error);
       
-      // Still clear local state on error, but don't redirect
+      // Still clear local state on error and redirect anyway
       localStorage.removeItem('auth_token');
       document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
       setToken(null);
       setIsAuthenticated(false);
       window.dispatchEvent(new Event('auth-changed'));
       
-      // Hide loader
+      // Hide loader and redirect even on error
       dispatch(hideLoading());
+      router.push('/login');
     }
   }, [dispatch, setToken, router]);
 

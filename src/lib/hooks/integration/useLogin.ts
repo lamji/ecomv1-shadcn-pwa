@@ -28,7 +28,7 @@ export function useLogin() {
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (token) {
-      setToken(token);
+      setToken(`Bearer ${token}`);
     }
   }, [setToken]);
 
@@ -49,7 +49,7 @@ export function useLogin() {
           // Persist token and user data
           localStorage.setItem('auth_token', token);
           localStorage.setItem('user_data', JSON.stringify(user));
-          setToken(token);
+          setToken(`Bearer ${token}`);
           
           /**
            * Use cookie for server-side auth

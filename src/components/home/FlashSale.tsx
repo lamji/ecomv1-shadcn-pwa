@@ -49,7 +49,8 @@ export default function Products({
     typeof window !== 'undefined' &&
     (window.location.pathname === '/view-all' ||
       window.location.pathname === '/' ||
-      window.location.pathname === '/search');
+      window.location.pathname === '/search' ||
+      window.location.pathname === '/new-arrivals');
 
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 

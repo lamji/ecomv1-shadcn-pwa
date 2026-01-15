@@ -12,6 +12,8 @@ export default function ImageWrapper() {
         width={120}
         height={40}
         className="object-contain"
+        priority // High priority for LCP image
+        sizes="120px"
         onError={e => console.error('Logo failed to load:', e)}
       />
     </header>

@@ -127,7 +127,7 @@ export default function UpdateProfilePage() {
               <Form className="space-y-8">
                 {/* Step 1: Phone Numbers */}
                 {currentStep === 1 && (
-                  <Card>
+                  <Card className="shadow-none border-0">
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -142,7 +142,7 @@ export default function UpdateProfilePage() {
                         Add at least one phone number for order notifications and delivery updates
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-4 shadow-none border-0">
                       <PhoneNumbersSection
                         values={values}
                         setFieldValue={setFieldValue}
@@ -156,7 +156,7 @@ export default function UpdateProfilePage() {
 
                 {/* Step 2: Addresses */}
                 {currentStep === 2 && (
-                  <Card>
+                  <Card className="shadow-none border-0">
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -171,7 +171,7 @@ export default function UpdateProfilePage() {
                         Add at least one complete address for delivery
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-4 shadow-none border-0">
                       <AddressesSection
                         values={values}
                         collapsedAddresses={collapsedAddresses}

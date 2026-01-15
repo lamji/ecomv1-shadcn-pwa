@@ -19,14 +19,14 @@ export function useGetProfile() {
     baseUrl: process.env.NEXT_PUBLIC_SOCKET_URL || "",
     endpoint: "api/profile",
     options: {
-      queryKey: ["profile"],
+      queryKey: ["profile", token],
       staleTime: 0, // Always consider data stale for immediate updates
       gcTime: 1000 * 60 * 60 * 24, // 24 hours - keep in cache for 1 day (React Query v5)
       refetchOnWindowFocus: false, // Don't refetch when window regains focus
       refetchOnReconnect: false, // Don't refetch when reconnecting
-      refetchOnMount: 'always', // Always refetch when component mounts
+      refetchOnMount: false, // Don't auto-refetch - wait for token first
       retry: 1, // Only retry once on failure
-      enabled: !!token,
+      enabled: !!token, // Only enable when token exists
     },
   });
 

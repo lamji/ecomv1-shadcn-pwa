@@ -28,12 +28,24 @@ const profileSlice = createSlice({
       state.lastFetched = null;
     },
     updateProfile: (state, action: PayloadAction<Partial<UserProfile>>) => {
-      if (state.profile) {
-        state.profile = { ...state.profile, ...action.payload };
-      }
+     
+      
+      // If state.profile is null, set it to the payload
+      // If state.profile exists, merge with payload
+      state.profile = state.profile 
+        ? { ...state.profile, ...action.payload }
+        : action.payload as UserProfile;
+        
+     
     },
   },
 });
 
 export const { clearProfile, updateProfile } = profileSlice.actions;
+
+// Selectors
+export const getProfileDataRedux = (state: { profile: ProfileState }) => state.profile.profile;
+export const getProfileLoadingRedux = (state: { profile: ProfileState }) => state.profile.isLoading;
+export const getProfileErrorRedux = (state: { profile: ProfileState }) => state.profile.error;
+
 export default profileSlice.reducer;
