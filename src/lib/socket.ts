@@ -11,7 +11,7 @@ export const socket = io(SOCKET_URL, {
 
 // Debug logging
 socket.on('connect', () => {
-  console.log('🟢 Socket connected:', socket.id);
+  console.log('🟢 Socket connected:');
 });
 
 socket.on('connect_error', (error) => {
