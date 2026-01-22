@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { socket } from '@/lib/socket';
 import { addNotification } from '@/lib/features/notificationSlice';
 import { NotificationItem } from '@/lib/data/notifications';
+import { getCurrentUserId } from '@/lib/utils/jwt';
 
 export function useSocketConnection() {
   const [isConnected, setIsConnected] = useState(socket.connected);
@@ -13,9 +14,18 @@ export function useSocketConnection() {
     const handleConnect = () => {
       setIsConnected(true);
       console.log('📡 [useSocketConnection] Connected, joining room...');
+      
+      // Join the general notification room
       socket.emit('joinRoom', 'onesignal-messages');
-      // Also join a general user room for targeted notifications
-      socket.emit('join', 'user-123'); // Hardcoded for now
+      
+      // Join user-specific room with actual user ID
+      const userId = getCurrentUserId();
+      if (userId) {
+        socket.emit('join', userId);
+        console.log(`🎯 [useSocketConnection] Joined user room: ${userId}`);
+      } else {
+        console.warn('⚠️ [useSocketConnection] No user ID found - not joining user room');
+      }
     };
     
     const handleDisconnect = () => setIsConnected(false);

@@ -34,8 +34,8 @@ export default function ResetPasswordPage() {
   const [isSuccess, setIsSuccess] = useState(false);
 
   // Get email and token from query params
-  const email = searchParams.get('email') || '';
-  const token = searchParams.get('token') || '';
+  const email = searchParams?.get('email') || '';
+  const token = searchParams?.get('token') || '';
 
   type ResetPasswordValues = { 
     password: string; 
